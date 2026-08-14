@@ -1,0 +1,17 @@
+# Ignore Aldec Riviera-PRO simulation databases
+lib/
+riviera/
+*.dataset
+*.vstf
+
+# Ignore Siemens Questa / ModelSim databases
+work/
+msim/
+*.wlf
+*.ucdb
+transcript
+
+# Ignore all simulation log files and temporary dumps
+*.log
+*.summary
+*.rpt
