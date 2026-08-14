@@ -1,0 +1,66 @@
+/* RAITON_COPYRIGHT_BEGIN                                                 */
+/* This is an automatically generated prolog.                             */
+/*                                                                        */
+/* AXI_INTERCONNECT_DESIGN/AXI_TB/master_agent.sv                         */
+/*                                                                        */
+/* RAITON CONFIDENTIAL                                                    */
+/*                                                                        */
+/* COPYRIGHT RAITON SEMICONDUCTOR PVT LTD 2018,2022                       */
+/*                                                                        */
+/* All Rights Reserved                                                    */
+/*                                                                        */
+/* NOTICE: All information contained herein is, and remains the           */
+/* property of Raiton semiconductor PVT. LTD. and its suppliers           */
+/* ,if any.  The intellectual and  technical concepts contained           */
+/* herein  are proprietary to  Raiton  semiconductor  PVT. LTD.           */
+/* they are protected  by trade secrets and / or copyright law.           */
+/* Dissemination of this  information  or reproduction of  this           */
+/* material or code is strictly forbidden unless  prior written           */
+/* permission is obtained from Raiton semiconductor PVT. LTD.             */
+/*                                                                        */
+/* RAITON_COPYRIGHT_END                                                   */
+class master_agent extends uvm_agent;
+
+   `uvm_component_utils (master_agent)
+   master_monitor     mon;
+   master_driver      drv;
+   master_sequencer   sqr;
+   config_obj         cfg; 
+   uvm_active_passive_enum is_active ; // value set by env
+
+   function new (string name = "master_agent" , uvm_component parent);
+      super.new(name,parent);
+   endfunction
+
+   extern function void build_phase   (uvm_phase phase);
+   extern function void connect_phase (uvm_phase phase);
+
+endclass :master_agent
+
+  function void master_agent :: build_phase (uvm_phase phase);
+  
+    if (!uvm_config_db #(config_obj) :: get (this , "" , "config_obj" ,cfg )) begin
+      `uvm_fatal(get_full_name(),"Config_obj get Failure");
+    end
+    
+    is_active  = cfg.is_active;
+     
+    super.build_phase (phase);
+    `uvm_info ("master_agent" , phase.get_name() , UVM_MEDIUM)
+    mon = master_monitor :: type_id :: create ("mon",this);
+    if (is_active == UVM_ACTIVE) begin
+      drv = master_driver :: type_id :: create ("drv",this);
+      sqr = master_sequencer   :: type_id :: create ("sqr",this);
+    end
+  endfunction : build_phase
+
+  function void master_agent :: connect_phase (uvm_phase phase);
+    super.connect_phase (phase);
+    `uvm_info ("master_agent::connect" , phase.get_name() , UVM_MEDIUM)
+    if(is_active == UVM_ACTIVE) begin
+      drv.seq_item_port.connect(sqr.seq_item_export);
+      drv.master_drv_intf = cfg.master_vif;
+    end
+    mon.master_mon_intf   = cfg.master_vif;
+  endfunction : connect_phase
+

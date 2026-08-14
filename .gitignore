@@ -3,6 +3,7 @@ lib/
 riviera/
 *.dataset
 *.vstf
+*.asdb
 
 # Ignore Siemens Questa / ModelSim databases
 work/
@@ -15,4 +16,7 @@ transcript
 *.log
 *.summary
 *.rpt
+*.swn
+*.swo
+*.swp
 

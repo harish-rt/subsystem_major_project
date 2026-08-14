@@ -1,0 +1,448 @@
+module core_wrapper 
+(
+  input logic clk_i,
+  input logic rst_n_i,
+
+  //peripherals
+  output         spi_clk_o,
+  output [  7:0] spi_cs_o,
+  input          spi_miso_i,
+  output         spi_mosi_o,
+
+  input          uart_rx_i,
+  output         uart_tx_o,
+
+  input  [ 31:0] gpio_input_i,
+  output [ 31:0] gpio_output_o,
+  output [ 31:0] gpio_output_enable_o,
+
+  output [ 31:0] ext1_cfg_araddr_o,
+  input          ext1_cfg_arready_i,
+  output         ext1_cfg_arvalid_o,
+  output [ 31:0] ext1_cfg_awaddr_o,
+  input          ext1_cfg_awready_i,
+  output         ext1_cfg_awvalid_o,
+  output         ext1_cfg_bready_o,
+  input  [  1:0] ext1_cfg_bresp_i,
+  input          ext1_cfg_bvalid_i,
+  input  [ 31:0] ext1_cfg_rdata_i,
+  output         ext1_cfg_rready_o,
+  input  [  1:0] ext1_cfg_rresp_i,
+  input          ext1_cfg_rvalid_i,
+  output [ 31:0] ext1_cfg_wdata_o,
+  input          ext1_cfg_wready_i,
+  output [  3:0] ext1_cfg_wstrb_o,
+  output         ext1_cfg_wvalid_o,
+  input          ext1_irq_i,
+
+  output [ 31:0] ext2_cfg_araddr_o,
+  input          ext2_cfg_arready_i,
+  output         ext2_cfg_arvalid_o,
+  output [ 31:0] ext2_cfg_awaddr_o,
+  input          ext2_cfg_awready_i,
+  output         ext2_cfg_awvalid_o,
+  output         ext2_cfg_bready_o,
+  input  [  1:0] ext2_cfg_bresp_i,
+  input          ext2_cfg_bvalid_i,
+  input  [ 31:0] ext2_cfg_rdata_i,
+  output         ext2_cfg_rready_o,
+  input  [  1:0] ext2_cfg_rresp_i,
+  input          ext2_cfg_rvalid_i,
+  output [ 31:0] ext2_cfg_wdata_o,
+  input          ext2_cfg_wready_i,
+  output [  3:0] ext2_cfg_wstrb_o,
+  output         ext2_cfg_wvalid_o,
+  input          ext2_irq_i,
+
+  output [ 31:0] ext3_cfg_araddr_o,
+  input          ext3_cfg_arready_i,
+  output         ext3_cfg_arvalid_o,
+  output [ 31:0] ext3_cfg_awaddr_o,
+  input          ext3_cfg_awready_i,
+  output         ext3_cfg_awvalid_o,
+  output         ext3_cfg_bready_o,
+  input  [  1:0] ext3_cfg_bresp_i,
+  input          ext3_cfg_bvalid_i,
+  input  [ 31:0] ext3_cfg_rdata_i,
+  output         ext3_cfg_rready_o,
+  input  [  1:0] ext3_cfg_rresp_i,
+  input          ext3_cfg_rvalid_i,
+  output [ 31:0] ext3_cfg_wdata_o,
+  input          ext3_cfg_wready_i,
+  output [  3:0] ext3_cfg_wstrb_o,
+  output         ext3_cfg_wvalid_o,
+  input          ext3_irq_i,
+
+  output rsta_busy_0,
+  output rstb_busy_0,
+
+  axi4_intf ext_axi4_slave,
+  axi4_intf ext_axi4_master,
+
+  //S00
+  axi4_lite_intf inst_bridge2axi_int,
+  //S02
+  axi4_lite_intf data_bridge2axi_int
+);
+
+  wire cdma_irq, core_perif_irq, intr_ctrl_irq;
+  wire [31:0] intr_0;
+
+  // Reset Controls
+  reg        internal_rst_n, internal_rst_n_2;     
+  reg [31:0] rst_count;
+
+  // Core Clock Input
+  logic      core_clk_i;
+
+  axi4_lite_intf	axi_int2core_peri 	();
+  axi4_lite_intf 	axi_int2main_mem	();
+
+
+//peripheral intr to intr cntrl
+  assign intr_0[26]               = cdma_irq;//cdma interrupt out
+  assign intr_0[27]               = core_perif_irq;//output form core periphar interrupt contoller
+
+  //ACLK
+  assign axi_int2core_peri.ACLK   = clk_i;
+  assign axi_int2main_mem.ACLK    = clk_i;
+
+  //RESETn
+  assign axi_int2core_peri.ARESETn  = internal_rst_n;               // to core peripheral
+  assign axi_int2main_mem.ARESETn   = internal_rst_n_2;             // Main Memory Unit
+  
+  always @(negedge rst_n_i) begin
+    rst_count <= 'd0;
+  end
+
+  always @(posedge clk_i)  begin
+    if(!rst_n_i) begin
+      // AXI Inter-connect
+      if(rst_count >= 20) begin
+        internal_rst_n  <= 1'b1;
+        rst_count       <= rst_count + 1'b1;
+      end
+      else begin
+        internal_rst_n  <= 1'b0;
+        rst_count       <= rst_count + 1'b1;
+      end
+      // Memory Unit
+      if(rst_count >= 1) begin
+        internal_rst_n_2 <= 1'b1;
+      end
+      else begin
+        internal_rst_n_2 <= 1'b0;
+      end
+    end
+    else begin
+      internal_rst_n    <= 1'b1;
+      internal_rst_n_2  <= 1'b1;
+      rst_count         <= 'd0;
+    end      
+  end
+
+//memory unit axi4_lite_intf
+ axi4_lite_memory_unit #(
+	.AXI_DW         (32	), 
+	.AXI_AW         (32	), 
+	.MEM_BASE_ADDR  (3'b100	), 
+	.MEM_BYTES      (29	)
+      ) AXI_SLAVE_MEM ( 
+	.s_axi_intf	(axi_int2main_mem)
+      );
+
+//this wrap consist of xilinx integreated ip's interconnect, cdma, irq_ctrl.
+ core_ip_wraps IPS_CORE (
+    .ACLK_0			        (clk_i		   ),
+    .ARESETN_0			    (internal_rst_n),
+
+    .M00_ACLK_0			    (clk_i		   ),                             //CDMA Reg
+    .M00_ARESETN_0		    (internal_rst_n), 
+    
+    .M01_ACLK_0			    (axi_int2core_peri.ACLK	  ),                  //Peripheral Core
+    .M01_ARESETN_0		    (axi_int2core_peri.ARESETn),
+    .M01_AXI_0_araddr		(axi_int2core_peri.ARADDR	),
+    .M01_AXI_0_arprot		(			                ),
+    .M01_AXI_0_arready	    (axi_int2core_peri.ARREADY  ),
+    .M01_AXI_0_arvalid	    (axi_int2core_peri.ARVALID  ),
+    .M01_AXI_0_awaddr		(axi_int2core_peri.AWADDR	),
+    .M01_AXI_0_awprot		(				            ),
+    .M01_AXI_0_awready	    (axi_int2core_peri.ARREADY  ),
+    .M01_AXI_0_awvalid	    (axi_int2core_peri.AWVALID  ),
+    .M01_AXI_0_bready		(axi_int2core_peri.BREADY	),
+    .M01_AXI_0_bresp		(axi_int2core_peri.BRESP	),
+    .M01_AXI_0_bvalid		(axi_int2core_peri.BVALID	),
+    .M01_AXI_0_rdata		(axi_int2core_peri.RDATA	),
+    .M01_AXI_0_rready		(axi_int2core_peri.RREADY	),
+    .M01_AXI_0_rresp		(axi_int2core_peri.RRESP	),
+    .M01_AXI_0_rvalid		(axi_int2core_peri.RVALID	),
+    .M01_AXI_0_wdata		(axi_int2core_peri.WDATA	),
+    .M01_AXI_0_wready		(axi_int2core_peri.WREADY	),
+    .M01_AXI_0_wstrb		(axi_int2core_peri.WSTRB	),
+    .M01_AXI_0_wvalid		(axi_int2core_peri.WVALID	),
+
+    .M02_ACLK_0			    (clk_i		   ),                             //Interrupt Ctrl
+    .M02_ARESETN_0		    (internal_rst_n),
+
+    .M03_ACLK_0	            (clk_i		   ),                             //BRAM Ctrl
+    .M03_ARESETN_0	        (internal_rst_n),
+
+    .M04_ACLK_0			    (axi_int2main_mem.ACLK    	),                //AXI4lite Main Mem
+    .M04_ARESETN_0		    (internal_rst_n 	        ),
+    .M04_AXI_0_araddr		(axi_int2main_mem.ARADDR  	),
+    .M04_AXI_0_arprot		(      		          	    ),
+    .M04_AXI_0_arready	    (axi_int2main_mem.ARREADY 	),
+    .M04_AXI_0_arvalid	    (axi_int2main_mem.ARVALID 	),
+    .M04_AXI_0_awaddr		(axi_int2main_mem.AWADDR  	),
+    .M04_AXI_0_awprot		(                         	),
+    .M04_AXI_0_awready	    (axi_int2main_mem.AWREADY 	),
+    .M04_AXI_0_awvalid	    (axi_int2main_mem.AWVALID 	),
+    .M04_AXI_0_bready		(axi_int2main_mem.BREADY  	),
+    .M04_AXI_0_bresp		(axi_int2main_mem.BRESP   	),
+    .M04_AXI_0_bvalid		(axi_int2main_mem.BVALID  	),
+    .M04_AXI_0_rdata		(axi_int2main_mem.RDATA   	),
+    .M04_AXI_0_rready		(axi_int2main_mem.RREADY  	),
+    .M04_AXI_0_rresp		(axi_int2main_mem.RRESP   	),
+    .M04_AXI_0_rvalid		(axi_int2main_mem.RVALID  	),
+    .M04_AXI_0_wdata		(axi_int2main_mem.WDATA   	),
+    .M04_AXI_0_wready		(axi_int2main_mem.WREADY  	),
+    .M04_AXI_0_wstrb		(axi_int2main_mem.WSTRB   	),
+    .M04_AXI_0_wvalid		(axi_int2main_mem.WVALID  	),
+
+    .M05_ACLK_0			    (ext_axi4_master.ACLK	  	),                //AXI4 Agent
+    .M05_ARESETN_0		    (ext_axi4_master.ARESETn  	),
+    .M05_AXI_0_araddr		(ext_axi4_master.ARADDR	  	),
+    .M05_AXI_0_arburst	    (ext_axi4_master.ARBURST  	),
+    .M05_AXI_0_arcache	    (ext_axi4_master.ARCACHE  	),
+    .M05_AXI_0_arid	  	    (ext_axi4_master.ARID	  	),
+    .M05_AXI_0_arlen		(ext_axi4_master.ARLEN	  	),
+    .M05_AXI_0_arlock		(ext_axi4_master.ARLOCK	  	),
+    .M05_AXI_0_arprot		(ext_axi4_master.ARPROT	  	),
+    .M05_AXI_0_arqos		(ext_axi4_master.ARQOS	  	),
+    .M05_AXI_0_arready	    (ext_axi4_master.ARREADY  	),
+    .M05_AXI_0_arregion	    (ext_axi4_master.ARREGION 	),
+    .M05_AXI_0_arsize		(ext_axi4_master.ARSIZE	  	),
+    .M05_AXI_0_arvalid	    (ext_axi4_master.ARVALID  	),
+    .M05_AXI_0_awaddr		(ext_axi4_master.AWADDR	  	),
+    .M05_AXI_0_awburst	    (ext_axi4_master.AWBURST  	),
+    .M05_AXI_0_awcache	    (ext_axi4_master.AWCACHE  	),
+    .M05_AXI_0_awid		    (ext_axi4_master.AWID	  	),
+    .M05_AXI_0_awlen		(ext_axi4_master.AWLEN	  	),
+    .M05_AXI_0_awlock		(ext_axi4_master.AWLOCK	  	),
+    .M05_AXI_0_awprot		(ext_axi4_master.AWPROT	  	),
+    .M05_AXI_0_awqos		(ext_axi4_master.AWQOS	  	),
+    .M05_AXI_0_awready	    (ext_axi4_master.AWREADY  	),
+    .M05_AXI_0_awregion	    (ext_axi4_master.AWREGION 	),
+    .M05_AXI_0_awsize		(ext_axi4_master.AWSIZE	  	),
+    .M05_AXI_0_awvalid	    (ext_axi4_master.AWVALID  	),
+    .M05_AXI_0_bid		    (ext_axi4_master.BID	  	),
+    .M05_AXI_0_bready		(ext_axi4_master.BREADY	  	),
+    .M05_AXI_0_bresp		(ext_axi4_master.BRESP	  	),
+    .M05_AXI_0_bvalid		(ext_axi4_master.BVALID	  	),
+    .M05_AXI_0_rdata		(ext_axi4_master.RDATA	  	),
+    .M05_AXI_0_rid		    (ext_axi4_master.RID	  	),
+    .M05_AXI_0_rlast		(ext_axi4_master.RLAST	  	),
+    .M05_AXI_0_rready		(ext_axi4_master.RREADY	  	),
+    .M05_AXI_0_rresp		(ext_axi4_master.RRESP	  	),
+    .M05_AXI_0_rvalid		(ext_axi4_master.RVALID	  	),
+    .M05_AXI_0_wdata		(ext_axi4_master.WDATA	  	),
+    .M05_AXI_0_wlast		(ext_axi4_master.WLAST	  	),
+    .M05_AXI_0_wready		(ext_axi4_master.WREADY	  	),
+    .M05_AXI_0_wstrb		(ext_axi4_master.WSTRB	  	),
+    .M05_AXI_0_wvalid		(ext_axi4_master.WVALID   	),
+
+    .S00_ACLK_0			    (inst_bridge2axi_int.ACLK	),                //Instruction Bridge
+    .S00_ARESETN_0		    (inst_bridge2axi_int.ARESETn),
+    .S00_AXI_0_araddr		(inst_bridge2axi_int.ARADDR ),
+    .S00_AXI_0_arprot		(                       	),
+    .S00_AXI_0_arready	    (inst_bridge2axi_int.ARREADY),
+    .S00_AXI_0_arvalid	    (inst_bridge2axi_int.ARVALID),
+    .S00_AXI_0_awaddr		(inst_bridge2axi_int.AWADDR ),
+    .S00_AXI_0_awprot		(                       	),
+    .S00_AXI_0_awready	    (inst_bridge2axi_int.AWREADY),
+    .S00_AXI_0_awvalid	    (inst_bridge2axi_int.AWVALID),
+    .S00_AXI_0_bready		(inst_bridge2axi_int.BREADY ),
+    .S00_AXI_0_bresp		(inst_bridge2axi_int.BRESP  ),
+    .S00_AXI_0_bvalid		(inst_bridge2axi_int.BVALID ),
+    .S00_AXI_0_rdata		(inst_bridge2axi_int.RDATA  ),
+    .S00_AXI_0_rready		(inst_bridge2axi_int.RREADY ),
+    .S00_AXI_0_rresp		(inst_bridge2axi_int.RRESP  ),
+    .S00_AXI_0_rvalid		(inst_bridge2axi_int.RVALID ),
+    .S00_AXI_0_wdata		(inst_bridge2axi_int.WDATA  ),
+    .S00_AXI_0_wready		(inst_bridge2axi_int.WREADY ),
+    .S00_AXI_0_wstrb		(inst_bridge2axi_int.WSTRB  ),
+    .S00_AXI_0_wvalid		(inst_bridge2axi_int.WVALID ),
+   
+    .S02_ACLK_0			    (data_bridge2axi_int.ACLK	),                 //Data Bridge
+    .S02_ARESETN_0		    (data_bridge2axi_int.ARESETn),
+    .S02_AXI_0_araddr		(data_bridge2axi_int.ARADDR ),
+    .S02_AXI_0_arprot		(                       	),
+    .S02_AXI_0_arready	    (data_bridge2axi_int.ARREADY),
+    .S02_AXI_0_arvalid	    (data_bridge2axi_int.ARVALID),
+    .S02_AXI_0_awaddr		(data_bridge2axi_int.AWADDR ),
+    .S02_AXI_0_awprot		(                      		),
+    .S02_AXI_0_awready	    (data_bridge2axi_int.AWREADY),
+    .S02_AXI_0_awvalid	    (data_bridge2axi_int.AWVALID),
+    .S02_AXI_0_bready		(data_bridge2axi_int.BREADY ),
+    .S02_AXI_0_bresp		(data_bridge2axi_int.BRESP  ),
+    .S02_AXI_0_bvalid		(data_bridge2axi_int.BVALID ),
+    .S02_AXI_0_rdata		(data_bridge2axi_int.RDATA  ),
+    .S02_AXI_0_rready		(data_bridge2axi_int.RREADY ),
+    .S02_AXI_0_rresp		(data_bridge2axi_int.RRESP 	),
+    .S02_AXI_0_rvalid		(data_bridge2axi_int.RVALID	),
+    .S02_AXI_0_wdata		(data_bridge2axi_int.WDATA  ),
+    .S02_AXI_0_wready		(data_bridge2axi_int.WREADY ),
+    .S02_AXI_0_wstrb		(data_bridge2axi_int.WSTRB  ),
+    .S02_AXI_0_wvalid		(data_bridge2axi_int.WVALID ),
+
+    .S04_ACLK_0			    (ext_axi4_slave.ACLK		),                //AXI4 Agent
+    .S04_ARESETN_0		    (ext_axi4_slave.ARESETn		),
+    .S04_AXI_0_araddr		(ext_axi4_slave.ARADDR		),
+    .S04_AXI_0_arburst	    (ext_axi4_slave.ARBURST		),
+    .S04_AXI_0_arcache	    (ext_axi4_slave.ARCACHE		),
+    .S04_AXI_0_arid		    (ext_axi4_slave.ARID		),
+    .S04_AXI_0_arlen		(ext_axi4_slave.ARLEN		),
+    .S04_AXI_0_arlock		(ext_axi4_slave.ARLOCK		),
+    .S04_AXI_0_arprot		(ext_axi4_slave.ARPROT		),
+    .S04_AXI_0_arqos		(ext_axi4_slave.ARQOS		),
+    .S04_AXI_0_arready	    (ext_axi4_slave.ARREADY		),
+    .S04_AXI_0_arregion	    (ext_axi4_slave.ARREGION	),
+    .S04_AXI_0_arsize		(ext_axi4_slave.ARSIZE		),
+    .S04_AXI_0_arvalid	    (ext_axi4_slave.ARVALID		),
+    .S04_AXI_0_awaddr		(ext_axi4_slave.AWADDR		),
+    .S04_AXI_0_awburst	    (ext_axi4_slave.AWBURST		),
+    .S04_AXI_0_awcache	    (ext_axi4_slave.AWCACHE		),
+    .S04_AXI_0_awid		    (ext_axi4_slave.AWID		),
+    .S04_AXI_0_awlen		(ext_axi4_slave.AWLEN		),
+    .S04_AXI_0_awlock		(ext_axi4_slave.AWLOCK		),
+    .S04_AXI_0_awprot		(ext_axi4_slave.AWPROT		),
+    .S04_AXI_0_awqos		(ext_axi4_slave.AWQOS		),
+    .S04_AXI_0_awready	    (ext_axi4_slave.AWREADY		),
+    .S04_AXI_0_awregion	    (ext_axi4_slave.AWREGION	),
+    .S04_AXI_0_awsize		(ext_axi4_slave.AWSIZE		),
+    .S04_AXI_0_awvalid	    (ext_axi4_slave.AWVALID		),
+    .S04_AXI_0_bid		    (ext_axi4_slave.BID		    ),
+    .S04_AXI_0_bready		(ext_axi4_slave.BREADY		),
+    .S04_AXI_0_bresp		(ext_axi4_slave.BRESP		),
+    .S04_AXI_0_bvalid		(ext_axi4_slave.BVALID		),
+    .S04_AXI_0_rdata		(ext_axi4_slave.RDATA		),
+    .S04_AXI_0_rid		    (ext_axi4_slave.RID		    ),
+    .S04_AXI_0_rlast		(ext_axi4_slave.RLAST		),
+    .S04_AXI_0_rready		(ext_axi4_slave.RREADY		),
+    .S04_AXI_0_rresp		(ext_axi4_slave.RRESP		),
+    .S04_AXI_0_rvalid		(ext_axi4_slave.RVALID		),
+    .S04_AXI_0_wdata		(ext_axi4_slave.WDATA		),
+    .S04_AXI_0_wlast		(ext_axi4_slave.WLAST		),
+    .S04_AXI_0_wready		(ext_axi4_slave.WREADY		),
+    .S04_AXI_0_wstrb		(ext_axi4_slave.WSTRB		),
+    .S04_AXI_0_wvalid		(ext_axi4_slave.WVALID		),
+
+    .cdma_introut_0         (cdma_irq       ),
+    .intr_0                 (intr_0         ),
+    .irq_0			        (intr_ctrl_irq	), 
+
+    .rsta_busy_0		    (rsta_busy_0		),
+    .rstb_busy_0		    (rstb_busy_0		)
+    );
+
+
+//peripheral_controllar_core
+ core_soc #(
+              .CLK_FREQ		  (50000000	),
+              .BAUDRATE		  (1000000	),
+              .C_SCK_RATIO	  (50	    )
+           ) 
+           CORE_PERIF_CTRL  (
+              .clk_i		        (axi_int2core_peri.ACLK	    ),
+              .rst_i		        (axi_int2core_peri.ARESETn  ),
+              .inport_awvalid_i	    (axi_int2core_peri.AWVALID  ),
+              .inport_awaddr_i	    (axi_int2core_peri.AWADDR	),
+              .inport_wvalid_i	    (axi_int2core_peri.WVALID 	),
+              .inport_wdata_i	    (axi_int2core_peri.WDATA	),
+              .inport_wstrb_i	    (axi_int2core_peri.WSTRB	),
+              .inport_bready_i	    (axi_int2core_peri.BREADY	),
+              .inport_arvalid_i	    (axi_int2core_peri.ARVALID	),
+              .inport_araddr_i	    (axi_int2core_peri.ARADDR	),
+              .inport_rready_i	    (axi_int2core_peri.RREADY	),
+              .inport_awready_o	    (axi_int2core_peri.AWREADY	),
+              .inport_wready_o	    (axi_int2core_peri.WREADY	),
+              .inport_bvalid_o	    (axi_int2core_peri.BVALID	),
+              .inport_bresp_o	    (axi_int2core_peri.BRESP	),
+              .inport_arready_o	    (axi_int2core_peri.ARREADY	),
+              .inport_rvalid_o	    (axi_int2core_peri.RVALID	),
+              .inport_rdata_o	    (axi_int2core_peri.RDATA	),
+              .inport_rresp_o	    (axi_int2core_peri.RRESP	),
+          
+              .spi_miso_i		      (spi_miso_i			),
+              .spi_clk_o		      (spi_clk_o			),
+              .spi_mosi_o		      (spi_mosi_o			),
+              .spi_cs_o		          (spi_cs_o			    ),
+                                                                  
+              .uart_rx_i		      (uart_rx_i			),
+              .uart_tx_o		      (uart_tx_o			),
+                                                                  
+              .gpio_input_i	          (gpio_input_i         ),
+              .gpio_output_o	      (gpio_output_o        ),
+              .gpio_output_enable_o   (gpio_output_enable_o	),
+                                                                    
+              .ext1_cfg_araddr_o	  (ext1_cfg_araddr_o	),
+              .ext1_cfg_arready_i	  (ext1_cfg_arready_i	),
+              .ext1_cfg_arvalid_o	  (ext1_cfg_arvalid_o	),
+              .ext1_cfg_awaddr_o	  (ext1_cfg_awaddr_o	),
+              .ext1_cfg_awready_i	  (ext1_cfg_awready_i	),
+              .ext1_cfg_awvalid_o	  (ext1_cfg_awvalid_o	),
+              .ext1_cfg_bready_o	  (ext1_cfg_bready_o	),
+              .ext1_cfg_bresp_i	      (ext1_cfg_bresp_i		),
+              .ext1_cfg_bvalid_i	  (ext1_cfg_bvalid_i	),
+              .ext1_cfg_rdata_i	      (ext1_cfg_rdata_i		),
+              .ext1_cfg_rready_o	  (ext1_cfg_rready_o	),
+              .ext1_cfg_rresp_i	      (ext1_cfg_rresp_i		),
+              .ext1_cfg_rvalid_i	  (ext1_cfg_rvalid_i	),
+              .ext1_cfg_wdata_o	      (ext1_cfg_wdata_o		),
+              .ext1_cfg_wready_i	  (ext1_cfg_wready_i	),
+              .ext1_cfg_wstrb_o	      (ext1_cfg_wstrb_o		),
+              .ext1_cfg_wvalid_o	  (ext1_cfg_wvalid_o	),
+              .ext1_irq_i		      (ext1_irq_i			),
+                                                                    
+              .ext2_cfg_araddr_o	  (ext2_cfg_araddr_o	),
+              .ext2_cfg_arready_i	  (ext2_cfg_arready_i	),
+              .ext2_cfg_arvalid_o	  (ext2_cfg_arvalid_o	),
+              .ext2_cfg_awaddr_o	  (ext2_cfg_awaddr_o	),
+              .ext2_cfg_awready_i	  (ext2_cfg_awready_i	),
+              .ext2_cfg_awvalid_o	  (ext2_cfg_awvalid_o	),
+              .ext2_cfg_bready_o	  (ext2_cfg_bready_o	),
+              .ext2_cfg_bresp_i	      (ext2_cfg_bresp_i		),
+              .ext2_cfg_bvalid_i	  (ext2_cfg_bvalid_i	),
+              .ext2_cfg_rdata_i	      (ext2_cfg_rdata_i		),
+              .ext2_cfg_rready_o	  (ext2_cfg_rready_o	),
+              .ext2_cfg_rresp_i	      (ext2_cfg_rresp_i		),
+              .ext2_cfg_rvalid_i	  (ext2_cfg_rvalid_i	),
+              .ext2_cfg_wdata_o	      (ext2_cfg_wdata_o		),
+              .ext2_cfg_wready_i	  (ext2_cfg_wready_i	),
+              .ext2_cfg_wstrb_o	      (ext2_cfg_wstrb_o		),
+              .ext2_cfg_wvalid_o	  (ext2_cfg_wvalid_o	),
+              .ext2_irq_i		      (ext2_irq_i			),
+                                                                    
+              .ext3_cfg_araddr_o	  (ext3_cfg_araddr_o	),
+              .ext3_cfg_arready_i	  (ext3_cfg_arready_i	),
+              .ext3_cfg_arvalid_o	  (ext3_cfg_arvalid_o	),
+              .ext3_cfg_awaddr_o	  (ext3_cfg_awaddr_o	),
+              .ext3_cfg_awready_i	  (ext3_cfg_awready_i	),
+              .ext3_cfg_awvalid_o	  (ext3_cfg_awvalid_o	),
+              .ext3_cfg_bready_o	  (ext3_cfg_bready_o	),
+              .ext3_cfg_bresp_i	      (ext3_cfg_bresp_i		),
+              .ext3_cfg_bvalid_i	  (ext3_cfg_bvalid_i	),
+              .ext3_cfg_rdata_i	      (ext3_cfg_rdata_i		),
+              .ext3_cfg_rready_o	  (ext3_cfg_rready_o	),
+              .ext3_cfg_rresp_i	      (ext3_cfg_rresp_i		),
+              .ext3_cfg_rvalid_i	  (ext3_cfg_rvalid_i	),
+              .ext3_cfg_wdata_o	      (ext3_cfg_wdata_o		),
+              .ext3_cfg_wready_i	  (ext3_cfg_wready_i	),
+              .ext3_cfg_wstrb_o	      (ext3_cfg_wstrb_o		),
+              .ext3_cfg_wvalid_o	  (ext3_cfg_wvalid_o	),
+              .ext3_irq_i		      (ext3_irq_i			),
+                                                                    
+              .intr_o		          (core_perif_irq		)
+            );
+
+endmodule 
