@@ -1,9 +1,13 @@
 # Ignore Aldec Riviera-PRO simulation databases
 lib/
 riviera/
+tb2/
+tbold/
 *.dataset
 *.vstf
 *.asdb
+*.awc
+*.error
 
 # Ignore Siemens Questa / ModelSim databases
 work/
