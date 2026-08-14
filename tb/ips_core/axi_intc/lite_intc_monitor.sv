@@ -106,7 +106,7 @@ endclass
 				end
     join
  
-  endtask : main_phase
+  endtask:main_phase
 
   task lite_intc_monitor :: mon_write_address();
     wait(mon_if.axi_awvalid && mon_if.axi_awready) begin
