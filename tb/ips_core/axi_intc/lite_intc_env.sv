@@ -10,7 +10,7 @@ class axi_lite_intc_env extends uvm_env;
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
         `uvm_info("axi_lite_intc_env::build", "inside_lite_intc_env_build_phase", UVM_MEDIUM)
-        if(!uvm_config_db #(intc_config_obj)::get(this,"","config_obj",obj))
+        if(!uvm_config_db #(intc_config_obj)::get(this,"","intc_config_obj",obj))
             `uvm_fatal(get_full_name(),"Config_obj get Failure")
 
             lite_intc_agt   = axi_lite_intc_agent::type_id::create("lite_intc_agt",this);
