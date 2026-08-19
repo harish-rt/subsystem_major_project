@@ -17,7 +17,9 @@ module top;
     axi4_intf master_if();
     axi4_intf slave_if();
 
-    axi4_lite_intf lite_inst_if();
+    //S00
+    axi4_lite_intf axil_riscv_if();
+    //S02
     axi4_lite_intf lite_data_if();
 
 // AXI Interrupt Controller
@@ -106,10 +108,11 @@ module top;
 
 //instructions and data interfaces
         //S00
-        .inst_bridge2axi_int(lite_inst_if),
+        .inst_bridge2axi_int(axil_riscv_if),
         //S02
         .data_bridge2axi_int(lite_data_if)
     );
+
 
     assign lite_intc_if.axi_araddr  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_ARADDR;
     assign lite_intc_if.axi_arready = dut.IPS_CORE.axi_interconnect_0_M02_AXI_ARREADY;
@@ -131,9 +134,16 @@ module top;
 
     assign intc_if.intc_irq         = dut.intr_ctrl_irq;
     assign intc_if.intc_intr        = dut.intr_0;
+    
+    assign axil_riscv_if.ACLK       = aclk;
+    assign axil_riscv_if.ARESETn    = areset_n;
 
     initial begin
-        run_test("base_test");
+        run_test("load_bram_test");
+        //run_test("read_bram_test");
+        //run_test("config_cdma_ral_test");
+        //run_test("read_cdma_test");
+        //run_test("base_test");
     end
 
     initial begin
@@ -144,18 +154,26 @@ module top;
         areset_n = 0;
         repeat(16)@(posedge aclk);
         areset_n = 1;
-        #3000;
-        $finish();
+        //#3000;
+        //$finish();
     end
 
     intc_config_obj                 obj;
+    cpu_config_obj                  cpu_obj;
     
     initial begin
         obj                     =   new("obj");
+        //INTC
         obj.axi_lite_is_active  =   UVM_PASSIVE;
-        obj.intc_is_active      =   UVM_PASSIVE;
         obj.lite_intc_intf      =   lite_intc_if;
+        obj.intc_is_active      =   UVM_PASSIVE;
         obj.intc_if             =   intc_if;
-        uvm_config_db #(intc_config_obj)::set(null,"*","config_obj",obj);
+        uvm_config_db #(intc_config_obj)::  set(null,"*","intc_config_obj",obj);
+
+        //CPU
+        cpu_obj                   =   new("cpu_obj");
+        cpu_obj.riscv_is_active   =   UVM_ACTIVE;
+        cpu_obj.riscv_lite_if     =   axil_riscv_if;
+        uvm_config_db #(cpu_config_obj)::   set(null,"*","cpu_config_obj",cpu_obj);
     end
 endmodule

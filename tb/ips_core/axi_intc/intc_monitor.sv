@@ -22,7 +22,7 @@ endclass
     function void intc_monitor :: build_phase (uvm_phase phase);
         `uvm_info ("intc_monitor :: build_phase started  ", "",UVM_LOW)
         super.build_phase(phase);
-        if(!uvm_config_db #(intc_config_obj)::get(this,"","config_obj",cfg))
+        if(!uvm_config_db #(intc_config_obj)::get(this,"","intc_config_obj",cfg))
             `uvm_fatal(get_full_name(),"Config_obj get Failure")
         
         mon_intc_ap = new("mon_intc_ap", this);

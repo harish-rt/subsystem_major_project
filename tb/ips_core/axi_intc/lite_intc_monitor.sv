@@ -36,12 +36,12 @@ endclass
 
   function void lite_intc_monitor :: build_phase (uvm_phase phase);
      super.build_phase (phase);
-        if(!uvm_config_db #(intc_config_obj)::get(this,"","config_obj",obj))
+        if(!uvm_config_db #(intc_config_obj)::get(this,"","intc_config_obj",obj))
             `uvm_fatal(get_full_name(),"Config_obj get Failure")
-     mon_ap 			= new ("mon_ap",this);
-		 mon_seqr_ap	= new ("mon_seqr_ap",this);
-		 dummy_seq		= lite_intc_seq_item :: type_id :: create("dummy_seq");
-     `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
+            mon_ap 			= new ("mon_ap",this);
+		    mon_seqr_ap	= new ("mon_seqr_ap",this);
+		    dummy_seq		= lite_intc_seq_item :: type_id :: create("dummy_seq");
+            `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
   endfunction : build_phase
 
   function void lite_intc_monitor :: connect_phase (uvm_phase phase);
