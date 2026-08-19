@@ -106,7 +106,7 @@ module top;
         .ext_axi4_master(master_if),
         .ext_axi4_slave(slave_if),
 
-//instructions and data interfaces
+    //instructions and data interfaces
         //S00
         .inst_bridge2axi_int(axil_riscv_if),
         //S02
@@ -114,32 +114,43 @@ module top;
     );
 
 
-    assign lite_intc_if.axi_araddr  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_ARADDR;
-    assign lite_intc_if.axi_arready = dut.IPS_CORE.axi_interconnect_0_M02_AXI_ARREADY;
-    assign lite_intc_if.axi_arvalid = dut.IPS_CORE.axi_interconnect_0_M02_AXI_ARVALID;
-    assign lite_intc_if.axi_awaddr  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_AWADDR;
-    assign lite_intc_if.axi_awready = dut.IPS_CORE.axi_interconnect_0_M02_AXI_AWREADY;
-    assign lite_intc_if.axi_awvalid = dut.IPS_CORE.axi_interconnect_0_M02_AXI_AWVALID;
-    assign lite_intc_if.axi_bready  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_BREADY;
-    assign lite_intc_if.axi_bresp   = dut.IPS_CORE.axi_interconnect_0_M02_AXI_BRESP;
-    assign lite_intc_if.axi_bvalid  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_BVALID;
-    assign lite_intc_if.axi_rdata   = dut.IPS_CORE.axi_interconnect_0_M02_AXI_RDATA;
-    assign lite_intc_if.axi_rready  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_RREADY;
-    assign lite_intc_if.axi_rresp   = dut.IPS_CORE.axi_interconnect_0_M02_AXI_RRESP;
-    assign lite_intc_if.axi_rvalid  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_RVALID;
-    assign lite_intc_if.axi_wdata   = dut.IPS_CORE.axi_interconnect_0_M02_AXI_WDATA;
-    assign lite_intc_if.axi_wready  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_WREADY;
-    assign lite_intc_if.axi_wstrb   = dut.IPS_CORE.axi_interconnect_0_M02_AXI_WSTRB;
-    assign lite_intc_if.axi_wvalid  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_WVALID;
-
-    assign intc_if.intc_irq         = dut.intr_ctrl_irq;
-    assign intc_if.intc_intr        = dut.intr_0;
+    // 2. Map the deep hierarchical paths directly to your interface fields
+    // --- Write Channels (AW) ---
+    assign lite_intc_if.axi_awaddr      = dut.IPS_CORE.axi_intc_0.s_axi_awaddr;
+    assign lite_intc_if.axi_awready     = dut.IPS_CORE.axi_intc_0.s_axi_awready;
     
+    // --- Write Data Channel (W) ---
+    assign lite_intc_if.axi_wdata   = dut.IPS_CORE.axi_intc_0.s_axi_wdata;
+    assign lite_intc_if.axi_wstrb   = dut.IPS_CORE.axi_intc_0.s_axi_wstrb;
+    assign lite_intc_if.axi_wvalid  = dut.IPS_CORE.axi_intc_0.s_axi_wvalid;
+    assign lite_intc_if.axi_wready  = dut.IPS_CORE.axi_intc_0.s_axi_wready;
+    
+    // --- Write Response Channel (B) ---
+    assign lite_intc_if.axi_bresp   = dut.IPS_CORE.axi_intc_0.s_axi_bresp;
+    assign lite_intc_if.axi_bvalid  = dut.IPS_CORE.axi_intc_0.s_axi_bvalid;
+    assign lite_intc_if.axi_bready  = dut.IPS_CORE.axi_intc_0.s_axi_bready;
+    
+    // --- Read Channels (AR) ---
+    assign lite_intc_if.axi_araddr      = dut.IPS_CORE.axi_intc_0.s_axi_araddr;
+    assign lite_intc_if.axi_arvalid     = dut.IPS_CORE.axi_intc_0.s_axi_arvalid;
+    assign lite_intc_if.axi_arready     = dut.IPS_CORE.axi_intc_0.s_axi_arready;
+    // --- Read Data Channel (R) ---
+    assign lite_intc_if.axi_rdata   = dut.IPS_CORE.axi_intc_0.s_axi_rdata;
+    assign lite_intc_if.axi_rresp   = dut.IPS_CORE.axi_intc_0.s_axi_rresp;
+    assign lite_intc_if.axi_rvalid  = dut.IPS_CORE.axi_intc_0.s_axi_rvalid;
+    assign lite_intc_if.axi_rready  = dut.IPS_CORE.axi_intc_0.s_axi_rready;
+
+
+    // Interrupt Wires
+    assign intc_if.intc_irq         = dut.intr_ctrl_irq;
+    assign intc_if.intc_intr        = dut.intr_0;   //CDMA is 26 | Core Peri is 27
+
     assign axil_riscv_if.ACLK       = aclk;
     assign axil_riscv_if.ARESETn    = areset_n;
 
     initial begin
-        run_test("load_bram_test");
+        run_test("config_intc_test");
+        //run_test("load_bram_test");
         //run_test("read_bram_test");
         //run_test("config_cdma_ral_test");
         //run_test("read_cdma_test");
