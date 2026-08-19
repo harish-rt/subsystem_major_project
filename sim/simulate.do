@@ -29,11 +29,12 @@ vsim -advdataflow -sv_seed random +access +rwc +m+top +UVM_VERBOSITY=UVM_DEBUG +
 -L core_wrapper \
 -L xil_defaultlib \
 -O0 xil_defaultlib.top core_ip_wraps.glbl \
--l sim_txt.log \
--do "
-add wave -recursive /top/axil_riscv_if/*;
-add wave -recursive /top/lite_intc_if/*;
-run -all;"
+-l sim_txt.log
+
+add wave -recursive /top/axil_riscv_if/*
+add wave -recursive /top/lite_intc_if/*
+add wave -recursive /top/intc_if/*
+run -all
 
 
 

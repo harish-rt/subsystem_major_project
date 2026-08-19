@@ -38,4 +38,3 @@ class cpu_env extends uvm_agent;
             end
         endfunction
 endclass
-
