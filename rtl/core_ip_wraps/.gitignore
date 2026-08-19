@@ -1,0 +1,9 @@
+# Sub IPs
+riviera/*.cfg
+riviera/*.swp
+riviera/*.swo
+riviera/*.asdb
+riviera/*.awc
+
+riviera/riviera
+riviera/work

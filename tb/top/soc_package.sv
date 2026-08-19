@@ -1,10 +1,12 @@
 package soc_package;
     import uvm_pkg::*;
     `include "uvm_macros.svh"
+    import reg_block_pkg::*;
 
 // COMMON
     `include "../common/config_tb.sv"
     `include "../ips_core/axi_intc/intc_config_obj.sv"
+    `include "../cpu/cpu_config_obj.sv"
     `include "../common/axi_parameters.sv"
 
 //IPS_CORE
@@ -21,11 +23,13 @@ package soc_package;
     `include "../ips_core/ips_core_env.sv"
 
 // MASTER
-    `include "../cpu/master_seq_item.sv"
-    `include "../cpu/master_sequence.sv"
-    `include "../cpu/master_driver.sv"
-    `include "../cpu/master_sequencer.sv"
-    `include "../cpu/master_agent.sv"
+    `include "../cpu/cpu_seq_item.sv"
+    `include "../cpu/cdma_ral/cdma_reg_adapter.sv"
+    `include "../cpu/cpu_sequence.sv"
+    `include "../cpu/cpu_driver.sv"
+    `include "../cpu/cpu_sequencer.sv"
+    `include "../cpu/cpu_monitor.sv"
+    `include "../cpu/cpu_agent.sv"
     `include "../cpu/cpu_env.sv"
 
 // TOP

@@ -1,5 +1,5 @@
-class base_test extends uvm_test;
-    `uvm_component_utils(base_test)
+class cpu_base_test extends uvm_test;
+    `uvm_component_utils(cpu_base_test)
     `NEW_COMP
 
     intc_config_obj                 obj;
@@ -8,7 +8,7 @@ class base_test extends uvm_test;
     
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-        if(!uvm_config_db #(intc_config_obj)::get(this,"","config_obj",obj))begin
+        if(!uvm_config_db #(intc_config_obj)::get(this,"","intc_config_obj",obj))begin
             `uvm_fatal("OBJ_MISSING", "The intc_config_obj handle was not set in uvm_config_db!")
         end
         lite_intc_if = obj.lite_intc_intf;
@@ -33,4 +33,76 @@ class base_test extends uvm_test;
         `uvm_info(get_full_name(),"outside_drop_objection", UVM_MEDIUM)
     endtask: reset_phase
 
-endclass : base_test
+endclass : cpu_base_test
+
+
+class read_cdma_test extends cpu_base_test;
+    `uvm_component_utils(read_cdma_test)
+    `NEW_COMP
+
+    read_cdma_seq master_seq;
+
+    task main_phase(uvm_phase phase);
+        master_seq = read_cdma_seq::type_id::create("master_seq");
+        phase.raise_objection(this);
+            master_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
+            phase.phase_done.set_drain_time(this, 100ns);
+        phase.drop_objection(this);
+    endtask
+endclass : read_cdma_test
+
+
+class config_cdma_ral_test extends cpu_base_test;
+    `uvm_component_utils(config_cdma_ral_test)
+    `NEW_COMP
+
+    config_cdma_ral_seq master_seq;
+
+    task main_phase(uvm_phase phase);
+        master_seq = config_cdma_ral_seq::type_id::create("master_seq");
+        phase.raise_objection(this);
+            master_seq.reg_block = w_env.c_env.reg_block;
+
+            master_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
+            phase.phase_done.set_drain_time(this, 100ns);
+        phase.drop_objection(this);
+    endtask
+endclass : config_cdma_ral_test
+
+
+class read_bram_test extends cpu_base_test;
+    `uvm_component_utils(read_bram_test)
+    `NEW_COMP
+
+    read_bram_seq master_seq;
+
+    task main_phase(uvm_phase phase);
+        master_seq = read_bram_seq::type_id::create("master_seq");
+        phase.raise_objection(this);
+            master_seq.reg_block = w_env.c_env.reg_block;
+
+            master_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
+            phase.phase_done.set_drain_time(this, 100ns);
+        phase.drop_objection(this);
+    endtask
+endclass : read_bram_test
+
+
+class load_bram_test extends cpu_base_test;
+    `uvm_component_utils(load_bram_test)
+    `NEW_COMP
+
+    load_bram_seq       mem_seq;
+    config_intc_seq     intc_seq;
+
+    task main_phase(uvm_phase phase);
+        mem_seq = load_bram_seq::type_id::create("mem_seq");
+        intc_seq = config_intc_seq::type_id::create("intc_seq");
+
+        phase.raise_objection(this);
+            mem_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
+            intc_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
+            phase.phase_done.set_drain_time(this, 100ns);
+        phase.drop_objection(this);
+    endtask
+endclass : load_bram_test

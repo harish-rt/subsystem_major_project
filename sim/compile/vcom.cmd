@@ -1,0 +1,1 @@
+ -d /home/harish/projects/SS/sim/compile -s /home/harish/projects/SS/sim/library.cfg -work core_ip_wraps -93 /home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ip/core_ip_wraps_axi_cdma_0_0/sim/core_ip_wraps_axi_cdma_0_0.vhd

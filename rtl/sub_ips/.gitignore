@@ -1,0 +1,14 @@
+# Sub IPs
+*.cfg
+sim/lib
+sim/work
+sim/log
+sim/*.asdb
+sim/*.awc
+
+*.pyc
+*.swp
+*.swo
+*.asdb
+*.awc
+sim_log.txt
