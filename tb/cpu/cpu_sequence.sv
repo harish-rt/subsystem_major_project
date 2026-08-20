@@ -192,7 +192,7 @@ class config_intc_seq extends base_cpu_sequence;
     endtask
 endclass : config_intc_seq
 
-
+/*
 class config_cdma_seq extends base_cpu_sequence;
     `uvm_object_utils(config_cdma_seq)
     `NEW_OBJ
@@ -201,6 +201,16 @@ class config_cdma_seq extends base_cpu_sequence;
         super.body();
         `uvm_info("config_cdma_seq", "Start of Config CDMA Sequence", UVM_MEDIUM)
 
+        do begin
+            reg_block.cdmasr.read(status,tdata);
+        end while(tdata[1]==0);
+        
+        reg_block.cdmacr.write(status,'h5000);
+        reg_block.sa.write(status,'h7100_0000);
+        reg_block.da.write(status,'h8000_0000);
+        reg_block.btt.write(status,1);
+
+        /*
         start_item(pkt);
         if(!pkt.randomize() with {
             AWADDR  == cdmacr;
@@ -210,8 +220,39 @@ class config_cdma_seq extends base_cpu_sequence;
             `uvm_error(get_full_name(), "randomization_failed")
         end
         finish_item(pkt);
-        get_response(pkt);             
+        get_response(pkt);*/
+        /*
         `uvm_info("config_cdma_seq", "End of Config CDMA Sequence", UVM_MEDIUM)
     endtask
 
 endclass : config_cdma_seq
+*/
+class config_intc_seq extends base_cpu_sequence;
+    `uvm_object_utils(config_intc_seq)
+    `NEW_OBJ
+    
+    int addr;
+
+    task body();
+        super.body();
+        `uvm_info("config_intc_seq", "Start of Config CDMA Sequence", UVM_MEDIUM)
+        //KERNEL: UVM_ERROR Response queue overflow, response was dropped
+        //this.set_response_queue_depth(20);         //clears
+
+        for (int i = 0; i < 10; i++) begin        
+            addr = 'h7000_1000 + (i*4);
+            start_item(pkt);
+            if(!pkt.randomize() with {
+                ARADDR  == addr;
+                write   == READ;
+                })begin
+                `uvm_error(get_full_name(), "randomization_failed")
+            end
+            finish_item(pkt);
+            get_response(pkt);             
+        end
+        `uvm_info("config_intc_seq", "End of Config CDMA Sequence", UVM_MEDIUM)
+    endtask
+
+endclass : config_intc_seq
+
