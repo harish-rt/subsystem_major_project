@@ -1,0 +1,12 @@
+Block Name,Block Description,Block Coverage,Block Backdoor,Block Component Name,Block Instance Name,Block Instance Description,Block Instance Dimension,Block Instance Type,Block Instance Backdoor,Block Instance No Reg Tests,Block Instance No Reg Access Test,Block Instance No Reg Shared Access Test,Block Instance No Reg Bit Bash Test,Block Instance No Reg HW Reset Test,Block Instance No Mem Tests,Block Instance No Mem Access Test,Block Instance No Mem Shared Access Test,Block Instance No Mem Walk Test,Project Extra Imports
+cdma_reg_block,,,,CDMA_CR,CDMA_CR_h,,,,,,,,,,,,,,
+cdma_reg_block,,,,CDMA_SR,CDMA_SR_h,,,,,,,,,,,,,,
+cdma_reg_block,,,,CURDESC_PNTR,CURDESC_PNTR_h,,,,,,,,,,,,,,
+cdma_reg_block,,,,CURDESC_PNTR_MSB,CURDESC_PNTR_MSB_h,,,,,,,,,,,,,,
+cdma_reg_block,,,,TAILDESC_PNTR,TAILDESC_PNTR_h,,,,,,,,,,,,,,
+cdma_reg_block,,,,TAILDESC_PNTR_MSB,TAILDESC_PNTR_MSB_h,,,,,,,,,,,,,,
+cdma_reg_block,,,,SA,SA_h,,,,,,,,,,,,,,
+cdma_reg_block,,,,SA_MSB,SA_MSB_h,,,,,,,,,,,,,,
+cdma_reg_block,,,,DA,DA_h,,,,,,,,,,,,,,
+cdma_reg_block,,,,DA_MSB,DA_MSB_h,,,,,,,,,,,,,,
+cdma_reg_block,,,,BTT,BTT_h,,,,,,,,,,,,,,
