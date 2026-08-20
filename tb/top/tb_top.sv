@@ -11,6 +11,8 @@ module top;
     bit aclk;
     bit areset_n;
 
+    wire intc_proc_rst;
+
     wire axi_intr;
     wire axi_irq;
 
@@ -23,8 +25,10 @@ module top;
     axi4_lite_intf lite_data_if();
 
 // AXI Interrupt Controller
+    assign intc_proc_rst = ~areset_n;
     axi4_lite_intc_intf lite_intc_if(.aclk(aclk),.areset_n(areset_n));
-    intc_intf           intc_if(.intc_procss_clk(aclk),.intc_procss_rst(areset_n));
+    //intc_intf           intc_if(.intc_procss_clk(aclk),.intc_procss_rst(~areset_n));
+    intc_intf           intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
 
     core_wrapper dut(
         .clk_i(aclk),
@@ -142,15 +146,16 @@ module top;
 
 
     // Interrupt Wires
-    assign intc_if.intc_irq         = dut.intr_ctrl_irq;
-    assign intc_if.intc_intr        = dut.intr_0;   //CDMA is 26 | Core Peri is 27
+    assign intc_if.intc_intr        = dut.IPS_CORE.intr_0;   //CDMA is 26 | Core Peri is 27
+    //assign intc_if.intc_intr        = 'h0400_0000;
+    assign intc_if.intc_irq         = dut.IPS_CORE.irq_0;
 
     assign axil_riscv_if.ACLK       = aclk;
     assign axil_riscv_if.ARESETn    = areset_n;
 
     initial begin
-        run_test("config_intc_test");
-        //run_test("load_bram_test");
+        //run_test("config_intc_test");
+        run_test("load_bram_test");
         //run_test("read_bram_test");
         //run_test("config_cdma_ral_test");
         //run_test("read_cdma_test");

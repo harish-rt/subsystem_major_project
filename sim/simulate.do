@@ -33,6 +33,7 @@ vsim -advdataflow -sv_seed random +access +rwc +m+top +UVM_VERBOSITY=UVM_DEBUG +
 
 add wave -recursive /top/axil_riscv_if/*
 add wave -recursive /top/lite_intc_if/*
+add wave -recursive /top/dut/IPS_CORE/cdma_introut_0
 add wave -recursive /top/intc_if/*
 run -all
 
