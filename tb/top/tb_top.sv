@@ -157,8 +157,9 @@ module top;
         //#3000;
         //$finish();
     end
-
+    //interrupt controller config object
     intc_config_obj                 obj;
+    //cpu config object
     cpu_config_obj                  cpu_obj;
     
     initial begin
