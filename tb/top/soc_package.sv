@@ -1,7 +1,10 @@
+
+`include "../ips_core/axi_cdma_env/axi_cdma_env_pkg.sv"
 package soc_package;
     import uvm_pkg::*;
     `include "uvm_macros.svh"
     import reg_block_pkg::*;
+    import axi_cdma_env_pkg ::*;
 
 // COMMON
     `include "../common/config_tb.sv"
@@ -21,6 +24,8 @@ package soc_package;
 
     `include "../ips_core/axi_intc/lite_intc_env.sv"
     `include "../ips_core/ips_core_env.sv"
+
+    //AXI_CDMA 
 
 // MASTER
     `include "../cpu/cpu_seq_item.sv"
