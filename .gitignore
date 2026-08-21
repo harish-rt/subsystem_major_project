@@ -10,6 +10,8 @@ tbold/
 *.awc
 *.error
 *.swj
+*asdbw*
+*tmp
 
 # Ignore Siemens Questa / ModelSim databases
 work/
@@ -25,4 +27,3 @@ transcript
 *.swn
 *.swo
 *.swp
-
