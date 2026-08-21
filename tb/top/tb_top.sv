@@ -11,6 +11,8 @@ module top;
     bit aclk;
     bit areset_n;
 
+    wire intc_proc_rst;
+
     wire axi_intr;
     wire axi_irq;
 
@@ -23,8 +25,10 @@ module top;
     axi4_lite_intf lite_data_if();
 
 // AXI Interrupt Controller
+    assign intc_proc_rst = ~areset_n;
     axi4_lite_intc_intf lite_intc_if(.aclk(aclk),.areset_n(areset_n));
-    intc_intf           intc_if(.intc_procss_clk(aclk),.intc_procss_rst(areset_n));
+    intc_intf           intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
+   
      
      
      //axi cdma interfaces 
@@ -122,12 +126,10 @@ module top;
         .data_bridge2axi_int(lite_data_if)
     );
 
-
-    // 2. Map the deep hierarchical paths directly to your interface fields
     // --- Write Channels (AW) ---
-    assign lite_intc_if.axi_awaddr      = dut.IPS_CORE.axi_intc_0.s_axi_awaddr;
-    assign lite_intc_if.axi_awready     = dut.IPS_CORE.axi_intc_0.s_axi_awready;
-    
+    assign lite_intc_if.axi_awaddr  = dut.IPS_CORE.axi_intc_0.s_axi_awaddr;
+    assign lite_intc_if.axi_awvalid = dut.IPS_CORE.axi_intc_0.s_axi_awvalid;
+    assign lite_intc_if.axi_awready = dut.IPS_CORE.axi_intc_0.s_axi_awready;
     // --- Write Data Channel (W) ---
     assign lite_intc_if.axi_wdata   = dut.IPS_CORE.axi_intc_0.s_axi_wdata;
     assign lite_intc_if.axi_wstrb   = dut.IPS_CORE.axi_intc_0.s_axi_wstrb;
@@ -314,8 +316,8 @@ module top;
 
      
     initial begin
-        obj                     =   new("obj");
         //INTC
+        obj                     =   new("obj");
         obj.axi_lite_is_active  =   UVM_PASSIVE;
         obj.lite_intc_intf      =   lite_intc_if;
         obj.intc_is_active      =   UVM_PASSIVE;
@@ -323,9 +325,9 @@ module top;
         uvm_config_db #(intc_config_obj)::  set(null,"*","intc_config_obj",obj);
 
         //CPU
-        cpu_obj                   =   new("cpu_obj");
-        cpu_obj.riscv_is_active   =   UVM_ACTIVE;
-        cpu_obj.riscv_lite_if     =   axil_riscv_if;
+        cpu_obj                 =   new("cpu_obj");
+        cpu_obj.riscv_is_active =   UVM_ACTIVE;
+        cpu_obj.riscv_lite_if   =   axil_riscv_if;
         uvm_config_db #(cpu_config_obj)::   set(null,"*","cpu_config_obj",cpu_obj);
 
        cdma_config_obj=axi_cdma_config_obj::type_id::create("cdma_config_obj");

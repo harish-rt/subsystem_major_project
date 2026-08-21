@@ -8,6 +8,8 @@ tbold/
 *.asdb
 *.awc
 *.error
+*asdbw*
+*tmp
 
 # Ignore Siemens Questa / ModelSim databases
 work/
