@@ -108,7 +108,7 @@ class load_bram_test extends cpu_base_test;
             intc_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
             cdma_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
 
-            phase.phase_done.set_drain_time(this, 100ns);
+            phase.phase_done.set_drain_time(this, 1000ns);
         phase.drop_objection(this);
     endtask
 endclass : load_bram_test

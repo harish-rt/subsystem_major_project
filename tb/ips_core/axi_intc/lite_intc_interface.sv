@@ -3,7 +3,7 @@ interface axi4_lite_intc_intf(input bit aclk, logic areset_n);
 `include "uvm_macros.svh"
  import uvm_pkg :: *;
 
-  logic [8:0]  axi_awaddr;                
+  logic [31:0]  axi_awaddr;                
   logic axi_awvalid;               
   logic axi_awready;                
   logic [31:0] axi_wdata;               
@@ -13,7 +13,7 @@ interface axi4_lite_intc_intf(input bit aclk, logic areset_n);
   logic [1:0] axi_bresp;                
   logic axi_bvalid;                  
   logic axi_bready;               
-  logic [8:0] axi_araddr;                
+  logic [31:0] axi_araddr;                
   logic axi_arvalid;
   logic axi_arready;                                
   logic [31:0]axi_rdata;                   
@@ -21,7 +21,7 @@ interface axi4_lite_intc_intf(input bit aclk, logic areset_n);
   logic axi_rvalid;                 
   logic axi_rready;
 
-	logic [31:0] dut_isr, dut_iar, dut_ier, dut_imr;
+	//logic [31:0] dut_isr, dut_iar, dut_ier, dut_imr;
 
 //driver_clocking block//
 
