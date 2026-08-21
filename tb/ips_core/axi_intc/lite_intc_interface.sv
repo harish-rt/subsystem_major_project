@@ -25,7 +25,7 @@ interface axi4_lite_intc_intf(input bit aclk, logic areset_n);
 
 //driver_clocking block//
 
-clocking axi_4_lite_driver_cb@(posedge aclk);
+clocking axi4_lite_drv_cb@(posedge aclk);
   default input #1 output #0;
   output axi_awaddr;
   output axi_awvalid;      
@@ -47,7 +47,7 @@ clocking axi_4_lite_driver_cb@(posedge aclk);
 endclocking 
 
 //monitor clocking block//
-clocking axi_4_lite_monitor_cb@(posedge aclk);
+clocking axi4_lite_mon_cb@(posedge aclk);
   default input #1 output #0;  
   input axi_awaddr;
   input axi_awvalid;      
@@ -68,10 +68,11 @@ clocking axi_4_lite_monitor_cb@(posedge aclk);
   input axi_rready;
 endclocking
 
-  modport axi_4_lite_driver_modport(clocking axi_4_lite_driver_cb,output areset_n);
-  modport axi_4_lite_monitor_modport(clocking axi_4_lite_monitor_cb,input areset_n);
+  modport axi4_lite_drv_mod(clocking axi4_lite_drv_cb,output areset_n);
+  modport axi4_lite_mon_mod(clocking axi4_lite_mon_cb,input areset_n);
 
 endinterface
+
 /*
 	property aw_addr;
 		@(posedge aclk) axi_awvalid |=> $stable(axi_awaddr) ##[1:$] axi_awready ##1 (!axi_awvalid); 
