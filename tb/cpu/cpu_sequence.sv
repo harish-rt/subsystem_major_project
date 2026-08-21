@@ -162,13 +162,16 @@ class config_intc_seq extends base_cpu_sequence;
     task body();
         super.body();
         
-        intc_d[26] = 1; //CDMA
-        intc_d[27] = 0; //Peripherals
+        intc_d      = 0;
+        intc_d[26]  = 1; //CDMA
+        intc_d[27]  = 0; //Peripherals
+        intc_d      = 'hffff_ffff;
 
         start_item(pkt);
         if(!pkt.randomize() with {
             AWADDR  == 'h7000_1008; //Interrupt Enable Register
             WDATA   == intc_d;
+            WSTRB   == 'hf;
             write   == WRITE;
             })begin
             `uvm_error(get_full_name(), "randomization_failed")
@@ -176,13 +179,15 @@ class config_intc_seq extends base_cpu_sequence;
         finish_item(pkt);
         get_response(pkt);
 
-        intc_d[0] = 1;  //Master Irq en
-        intc_d[1] = 1;  //Hardware Interrupt en
+        intc_d      = 0;
+        intc_d[0]   = 1;  //Master Irq en
+        intc_d[1]   = 1;  //Hardware Interrupt en
 
         start_item(pkt);
         if(!pkt.randomize() with {
             AWADDR  == 'h7000_101c; //Master Enable Register
             WDATA   == intc_d;
+            WSTRB   == 'hf;
             write   == WRITE;
             })begin
             `uvm_error(get_full_name(), "randomization_failed")
@@ -192,7 +197,7 @@ class config_intc_seq extends base_cpu_sequence;
     endtask
 endclass : config_intc_seq
 
-/*
+
 class config_cdma_seq extends base_cpu_sequence;
     `uvm_object_utils(config_cdma_seq)
     `NEW_OBJ
@@ -221,12 +226,12 @@ class config_cdma_seq extends base_cpu_sequence;
         end
         finish_item(pkt);
         get_response(pkt);*/
-        /*
         `uvm_info("config_cdma_seq", "End of Config CDMA Sequence", UVM_MEDIUM)
     endtask
 
 endclass : config_cdma_seq
-*/
+
+/*
 class config_intc_seq extends base_cpu_sequence;
     `uvm_object_utils(config_intc_seq)
     `NEW_OBJ
@@ -255,4 +260,4 @@ class config_intc_seq extends base_cpu_sequence;
     endtask
 
 endclass : config_intc_seq
-
+*/
