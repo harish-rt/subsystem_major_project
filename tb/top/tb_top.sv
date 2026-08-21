@@ -27,7 +27,6 @@ module top;
 // AXI Interrupt Controller
     assign intc_proc_rst = ~areset_n;
     axi4_lite_intc_intf lite_intc_if(.aclk(aclk),.areset_n(areset_n));
-    //intc_intf           intc_if(.intc_procss_clk(aclk),.intc_procss_rst(~areset_n));
     intc_intf           intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
 
     core_wrapper dut(
@@ -117,27 +116,24 @@ module top;
         .data_bridge2axi_int(lite_data_if)
     );
 
-
-    // 2. Map the deep hierarchical paths directly to your interface fields
     // --- Write Channels (AW) ---
-    assign lite_intc_if.axi_awaddr      = dut.IPS_CORE.axi_intc_0.s_axi_awaddr;
-    assign lite_intc_if.axi_awready     = dut.IPS_CORE.axi_intc_0.s_axi_awready;
-    
+    assign lite_intc_if.axi_awaddr  = dut.IPS_CORE.axi_intc_0.s_axi_awaddr;
+    assign lite_intc_if.axi_awvalid = dut.IPS_CORE.axi_intc_0.s_axi_awvalid;
+    assign lite_intc_if.axi_awready = dut.IPS_CORE.axi_intc_0.s_axi_awready;
     // --- Write Data Channel (W) ---
     assign lite_intc_if.axi_wdata   = dut.IPS_CORE.axi_intc_0.s_axi_wdata;
     assign lite_intc_if.axi_wstrb   = dut.IPS_CORE.axi_intc_0.s_axi_wstrb;
     assign lite_intc_if.axi_wvalid  = dut.IPS_CORE.axi_intc_0.s_axi_wvalid;
     assign lite_intc_if.axi_wready  = dut.IPS_CORE.axi_intc_0.s_axi_wready;
-    
     // --- Write Response Channel (B) ---
     assign lite_intc_if.axi_bresp   = dut.IPS_CORE.axi_intc_0.s_axi_bresp;
     assign lite_intc_if.axi_bvalid  = dut.IPS_CORE.axi_intc_0.s_axi_bvalid;
     assign lite_intc_if.axi_bready  = dut.IPS_CORE.axi_intc_0.s_axi_bready;
     
     // --- Read Channels (AR) ---
-    assign lite_intc_if.axi_araddr      = dut.IPS_CORE.axi_intc_0.s_axi_araddr;
-    assign lite_intc_if.axi_arvalid     = dut.IPS_CORE.axi_intc_0.s_axi_arvalid;
-    assign lite_intc_if.axi_arready     = dut.IPS_CORE.axi_intc_0.s_axi_arready;
+    assign lite_intc_if.axi_araddr  = dut.IPS_CORE.axi_intc_0.s_axi_araddr;
+    assign lite_intc_if.axi_arvalid = dut.IPS_CORE.axi_intc_0.s_axi_arvalid;
+    assign lite_intc_if.axi_arready = dut.IPS_CORE.axi_intc_0.s_axi_arready;
     // --- Read Data Channel (R) ---
     assign lite_intc_if.axi_rdata   = dut.IPS_CORE.axi_intc_0.s_axi_rdata;
     assign lite_intc_if.axi_rresp   = dut.IPS_CORE.axi_intc_0.s_axi_rresp;
@@ -147,7 +143,6 @@ module top;
 
     // Interrupt Wires
     assign intc_if.intc_intr        = dut.IPS_CORE.intr_0;   //CDMA is 26 | Core Peri is 27
-    //assign intc_if.intc_intr        = 'h0400_0000;
     assign intc_if.intc_irq         = dut.IPS_CORE.irq_0;
 
     assign axil_riscv_if.ACLK       = aclk;
@@ -178,8 +173,8 @@ module top;
     cpu_config_obj                  cpu_obj;
     
     initial begin
-        obj                     =   new("obj");
         //INTC
+        obj                     =   new("obj");
         obj.axi_lite_is_active  =   UVM_PASSIVE;
         obj.lite_intc_intf      =   lite_intc_if;
         obj.intc_is_active      =   UVM_PASSIVE;
@@ -187,9 +182,9 @@ module top;
         uvm_config_db #(intc_config_obj)::  set(null,"*","intc_config_obj",obj);
 
         //CPU
-        cpu_obj                   =   new("cpu_obj");
-        cpu_obj.riscv_is_active   =   UVM_ACTIVE;
-        cpu_obj.riscv_lite_if     =   axil_riscv_if;
+        cpu_obj                 =   new("cpu_obj");
+        cpu_obj.riscv_is_active =   UVM_ACTIVE;
+        cpu_obj.riscv_lite_if   =   axil_riscv_if;
         uvm_config_db #(cpu_config_obj)::   set(null,"*","cpu_config_obj",cpu_obj);
     end
 endmodule

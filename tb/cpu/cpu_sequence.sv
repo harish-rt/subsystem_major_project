@@ -173,6 +173,7 @@ class config_intc_seq extends base_cpu_sequence;
             WDATA   == intc_d;
             WSTRB   == 'hf;
             write   == WRITE;
+            reg_type== IER;
             })begin
             `uvm_error(get_full_name(), "randomization_failed")
         end
@@ -189,6 +190,7 @@ class config_intc_seq extends base_cpu_sequence;
             WDATA   == intc_d;
             WSTRB   == 'hf;
             write   == WRITE;
+            reg_type== MER;
             })begin
             `uvm_error(get_full_name(), "randomization_failed")
         end
