@@ -292,8 +292,8 @@ module top;
     assign cdma_data_mov_intf.awlock=0;
 
     initial begin
-        //run_test("config_intc_test");
-        run_test("load_bram_test");
+        run_test("config_intc_test");
+        //run_test("load_bram_test");
         //run_test("read_bram_test");
         //run_test("config_cdma_ral_test");
         //run_test("read_cdma_test");
