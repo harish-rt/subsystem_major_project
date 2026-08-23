@@ -6,8 +6,10 @@ tbold/
 *.dataset
 *.vstf
 *.asdb
+*.acdb
 *.awc
 *.error
+*.swj
 
 # Ignore Siemens Questa / ModelSim databases
 work/
