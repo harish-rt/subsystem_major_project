@@ -27,9 +27,6 @@ module top;
 // AXI Interrupt Controller
     assign intc_proc_rst = ~areset_n;
     axi4_lite_intc_intf lite_intc_if(.aclk(aclk),.areset_n(areset_n));
-    intc_intf           intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
-   
-     
      
      //axi cdma interfaces 
      axi_cdma_axi_master_intf  cdma_reg_intf(.aclk(aclk),.areset_n(areset_n));
@@ -38,6 +35,7 @@ module top;
      axi_cdma_interrupt_intf cdma_interrupt_intf(.aclk(aclk));
 
     axi_cdma_config_obj cdma_config_obj;
+    intc_intf           intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
 
     core_wrapper dut(
         .clk_i(aclk),
@@ -135,16 +133,15 @@ module top;
     assign lite_intc_if.axi_wstrb   = dut.IPS_CORE.axi_intc_0.s_axi_wstrb;
     assign lite_intc_if.axi_wvalid  = dut.IPS_CORE.axi_intc_0.s_axi_wvalid;
     assign lite_intc_if.axi_wready  = dut.IPS_CORE.axi_intc_0.s_axi_wready;
-    
     // --- Write Response Channel (B) ---
     assign lite_intc_if.axi_bresp   = dut.IPS_CORE.axi_intc_0.s_axi_bresp;
     assign lite_intc_if.axi_bvalid  = dut.IPS_CORE.axi_intc_0.s_axi_bvalid;
     assign lite_intc_if.axi_bready  = dut.IPS_CORE.axi_intc_0.s_axi_bready;
     
     // --- Read Channels (AR) ---
-    assign lite_intc_if.axi_araddr      = dut.IPS_CORE.axi_intc_0.s_axi_araddr;
-    assign lite_intc_if.axi_arvalid     = dut.IPS_CORE.axi_intc_0.s_axi_arvalid;
-    assign lite_intc_if.axi_arready     = dut.IPS_CORE.axi_intc_0.s_axi_arready;
+    assign lite_intc_if.axi_araddr  = dut.IPS_CORE.axi_intc_0.s_axi_araddr;
+    assign lite_intc_if.axi_arvalid = dut.IPS_CORE.axi_intc_0.s_axi_arvalid;
+    assign lite_intc_if.axi_arready = dut.IPS_CORE.axi_intc_0.s_axi_arready;
     // --- Read Data Channel (R) ---
     assign lite_intc_if.axi_rdata   = dut.IPS_CORE.axi_intc_0.s_axi_rdata;
     assign lite_intc_if.axi_rresp   = dut.IPS_CORE.axi_intc_0.s_axi_rresp;
@@ -153,8 +150,8 @@ module top;
 
 
     // Interrupt Wires
-    assign intc_if.intc_irq         = dut.intr_ctrl_irq;
-    assign intc_if.intc_intr        = dut.intr_0;   //CDMA is 26 | Core Peri is 27
+    assign intc_if.intc_intr        = dut.IPS_CORE.intr_0;   //CDMA is 26 | Core Peri is 27
+    assign intc_if.intc_irq         = dut.IPS_CORE.irq_0;
 
     assign axil_riscv_if.ACLK       = aclk;
     assign axil_riscv_if.ARESETn    = areset_n;

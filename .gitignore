@@ -6,8 +6,10 @@ tbold/
 *.dataset
 *.vstf
 *.asdb
+*.acdb
 *.awc
 *.error
+*.swj
 *asdbw*
 *tmp
 
@@ -25,4 +27,3 @@ transcript
 *.swn
 *.swo
 *.swp
-
