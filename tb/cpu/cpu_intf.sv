@@ -1,12 +1,12 @@
 `include "uvm_macros.svh"
-`include "package.sv"
+`include "../top/cpu_package.sv"
 `define DATA_WIDTH     32
 `define ADDR_WIDTH     32
 `define RESPONSE_WIDTH 2
 
 interface cpu_intf (input aclk, areset_n);
    import  uvm_pkg :: *;   
-   import soc_package:: *;
+   import cpu_package:: *;
    // ---------------- Write Channel ----------------
    logic [`ADDR_WIDTH-1 : 0] awaddr;
    logic                     awvalid;
