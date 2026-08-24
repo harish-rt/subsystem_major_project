@@ -1,22 +1,15 @@
 class intc_seq_item extends uvm_sequence_item;
 
-    rand bit [31:0] intc_intr;
-    bit                     intc_irq;
-    bit [31:0]    intc_intr_addr;
-    rand int                delay_cycles;
+    rand bit [31:0]     intc_intr;
+    bit                 intc_irq;
 
     `uvm_object_param_utils_begin(intc_seq_item)
         `uvm_field_int(intc_intr,       UVM_ALL_ON)
         `uvm_field_int(intc_irq,        UVM_ALL_ON)
-        `uvm_field_int(intc_intr_addr,  UVM_ALL_ON)
-        `uvm_field_int(delay_cycles,    UVM_ALL_ON)
     `uvm_object_utils_end
     `NEW_OBJ
 
     // Constraints
-    constraint c_delay {
-      delay_cycles inside {[0:10]};
-    }
 
 endclass
 

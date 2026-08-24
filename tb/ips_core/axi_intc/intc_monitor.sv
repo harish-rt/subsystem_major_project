@@ -2,7 +2,6 @@ class intc_monitor extends uvm_monitor;
     `uvm_component_utils(intc_monitor)
     `NEW_COMP
     
-    intc_config_obj                     cfg;
 	intc_seq_item 					    pkt;
 
     bit                          [31:0] prev_intr;
@@ -19,8 +18,6 @@ endclass : intc_monitor
 function void intc_monitor :: build_phase (uvm_phase phase);
     `uvm_info ("intc_monitor :: build_phase started ", "",UVM_LOW)
     super.build_phase(phase);
-    if(!uvm_config_db #(intc_config_obj)::get(this,"","intc_config_obj",cfg))
-        `uvm_fatal(get_full_name(),"Config_obj get Failure")
     
     mon_intc_ap = new("mon_intc_ap", this);
     `uvm_info ("intc_monitor  :: build_phase ended ", "",UVM_LOW)
@@ -37,7 +34,6 @@ task intc_monitor :: main_phase(uvm_phase phase);
 	        
             pkt = intc_seq_item::type_id::create("pkt");
 
-            pkt.intc_intr_addr  = mon_intc_intf.intc_interface_monitor_cb.intc_intr_addr;
             pkt.intc_intr       = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
             pkt.intc_irq        = mon_intc_intf.intc_interface_monitor_cb.intc_irq;
 
@@ -50,6 +46,9 @@ task intc_monitor :: main_phase(uvm_phase phase);
     end
     `uvm_info ("mon_intc :: main_phase ended ", "",UVM_LOW) 
 endtask : main_phase
+
+
+
 
 /*
 class intc_monitor extends uvm_monitor;
