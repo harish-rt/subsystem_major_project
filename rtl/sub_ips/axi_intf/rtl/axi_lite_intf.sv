@@ -5,35 +5,34 @@ interface axi4_lite_intf();
     
    logic ACLK;
    logic ARESETn;
-   //Read address channel signals
-   logic [ADDR_WIDTH-1:0]	ARADDR	;
-   logic [2:0] 			ARPROT	;
-   logic 			ARREADY	;
-   logic			ARVALID	;
- 
    //Write address channel signals
    logic [ADDR_WIDTH-1:0]	AWADDR	;
-   logic [2:0] 			AWPROT	;
    logic  			AWREADY	;
    logic  			AWVALID	;
-
-   //Write response channel signals
-   logic			BREADY	;
-   logic [1:0]			BRESP	;
-   logic 			BVALID	;
-
-   //Read data channel signals
-   logic [DATA_WIDTH-1:0]	RDATA	;
-   logic 			RREADY  ;
-   logic [1:0]			RRESP	;
-   logic 			RVALID	;
+   logic [2:0] 		AWPROT	;
 
    //Write data channel signals
    logic [DATA_WIDTH-1:0]	WDATA	;
-   logic  			WREADY	;
    logic [(DATA_WIDTH/8)-1:0] 	WSTRB	;
+   logic  			WREADY	;
    logic  			WVALID	;
 
+   //Write response channel signals
+   logic [1:0]		BRESP	;
+   logic			BREADY	;
+   logic 			BVALID	;
+
+   //Read address channel signals
+   logic [ADDR_WIDTH-1:0]	ARADDR	;
+   logic 			ARREADY	;
+   logic			ARVALID	;
+   logic [2:0] 		ARPROT	;
+ 
+   //Read data channel signals
+   logic [DATA_WIDTH-1:0]	RDATA	;
+   logic [1:0]		RRESP	;
+   logic 			RREADY  ;
+   logic 			RVALID	;
 
    clocking axil_drv_cb @(posedge ACLK);
       default input #1ns output #1ns;

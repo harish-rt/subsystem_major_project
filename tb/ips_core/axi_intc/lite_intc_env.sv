@@ -2,10 +2,10 @@ class axi_lite_intc_env extends uvm_env;
     `uvm_component_utils(axi_lite_intc_env)
     `NEW_COMP
     
+    uvm_active_passive_enum     is_active;
     axi_lite_intc_agent         lite_intc_agt;
     intc_agent                  intc_agt;
     intc_config_obj             obj;
-    uvm_active_passive_enum     is_active;
 
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
@@ -23,7 +23,6 @@ class axi_lite_intc_env extends uvm_env;
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
             lite_intc_agt.mon.mon_if    = obj.lite_intc_intf;            
-            lite_intc_agt.mon.intc_if   = obj.intc_if;            
             if (obj.axi_lite_is_active == UVM_ACTIVE) begin
             end
             intc_agt.mon.mon_intc_intf  = obj.intc_if;            

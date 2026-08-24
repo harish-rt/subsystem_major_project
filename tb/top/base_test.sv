@@ -94,15 +94,39 @@ class load_bram_test extends cpu_base_test;
 
     load_bram_seq       mem_seq;
     config_intc_seq     intc_seq;
+    config_cdma_seq     cdma_seq;
 
     task main_phase(uvm_phase phase);
         mem_seq = load_bram_seq::type_id::create("mem_seq");
         intc_seq = config_intc_seq::type_id::create("intc_seq");
+        cdma_seq = config_cdma_seq::type_id::create("cdma_seq");
 
         phase.raise_objection(this);
+            cdma_seq.reg_block = w_env.c_env.reg_block;
+
             mem_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
             intc_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
-            phase.phase_done.set_drain_time(this, 100ns);
+            cdma_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
+
+            phase.phase_done.set_drain_time(this, 1000ns);
         phase.drop_objection(this);
     endtask
 endclass : load_bram_test
+
+class config_intc_test extends cpu_base_test;
+    `uvm_component_utils(config_intc_test)
+    `NEW_COMP
+
+    config_intc_seq     intc_seq;
+
+    task main_phase(uvm_phase phase);
+        intc_seq = config_intc_seq::type_id::create("intc_seq");
+
+        phase.raise_objection(this);
+
+            intc_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
+
+            phase.phase_done.set_drain_time(this, 100ns);
+        phase.drop_objection(this);
+    endtask
+endclass : config_intc_test
