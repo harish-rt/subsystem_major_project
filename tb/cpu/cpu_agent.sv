@@ -1,26 +1,22 @@
 class cpu_agent extends uvm_agent;
-    `uvm_component_utils(cpu_agent)
-    `NEW_COMP
+   `uvm_component_utils(cpu_agent)
+   cpu_monitor    mon;
+   cpu_driver     drv;
+   cpu_sequencer  sqr;
+   
+   function new(string name="cpu_agent", uvm_component parent);
+      super.new(name, parent);
+   endfunction
 
-    cpu_driver                  cpu_drv;
-    cpu_sequencer               cpu_sqr;
-    cpu_monitor                 cpu_mon;
-    uvm_active_passive_enum     is_active;
+   function void build_phase(uvm_phase phase);
+      super.build_phase(phase);
+      mon = cpu_monitor::type_id::create("mon", this);
+      drv = cpu_driver::type_id::create("drv", this);
+      sqr = cpu_sequencer::type_id::create("sqr", this);
+   endfunction
 
-    function void build_phase(uvm_phase phase);
-        super.build_phase(phase);
-        cpu_mon = cpu_monitor::type_id::create("cpu_mon",this);
-        if(is_active == UVM_ACTIVE) begin
-            cpu_drv = cpu_driver    ::type_id::create   ("cpu_drv",this);
-            cpu_sqr = cpu_sequencer ::type_id::create   ("cpu_sqr",this);
-        end
-    endfunction
-
-    function void connect_phase(uvm_phase phase);
-        super.connect_phase(phase);
-        if(is_active == UVM_ACTIVE) begin
-            cpu_drv.seq_item_port.connect(cpu_sqr.seq_item_export);
-        end
-    endfunction
-
-endclass
+   function void connect_phase(uvm_phase phase);
+      super.connect_phase(phase);
+      `uvm_info("cpu_agent::connect", phase.get_name(), UVM_MEDIUM)
+   endfunction
+endclass:cpu_agent
