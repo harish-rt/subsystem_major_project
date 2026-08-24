@@ -2,20 +2,17 @@ interface intc_intf(input bit intc_procss_clk, logic intc_procss_rst);
 
     logic [31:0]    intc_intr;                                
     logic           intc_irq;                      
-    logic [31:0]    intc_intr_addr;                 
 
     clocking intc_interface_driver_cb @(posedge intc_procss_clk);
         default input #1 output #0;
         output intc_intr;                                
         input  intc_irq;                      
-        input  intc_intr_addr;                 
     endclocking
 
     clocking intc_interface_monitor_cb @(posedge intc_procss_clk);
         default input #1 output #0;
         input intc_intr;                                
         input intc_irq;                      
-        input intc_intr_addr;                 
     endclocking
 
     modport intc_drv_mod(clocking intc_interface_driver_cb, input intc_procss_rst);
