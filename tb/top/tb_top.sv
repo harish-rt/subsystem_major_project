@@ -4,7 +4,7 @@ import uvm_pkg :: *;
 
 `include "../ips_core/axi_intc/lite_intc_interface.sv"
 `include "../ips_core/axi_intc/intc_interface.sv"
-import soc_package :: *;
+import intc_package :: *;
 import axi_cdma_env_pkg ::*;
 module top;
 
@@ -26,16 +26,16 @@ module top;
 
 // AXI Interrupt Controller
     assign intc_proc_rst = ~areset_n;
-    axi4_lite_intc_intf lite_intc_if(.aclk(aclk),.areset_n(areset_n));
+    axi4_lite_intc_intf         lite_intc_if(.aclk(aclk),.areset_n(areset_n));
+    intc_intf                   intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
      
-     //axi cdma interfaces 
-     axi_cdma_axi_master_intf  cdma_reg_intf(.aclk(aclk),.areset_n(areset_n));
-     axi_cdma_axi_slave_intf   cdma_sg_intf(.aclk(aclk),.areset_n(areset_n));
-     axi_cdma_axi_slave_intf   cdma_data_mov_intf(.aclk(aclk),.areset_n(arset_n));
-     axi_cdma_interrupt_intf cdma_interrupt_intf(.aclk(aclk));
+//axi cdma interfaces 
+    axi_cdma_axi_master_intf    cdma_reg_intf(.aclk(aclk),.areset_n(areset_n));
+    axi_cdma_axi_slave_intf     cdma_sg_intf(.aclk(aclk),.areset_n(areset_n));
+    axi_cdma_axi_slave_intf     cdma_data_mov_intf(.aclk(aclk),.areset_n(arset_n));
+    axi_cdma_interrupt_intf     cdma_interrupt_intf(.aclk(aclk));
 
-    axi_cdma_config_obj cdma_config_obj;
-    intc_intf           intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
+    axi_cdma_config_obj         cdma_config_obj;
 
     core_wrapper dut(
         .clk_i(aclk),
@@ -327,7 +327,8 @@ module top;
         cpu_obj.riscv_lite_if   =   axil_riscv_if;
         uvm_config_db #(cpu_config_obj)::   set(null,"*","cpu_config_obj",cpu_obj);
 
-       cdma_config_obj=axi_cdma_config_obj::type_id::create("cdma_config_obj");
+        //CDMA
+        cdma_config_obj=axi_cdma_config_obj::type_id::create("cdma_config_obj");
         cdma_config_obj.no_of_masters=1;
         cdma_config_obj.no_of_slaves=2;
 
