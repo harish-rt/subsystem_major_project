@@ -1,15 +1,12 @@
-
-`include "../ips_core/axi_cdma_env/axi_cdma_env_pkg.sv"
 package intc_package;
     import uvm_pkg::*;
     `include "uvm_macros.svh"
-    import reg_block_pkg::*;
     import axi_cdma_env_pkg ::*;
+    import cpu_package ::*;
 
 // COMMON
     `include "../common/config_tb.sv"
     `include "../ips_core/axi_intc/intc_config_obj.sv"
-    `include "../cpu/cpu_config_obj.sv"
     `include "../common/axi_parameters.sv"
 
 //IPS_CORE
@@ -27,15 +24,6 @@ package intc_package;
 
     //AXI_CDMA 
 
-// MASTER
-    `include "../cpu/cpu_seq_item.sv"
-    `include "../cpu/cdma_ral/cdma_reg_adapter.sv"
-    `include "../cpu/cpu_sequence.sv"
-    `include "../cpu/cpu_driver.sv"
-    `include "../cpu/cpu_sequencer.sv"
-    `include "../cpu/cpu_monitor.sv"
-    `include "../cpu/cpu_agent.sv"
-    `include "../cpu/cpu_env.sv"
 
 // TOP
     `include "wrapper_env.sv"
