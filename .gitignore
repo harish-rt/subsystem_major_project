@@ -3,6 +3,7 @@ lib/
 riviera/
 tb2/
 tbold/
+riscv_tb/
 *.dataset
 *.vstf
 *.asdb
