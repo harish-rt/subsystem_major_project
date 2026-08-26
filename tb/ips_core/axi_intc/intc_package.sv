@@ -5,8 +5,8 @@ package intc_package;
     `include "uvm_macros.svh"
 
 // COMMON
-    `include "intc_config_obj.sv"
     `include "../../common/axi_parameters.sv"
+    `include "intc_config_obj.sv"
 
 //IPS_CORE
     //AXI INTERRUPT CONTROLLER

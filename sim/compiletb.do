@@ -27,12 +27,14 @@ vlog -work xil_defaultlib -uvmver 1.2 \
 -l core_perif \
 -l spi_mem \
 -l core_wrapper \
+"../tb/common/config_tb.sv" \
 "../tb/top/cpu_package.sv" \
 "../tb/ips_core/axi_cdma_env/axi_cdma_env_pkg.sv" \
+"../mem_agent/mem_pkg.sv" \
 "../tb/ips_core/axi_intc/intc_package.sv" \
 "../tb/top/soc_package.sv" \
-"../tb/top/tb_top.sv" \
-2>&1 | tee compiletb.log
+"../tb/top/tb_top.sv" 
+#2>&1 | tee compiletb.log
 
 
 #shows in terminal and creates log file
