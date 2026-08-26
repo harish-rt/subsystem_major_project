@@ -12,6 +12,9 @@ tbold/
 *.swj
 *asdbw*
 *tmp
+*.cmd
+*ref 
+
 
 # Ignore Siemens Questa / ModelSim databases
 work/

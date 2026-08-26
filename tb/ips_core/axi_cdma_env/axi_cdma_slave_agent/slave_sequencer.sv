@@ -1,11 +1,11 @@
 /* RAITON_COPYRIGHT_BEGIN                                                 */
 /* This is an automatically generated prolog.                             */
 /*                                                                        */
-/* HOME/AXI_CDMA/tb/axi_cdma_interrupt_seq_item.sv                                    */
+/* AXI_INTERCONNECT_DESIGN/AXI_TB/slave_sequencer.sv                      */
 /*                                                                        */
 /* RAITON CONFIDENTIAL                                                    */
 /*                                                                        */
-/* COPYRIGHT RAITON SEMICONDUCTOR PVT LTD 2018,2021                       */
+/* COPYRIGHT RAITON SEMICONDUCTOR PVT LTD 2018,2022                       */
 /*                                                                        */
 /* All Rights Reserved                                                    */
 /*                                                                        */
@@ -19,15 +19,18 @@
 /* permission is obtained from Raiton semiconductor PVT. LTD.             */
 /*                                                                        */
 /* RAITON_COPYRIGHT_END                                                   */
-class axi_cdma_interrupt_seq_item extends uvm_sequence_item;
-   bit interrupt_out;
+class slave_sequencer extends uvm_sequencer #(slave_seq_item,slave_seq_item);
+   `uvm_component_utils (slave_sequencer)
+    uvm_tlm_analysis_fifo #(slave_seq_item) resp_af;
 
-   `uvm_object_utils_begin(axi_cdma_interrupt_seq_item)
-   `uvm_field_int(interrupt_out,UVM_ALL_ON)
-   `uvm_object_utils_end
-  
-  function new(string name="axi_cdma_interrupt_seq_item");
-            super.new(name);
-  endfunction
-   
-endclass :axi_cdma_interrupt_seq_item
+   function new (string name = "slave_sequencer" , uvm_component parent);
+      super.new(name,parent);
+     resp_af = new ("resp_af",this);
+   endfunction
+
+   extern task main_phase (uvm_phase phase);
+endclass :slave_sequencer
+
+task slave_sequencer :: main_phase (uvm_phase phase);
+     `uvm_info (get_full_name(),"slave_sequencer :: main_phase Triggred"  , UVM_MEDIUM)
+  endtask : main_phase

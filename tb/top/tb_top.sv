@@ -288,12 +288,12 @@ module top;
     assign cdma_data_mov_intf.awlock=0;
 
     initial begin
-        run_test("config_intc_test");
+        //run_test("config_intc_test");
         //run_test("load_bram_test");
         //run_test("read_bram_test");
         //run_test("config_cdma_ral_test");
         //run_test("read_cdma_test");
-        //run_test("base_test");
+        run_test("cpu_base_test");
     end
 
     initial begin
@@ -331,6 +331,7 @@ module top;
         cdma_config_obj=axi_cdma_config_obj::type_id::create("cdma_config_obj");
         cdma_config_obj.no_of_masters=1;
         cdma_config_obj.no_of_slaves=2;
+        cdma_config_obj.enable_scoreboard=0;
 
         cdma_config_obj.mas_if=new[1];
         cdma_config_obj.mas_if[0]=cdma_reg_intf;
