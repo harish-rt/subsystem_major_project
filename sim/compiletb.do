@@ -27,7 +27,7 @@ vlog -work xil_defaultlib -uvmver 1.2 \
 -l core_perif \
 -l spi_mem \
 -l core_wrapper \
-"../tb/cpu/cdma_ral/reg_block_pkg.sv" \
+"../tb/ips_core/axi_cdma_env/axi_cdma_env_pkg.sv"
 "../tb/top/intc_package.sv" \
 "../tb/top/tb_top.sv" 
 #2>&1 | tee compiletb.log

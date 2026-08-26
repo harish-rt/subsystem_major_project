@@ -2,11 +2,11 @@ class lite_intc_monitor extends uvm_monitor;
     `uvm_component_utils(lite_intc_monitor)
     `NEW_COMP
     
-    uvm_analysis_port #(lite_intc_seq_item)     mon_ap;
+    uvm_analysis_port #(lite_intc_seq_item)         mon_ap;
 	virtual axi4_lite_intc_intf.axi4_lite_mon_mod	mon_if;
 
-    lite_intc_seq_item                          sq_itm_h,aw_pkt,w_pkt,b_pkt,ar_pkt,r_pkt;
-    intc_config_obj                             obj;
+    lite_intc_seq_item                              sq_itm_h,aw_pkt,w_pkt,b_pkt,ar_pkt,r_pkt;
+    intc_config_obj                                 obj;
 
     lite_intc_seq_item  wr_addr_queue[$],rd_addr_queue[$],wr_data_queue[$],rd_data_queue[$],wr_resp_queue[$];
 
