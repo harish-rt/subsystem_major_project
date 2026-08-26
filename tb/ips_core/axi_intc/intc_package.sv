@@ -5,7 +5,6 @@ package intc_package;
     `include "uvm_macros.svh"
 
 // COMMON
-    `include "../../common/axi_parameters.sv"
     `include "intc_config_obj.sv"
 
 //IPS_CORE
