@@ -2,12 +2,16 @@
 `include "uvm_macros.svh"
 import uvm_pkg :: *;
 
-`include "../ips_core/axi_intc/lite_intc_interface.sv"
-`include "../ips_core/axi_intc/intc_interface.sv"
-import intc_package :: *;
-import axi_cdma_env_pkg ::*;
+//import cpu_package ::*;
+//import axi_cdma_env_pkg ::*;
+//import intc_package ::*;
 
 module top;
+
+import cpu_package ::*;
+import axi_cdma_env_pkg ::*;
+import intc_package ::*;
+    import soc_package ::*;
 
     bit aclk;
     bit areset_n;
@@ -36,8 +40,7 @@ module top;
     axi_cdma_axi_slave_intf     cdma_data_mov_intf(.aclk(aclk),.areset_n(arset_n));
     axi_cdma_interrupt_intf     cdma_interrupt_intf(.aclk(aclk));
 
-    axi_cdma_config_obj         cdma_config_obj;
-
+    
     core_wrapper dut(
         .clk_i(aclk),
         .rst_n_i(areset_n),
@@ -125,6 +128,11 @@ module top;
         .data_bridge2axi_int(lite_data_if)
     );
 
+    // Cpu 
+    assign axil_riscv_if.ACLK    = aclk;
+    assign axil_riscv_if.ARESETn = areset_n;
+    
+    // Interuppt controller
     // --- Write Channels (AW) ---
     assign lite_intc_if.axi_awaddr  = dut.IPS_CORE.axi_intc_0.s_axi_awaddr;
     assign lite_intc_if.axi_awvalid = dut.IPS_CORE.axi_intc_0.s_axi_awvalid;
@@ -154,9 +162,6 @@ module top;
     assign intc_if.intc_intr        = dut.IPS_CORE.intr_0;   //CDMA is 26 | Core Peri is 27
     assign intc_if.intc_irq         = dut.IPS_CORE.irq_0;
 
-    assign axil_riscv_if.ACLK       = aclk;
-    assign axil_riscv_if.ARESETn    = areset_n;
-    
 
     //cdma connect
 
@@ -308,25 +313,30 @@ module top;
         //#3000;
         //$finish();
     end
+    //interrupt controller config object
+    intc_config_obj                 intc_obj;
+    //cpu config object
+    config_obj                      obj;
+    //cdma config object
+    axi_cdma_config_obj             cdma_config_obj;
 
-    intc_config_obj                 obj;
-    cpu_config_obj                  cpu_obj;
 
      
     initial begin
         //INTC
-        obj                     =   new("obj");
-        obj.axi_lite_is_active  =   UVM_PASSIVE;
-        obj.lite_intc_intf      =   lite_intc_if;
-        obj.intc_is_active      =   UVM_PASSIVE;
-        obj.intc_if             =   intc_if;
-        uvm_config_db #(intc_config_obj)::  set(null,"*","intc_config_obj",obj);
+        intc_obj                     =   new("intc_obj");
+        intc_obj.axi_lite_is_active  =   UVM_PASSIVE;
+        intc_obj.lite_intc_intf      =   lite_intc_if;
+        intc_obj.intc_is_active      =   UVM_PASSIVE;
+        intc_obj.intc_if             =   intc_if;
+        uvm_config_db #(intc_config_obj)::  set(null,"*","intc_config_obj",intc_obj);
 
         //CPU
-        cpu_obj                 =   new("cpu_obj");
-        cpu_obj.riscv_is_active =   UVM_ACTIVE;
-        cpu_obj.riscv_lite_if   =   axil_riscv_if;
-        uvm_config_db #(cpu_config_obj)::   set(null,"*","cpu_config_obj",cpu_obj);
+        obj = config_obj :: type_id :: create ("obj");
+        obj.cpu_i  = axil_riscv_if;
+        obj.mas_is_active = 1;        // agent active
+        uvm_config_db #(config_obj) :: set (null , "*" , "config_obj" , obj);
+
 
         //CDMA
         cdma_config_obj=axi_cdma_config_obj::type_id::create("cdma_config_obj");
