@@ -18,9 +18,9 @@ class cpu_agent extends uvm_agent;
 
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
-        if(is_active == UVM_ACTIVE) begin
-            cpu_drv.seq_item_port.connect(cpu_sqr.seq_item_export);
-        end
+       // if(is_active == UVM_ACTIVE) begin
+           // cpu_drv.seq_item_port.connect(cpu_sqr.seq_item_export);
+      //  end
     endfunction
 
 endclass

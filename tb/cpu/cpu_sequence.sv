@@ -3,7 +3,7 @@ class base_cpu_sequence extends uvm_sequence#(axil_cpu_seq_item);
     `NEW_OBJ
     
     uvm_phase           phase;
-    cdma_reg_block      reg_block;
+    //cdma_reg_block      reg_block;
     uvm_status_e        status;
     uvm_reg_data_t      tdata;
     axil_cpu_seq_item   pkt;
@@ -71,7 +71,7 @@ class config_cdma_ral_seq extends base_cpu_sequence;
         //KERNEL: UVM_ERROR Response queue overflow, response was dropped
         //this.set_response_queue_depth(20);         //clears
 
-        reg_block.cdmacr.read(status,tdata);
+        //reg_block.cdmacr.read(status,tdata);
         `uvm_info("config_cdma_seq", "End of Config CDMA Sequence", UVM_MEDIUM)
     endtask
 
@@ -208,14 +208,14 @@ class config_cdma_seq extends base_cpu_sequence;
         super.body();
         `uvm_info("config_cdma_seq", "Start of Config CDMA Sequence", UVM_MEDIUM)
 
-        do begin
+        /*do begin
             reg_block.cdmasr.read(status,tdata);
         end while(tdata[1]==0);
         
         reg_block.cdmacr.write(status,'h5000);
         reg_block.sa.write(status,'h7100_0000);
         reg_block.da.write(status,'h8000_0000);
-        reg_block.btt.write(status,1);
+        reg_block.btt.write(status,1);*/
 
         /*
         start_item(pkt);
