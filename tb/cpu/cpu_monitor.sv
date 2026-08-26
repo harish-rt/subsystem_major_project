@@ -1,6 +1,3 @@
-`include "uvm_macros.svh"
-import uvm_pkg::*;
-
 class cpu_monitor extends uvm_monitor;
    `uvm_component_utils(cpu_monitor)
 

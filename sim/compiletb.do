@@ -30,8 +30,8 @@ vlog -work xil_defaultlib -uvmver 1.2 \
 "../tb/top/cpu_package.sv" \
 "../tb/ips_core/axi_cdma_env/axi_cdma_env_pkg.sv" \
 "../tb/top/intc_package.sv" \
-"../tb/top/tb_top.sv"
-#2>&1 | tee compiletb.log
+"../tb/top/tb_top.sv" \
+2>&1 | tee compiletb.log
 
 
 #shows in terminal and creates log file

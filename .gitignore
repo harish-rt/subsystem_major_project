@@ -4,6 +4,7 @@ riviera/
 tb2/
 tbold/
 riscv_tb/
+*.cmd
 *.dataset
 *.vstf
 *.asdb
