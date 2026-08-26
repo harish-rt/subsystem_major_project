@@ -1,12 +1,12 @@
-class base_cpu_sequence extends uvm_sequence#(axil_cpu_seq_item);
+class base_cpu_sequence extends uvm_sequence#(cpu_seq_item);
     `uvm_object_utils(base_cpu_sequence)
     `NEW_OBJ
     
     uvm_phase           phase;
-    cdma_reg_block      reg_block;
+    //cdma_reg_block      reg_block;
     uvm_status_e        status;
     uvm_reg_data_t      tdata;
-    axil_cpu_seq_item   pkt;
+    cpu_seq_item   pkt;
 
     task pre_body();
         phase   =   get_starting_phase();
@@ -26,7 +26,7 @@ class base_cpu_sequence extends uvm_sequence#(axil_cpu_seq_item);
     task body ();
         `uvm_info(get_full_name(),"inside base_cpu_sequence body", UVM_MEDIUM)
 
-        pkt = axil_cpu_seq_item::type_id::create("pkt");
+        pkt = cpu_seq_item::type_id::create("pkt");
     endtask
 endclass : base_cpu_sequence
 
@@ -48,7 +48,7 @@ class read_cdma_seq extends base_cpu_sequence;
             start_item(pkt);
             if(!pkt.randomize() with {
                 ARADDR  == addr;
-                write   == READ;
+                operation   == READ;
                 })begin
                 `uvm_error(get_full_name(), "randomization_failed")
             end
@@ -71,7 +71,7 @@ class config_cdma_ral_seq extends base_cpu_sequence;
         //KERNEL: UVM_ERROR Response queue overflow, response was dropped
         //this.set_response_queue_depth(20);         //clears
 
-        reg_block.cdmacr.read(status,tdata);
+        //reg_block.cdmacr.read(status,tdata);
         `uvm_info("config_cdma_seq", "End of Config CDMA Sequence", UVM_MEDIUM)
     endtask
 
@@ -95,7 +95,7 @@ class read_bram_seq extends base_cpu_sequence;
             start_item(pkt);
             if(!pkt.randomize() with {
                 ARADDR  == addr;
-                write   == READ;
+                operation   == READ;
                 })begin
                 `uvm_error(get_full_name(), "randomization_failed")
             end
@@ -123,7 +123,7 @@ class load_bram_seq extends base_cpu_sequence;
             AWADDR  == 'h7100_0000;
             WDATA   == 'ha;
             WSTRB   == 'hf;
-            write   == WRITE;
+            operation   == WRITE;
             })begin
             `uvm_error(get_full_name(), "randomization_failed")
         end
@@ -133,7 +133,7 @@ class load_bram_seq extends base_cpu_sequence;
         start_item(pkt);
         if(!pkt.randomize() with {
             ARADDR  == 'h7100_0000;
-            write   == READ;
+            operation   == READ;
             })begin
             `uvm_error(get_full_name(), "randomization_failed")
         end
@@ -143,7 +143,7 @@ class load_bram_seq extends base_cpu_sequence;
         start_item(pkt);
         if(!pkt.randomize() with {
             ARADDR  == 'h7100_0000;
-            write   == READ;
+            operation   == READ;
             })begin
             `uvm_error(get_full_name(), "randomization_failed")
         end
@@ -162,28 +162,34 @@ class config_intc_seq extends base_cpu_sequence;
     task body();
         super.body();
         
-        intc_d[26] = 1; //CDMA
-        intc_d[27] = 0; //Peripherals
+        intc_d      = 0;
+        intc_d[26]  = 1; //CDMA
+        intc_d[27]  = 0; //Peripherals
 
         start_item(pkt);
         if(!pkt.randomize() with {
             AWADDR  == 'h7000_1008; //Interrupt Enable Register
             WDATA   == intc_d;
-            write   == WRITE;
+            WSTRB   == 'hf;
+            operation   == WRITE;
+            reg_type== IER;
             })begin
             `uvm_error(get_full_name(), "randomization_failed")
         end
         finish_item(pkt);
         get_response(pkt);
 
-        intc_d[0] = 1;  //Master Irq en
-        intc_d[1] = 1;  //Hardware Interrupt en
+        intc_d      = 0;
+        intc_d[0]   = 1;  //Master Irq en
+        intc_d[1]   = 1;  //Hardware Interrupt en
 
         start_item(pkt);
         if(!pkt.randomize() with {
             AWADDR  == 'h7000_101c; //Master Enable Register
             WDATA   == intc_d;
-            write   == WRITE;
+            WSTRB   == 'hf;
+            operation   == WRITE;
+            reg_type== MER;
             })begin
             `uvm_error(get_full_name(), "randomization_failed")
         end
@@ -201,17 +207,56 @@ class config_cdma_seq extends base_cpu_sequence;
         super.body();
         `uvm_info("config_cdma_seq", "Start of Config CDMA Sequence", UVM_MEDIUM)
 
+        do begin
+            //reg_block.cdmasr.read(status,tdata);
+        end while(tdata[1]==0);
+        
+        //reg_block.cdmacr.operation(status,'h5000);
+        //reg_block.sa.operation(status,'h7100_0000);
+        //reg_block.da.operation(status,'h8000_0000);
+        //reg_block.btt.operation(status,1);
+
+        /*
         start_item(pkt);
         if(!pkt.randomize() with {
             AWADDR  == cdmacr;
-            //WDATA   == ;
-            write   == WRITE;
             })begin
             `uvm_error(get_full_name(), "randomization_failed")
         end
         finish_item(pkt);
-        get_response(pkt);             
+        get_response(pkt);*/
         `uvm_info("config_cdma_seq", "End of Config CDMA Sequence", UVM_MEDIUM)
     endtask
 
 endclass : config_cdma_seq
+
+/*
+class config_intc_seq extends base_cpu_sequence;
+    `uvm_object_utils(config_intc_seq)
+    `NEW_OBJ
+    
+    int addr;
+
+    task body();
+        super.body();
+        `uvm_info("config_intc_seq", "Start of Config CDMA Sequence", UVM_MEDIUM)
+        //KERNEL: UVM_ERROR Response queue overflow, response was dropped
+        //this.set_response_queue_depth(20);         //clears
+
+        for (int i = 0; i < 10; i++) begin        
+            addr = 'h7000_1000 + (i*4);
+            start_item(pkt);
+            if(!pkt.randomize() with {
+                ARADDR  == addr;
+                operation   == READ;
+                })begin
+                `uvm_error(get_full_name(), "randomization_failed")
+            end
+            finish_item(pkt);
+            get_response(pkt);             
+        end
+        `uvm_info("config_intc_seq", "End of Config CDMA Sequence", UVM_MEDIUM)
+    endtask
+
+endclass : config_intc_seq
+*/

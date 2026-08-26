@@ -3,11 +3,17 @@ lib/
 riviera/
 tb2/
 tbold/
+riscv_tb/
+*.cmd
 *.dataset
 *.vstf
 *.asdb
+*.acdb
 *.awc
 *.error
+*.swj
+*asdbw*
+*tmp
 
 # Ignore Siemens Questa / ModelSim databases
 work/
@@ -23,4 +29,3 @@ transcript
 *.swn
 *.swo
 *.swp
-

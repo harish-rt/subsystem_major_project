@@ -3,7 +3,7 @@ interface axi4_lite_intc_intf(input bit aclk, logic areset_n);
 `include "uvm_macros.svh"
  import uvm_pkg :: *;
 
-  logic [8:0]  axi_awaddr;                
+  logic [31:0]  axi_awaddr;                
   logic axi_awvalid;               
   logic axi_awready;                
   logic [31:0] axi_wdata;               
@@ -13,7 +13,7 @@ interface axi4_lite_intc_intf(input bit aclk, logic areset_n);
   logic [1:0] axi_bresp;                
   logic axi_bvalid;                  
   logic axi_bready;               
-  logic [8:0] axi_araddr;                
+  logic [31:0] axi_araddr;                
   logic axi_arvalid;
   logic axi_arready;                                
   logic [31:0]axi_rdata;                   
@@ -21,11 +21,11 @@ interface axi4_lite_intc_intf(input bit aclk, logic areset_n);
   logic axi_rvalid;                 
   logic axi_rready;
 
-	logic [31:0] dut_isr, dut_iar, dut_ier, dut_imr;
+	//logic [31:0] dut_isr, dut_iar, dut_ier, dut_imr;
 
 //driver_clocking block//
 
-clocking axi_4_lite_driver_cb@(posedge aclk);
+clocking axi4_lite_drv_cb@(posedge aclk);
   default input #1 output #0;
   output axi_awaddr;
   output axi_awvalid;      
@@ -47,7 +47,7 @@ clocking axi_4_lite_driver_cb@(posedge aclk);
 endclocking 
 
 //monitor clocking block//
-clocking axi_4_lite_monitor_cb@(posedge aclk);
+clocking axi4_lite_mon_cb@(posedge aclk);
   default input #1 output #0;  
   input axi_awaddr;
   input axi_awvalid;      
@@ -68,10 +68,11 @@ clocking axi_4_lite_monitor_cb@(posedge aclk);
   input axi_rready;
 endclocking
 
-  modport axi_4_lite_driver_modport(clocking axi_4_lite_driver_cb,output areset_n);
-  modport axi_4_lite_monitor_modport(clocking axi_4_lite_monitor_cb,input areset_n);
+  modport axi4_lite_drv_mod(clocking axi4_lite_drv_cb,output areset_n);
+  modport axi4_lite_mon_mod(clocking axi4_lite_mon_cb,input areset_n);
 
 endinterface
+
 /*
 	property aw_addr;
 		@(posedge aclk) axi_awvalid |=> $stable(axi_awaddr) ##[1:$] axi_awready ##1 (!axi_awvalid); 
