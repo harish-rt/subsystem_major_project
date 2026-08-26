@@ -1,17 +1,15 @@
 `timescale 1ns/1ps
+
+module top;
 `include "uvm_macros.svh"
 import uvm_pkg :: *;
 
-//import cpu_package ::*;
-//import axi_cdma_env_pkg ::*;
-//import intc_package ::*;
-
-module top;
-
 import cpu_package ::*;
 import axi_cdma_env_pkg ::*;
+import mem_package :: *;
 import intc_package ::*;
-    import soc_package ::*;
+
+import soc_package ::*;
 
     bit aclk;
     bit areset_n;
@@ -29,6 +27,9 @@ import intc_package ::*;
     //S02
     axi4_lite_intf lite_data_if();
 
+    //memory interface
+    axi4_lite_intf mem_intf();
+
 // AXI Interrupt Controller
     assign intc_proc_rst    =   ~areset_n;
     axi4_lite_intc_intf         lite_intc_if(.aclk(aclk),.areset_n(areset_n));
@@ -37,7 +38,7 @@ import intc_package ::*;
 //axi cdma interfaces 
     axi_cdma_axi_master_intf    cdma_reg_intf(.aclk(aclk),.areset_n(areset_n));
     axi_cdma_axi_slave_intf     cdma_sg_intf(.aclk(aclk),.areset_n(areset_n));
-    axi_cdma_axi_slave_intf     cdma_data_mov_intf(.aclk(aclk),.areset_n(arset_n));
+    axi_cdma_axi_slave_intf     cdma_data_mov_intf(.aclk(aclk),.areset_n(areset_n));
     axi_cdma_interrupt_intf     cdma_interrupt_intf(.aclk(aclk));
 
     
@@ -293,6 +294,26 @@ import intc_package ::*;
     assign cdma_data_mov_intf.awregion=0;
     assign cdma_data_mov_intf.awlock=0;
 
+    //Memory assignment
+    assign mem_intf.ARADDR  = dut.AXI_SLAVE_MEM.s_axi_intf.ARADDR;   
+    assign mem_intf.ARREADY = dut.AXI_SLAVE_MEM.s_axi_intf.ARREADY;  
+    assign mem_intf.ARVALID = dut.AXI_SLAVE_MEM.s_axi_intf.ARVALID;
+    assign mem_intf.AWADDR  = dut.AXI_SLAVE_MEM.s_axi_intf.AWADDR;   
+    assign mem_intf.AWREADY = dut.AXI_SLAVE_MEM.s_axi_intf.AWREADY;  
+    assign mem_intf.AWVALID = dut.AXI_SLAVE_MEM.s_axi_intf.AWVALID; 
+    assign mem_intf.BREADY  = dut.AXI_SLAVE_MEM.s_axi_intf.BREADY;   
+    assign mem_intf.BRESP   = dut.AXI_SLAVE_MEM.s_axi_intf.BRESP;    
+    assign mem_intf.BVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.BVALID;   
+    assign mem_intf.RDATA   = dut.AXI_SLAVE_MEM.s_axi_intf.RDATA;    
+    assign mem_intf.RREADY  = dut.AXI_SLAVE_MEM.s_axi_intf.RREADY;   
+    assign mem_intf.RRESP   = dut.AXI_SLAVE_MEM.s_axi_intf.RRESP;    
+    assign mem_intf.RVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.RVALID;   
+    assign mem_intf.WDATA   = dut.AXI_SLAVE_MEM.s_axi_intf.WDATA;    
+    assign mem_intf.WREADY  = dut.AXI_SLAVE_MEM.s_axi_intf.WREADY;   
+    assign mem_intf.WSTRB   = dut.AXI_SLAVE_MEM.s_axi_intf.WSTRB;    
+    assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
+ 
+
     initial begin
         run_test("config_intc_test");
         //run_test("load_bram_test");
@@ -316,12 +337,16 @@ import intc_package ::*;
     //interrupt controller config object
     intc_config_obj                 intc_obj;
     //cpu config object
-    config_obj                      obj;
+    cpu_config_obj                  obj;
     //cdma config object
     axi_cdma_config_obj             cdma_config_obj;
 
 
-     
+    initial begin
+    	uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
+    end
+   
+    
     initial begin
         //INTC
         intc_obj                     =   new("intc_obj");
@@ -332,10 +357,10 @@ import intc_package ::*;
         uvm_config_db #(intc_config_obj)::  set(null,"*","intc_config_obj",intc_obj);
 
         //CPU
-        obj = config_obj :: type_id :: create ("obj");
+        obj = cpu_config_obj :: type_id :: create ("obj");
         obj.cpu_i  = axil_riscv_if;
         obj.mas_is_active = 1;        // agent active
-        uvm_config_db #(config_obj) :: set (null , "*" , "config_obj" , obj);
+        uvm_config_db #(cpu_config_obj) :: set (null , "*" , "cpu_config_obj" , obj);
 
 
         //CDMA
