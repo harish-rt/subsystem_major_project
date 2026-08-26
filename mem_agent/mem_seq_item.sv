@@ -36,29 +36,29 @@ class mem_seq_item extends uvm_sequence_item;
     
     `uvm_object_utils_begin(mem_seq_item)
 
-    `uvm_field_int(araddr,UVM_ALL_ON);
-    `uvm_field_int(arprot,UVM_ALL_ON);
-    `uvm_field_int(arready,UVM_ALL_ON);
-    `uvm_field_int(arvalid,UVM_ALL_ON);
+    `uvm_field_int(araddr,UVM_ALL_ON)
+    `uvm_field_int(arprot,UVM_ALL_ON)
+    `uvm_field_int(arready,UVM_ALL_ON)
+    `uvm_field_int(arvalid,UVM_ALL_ON)
 
-    `uvm_field_int(awaddr,UVM_ALL_ON);
-    `uvm_field_int(awprot,UVM_ALL_ON);
-    `uvm_field_int(awready,UVM_ALL_ON);
-    `uvm_field_int(awvalid,UVM_ALL_ON);
+    `uvm_field_int(awaddr,UVM_ALL_ON)
+    `uvm_field_int(awprot,UVM_ALL_ON)
+    `uvm_field_int(awready,UVM_ALL_ON)
+    `uvm_field_int(awvalid,UVM_ALL_ON)
     
-    `uvm_field_int(bready,UVM_ALL_ON);
-	`uvm_field_enum(RESPONSE_TYPE,bresp,UVM_ALL_ON);
-    `uvm_field_int(bvalid,UVM_ALL_ON);
+    `uvm_field_int(bready,UVM_ALL_ON)
+	`uvm_field_enum(RESPONSE_TYPE,bresp,UVM_ALL_ON)
+    `uvm_field_int(bvalid,UVM_ALL_ON)
 
-    `uvm_field_int(araddr,UVM_ALL_ON);
-    `uvm_field_int(arprot,UVM_ALL_ON);
-    `uvm_field_int(arready,UVM_ALL_ON);
-    `uvm_field_int(arvalid,UVM_ALL_ON);
+    `uvm_field_int(araddr,UVM_ALL_ON)
+    `uvm_field_int(arprot,UVM_ALL_ON)
+    `uvm_field_int(arready,UVM_ALL_ON)
+    `uvm_field_int(arvalid,UVM_ALL_ON)
 
-    `uvm_field_int(rdata,UVM_ALL_ON);
-	`uvm_field_enum(RESPONSE_TYPE,rresp,UVM_ALL_ON);
-    `uvm_field_int(rvalid,UVM_ALL_ON);
-    `uvm_field_int(rready,UVM_ALL_ON);
+    `uvm_field_int(rdata,UVM_ALL_ON)
+	`uvm_field_enum(RESPONSE_TYPE,rresp,UVM_ALL_ON)
+    `uvm_field_int(rvalid,UVM_ALL_ON)
+    `uvm_field_int(rready,UVM_ALL_ON)
     `uvm_object_utils_end   
 
     function new (string name = "mem_seq_item");

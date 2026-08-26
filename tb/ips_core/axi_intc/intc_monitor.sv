@@ -2,6 +2,59 @@ class intc_monitor extends uvm_monitor;
     `uvm_component_utils(intc_monitor)
     `NEW_COMP
     
+	intc_seq_item 					    pkt;
+
+    bit                          [31:0] prev_intr;
+    bit                                 prev_irq;
+
+    virtual intc_intf                   mon_intc_intf;
+	uvm_analysis_port #(intc_seq_item) 	mon_intc_ap;
+
+    extern function void build_phase	(uvm_phase phase);
+    extern task main_phase				(uvm_phase phase);
+
+endclass : intc_monitor
+
+function void intc_monitor :: build_phase (uvm_phase phase);
+    `uvm_info ("intc_monitor :: build_phase started ", "",UVM_LOW)
+    super.build_phase(phase);
+    
+    mon_intc_ap = new("mon_intc_ap", this);
+    `uvm_info ("intc_monitor  :: build_phase ended ", "",UVM_LOW)
+endfunction 
+
+task intc_monitor :: main_phase(uvm_phase phase);		
+	wait(mon_intc_intf.intc_procss_rst==0);
+    `uvm_info ("intc_monitor :: main_phase started ", "",UVM_LOW)
+    
+    forever begin
+        @(mon_intc_intf.intc_interface_monitor_cb);
+        if((mon_intc_intf.intc_interface_monitor_cb.intc_intr != prev_intr) ||
+            (mon_intc_intf.intc_interface_monitor_cb.intc_irq != prev_irq)) begin
+	        
+            pkt = intc_seq_item::type_id::create("pkt");
+
+            pkt.intc_intr       = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
+            pkt.intc_irq        = mon_intc_intf.intc_interface_monitor_cb.intc_irq;
+
+            mon_intc_ap.write(pkt);
+            `uvm_info("intc_monitor_pkt",pkt.sprint(),UVM_MEDIUM)            
+
+            prev_intr   = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
+            prev_irq    = mon_intc_intf.intc_interface_monitor_cb.intc_irq;
+        end
+    end
+    `uvm_info ("mon_intc :: main_phase ended ", "",UVM_LOW) 
+endtask : main_phase
+
+
+
+
+/*
+class intc_monitor extends uvm_monitor;
+    `uvm_component_utils(intc_monitor)
+    `NEW_COMP
+    
     virtual intc_intf 			            mon_intc_intf;
   
 	uvm_analysis_port #(intc_seq_item) 	    mon_intc_ap;
@@ -56,18 +109,15 @@ endclass
   task intc_monitor :: collections();
   	
     @(mon_intc_intf.intc_interface_monitor_cb);
-		@(mon_intc_intf.intc_procss_rst,
-			mon_intc_intf.intc_interface_monitor_cb.intc_intr,
-			mon_intc_intf.intc_interface_monitor_cb.intc_irq,
-			mon_intc_intf.intc_interface_monitor_cb.intc_procss_acklg);
+		@(  mon_intc_intf.intc_procss_rst,
+		    mon_intc_intf.intc_interface_monitor_cb.intc_intr,
+			mon_intc_intf.intc_interface_monitor_cb.intc_irq);
 		
-		tx_h.intc_procss_rst	 = mon_intc_intf.intc_procss_rst;
-    tx_h.intc_intr_addr    = mon_intc_intf.intc_interface_monitor_cb.intc_intr_addr;
-    tx_h.intc_intr         = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
-    tx_h.intc_irq          = mon_intc_intf.intc_interface_monitor_cb.intc_irq; 
-    tx_h.intc_procss_acklg = mon_intc_intf.intc_interface_monitor_cb.intc_procss_acklg;
+        tx_h.intc_intr_addr     = mon_intc_intf.intc_interface_monitor_cb.intc_intr_addr;
+        tx_h.intc_intr          = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
+        tx_h.intc_irq           = mon_intc_intf.intc_interface_monitor_cb.intc_irq; 
 
-    mon_intc_ap.write(tx_h);
+        mon_intc_ap.write(tx_h);
 
   endtask
 	

@@ -2,17 +2,21 @@
 `include "uvm_macros.svh"
 import uvm_pkg :: *;
 
+`include "../cpu/cpu_intf.sv"
 `include "../ips_core/axi_intc/lite_intc_interface.sv"
 `include "../ips_core/axi_intc/intc_interface.sv"
-//`include "../../rtl/sub_ips/axi_intf/rtl/axi_lite_intf.sv" 
 
-import soc_package :: *;
 import mem_package :: *;
+import cpu_package ::*;
+import axi_cdma_env_pkg ::*;
+import intc_package ::*;
 
 module top;
 
     bit aclk;
     bit areset_n;
+
+    wire intc_proc_rst;
 
     wire axi_intr;
     wire axi_irq;
@@ -26,11 +30,23 @@ module top;
     axi4_lite_intf lite_data_if();
 
     //memory interface
-    axi4_lite_intf mem_intf(.ACLK(aclk), .ARESETn(areset_n));
+    axi4_lite_intf mem_intf();
 
 // AXI Interrupt Controller
-    axi4_lite_intc_intf lite_intc_if(.aclk(aclk),.areset_n(areset_n));
-    intc_intf           intc_if(.intc_procss_clk(aclk),.intc_procss_rst(areset_n));
+    assign intc_proc_rst = ~areset_n;
+    axi4_lite_intc_intf         lite_intc_if(.aclk(aclk),.areset_n(areset_n));
+    intc_intf                   intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
+     
+//axi cdma interfaces 
+    axi_cdma_axi_master_intf    cdma_reg_intf(.aclk(aclk),.areset_n(areset_n));
+    axi_cdma_axi_slave_intf     cdma_sg_intf(.aclk(aclk),.areset_n(areset_n));
+    axi_cdma_axi_slave_intf     cdma_data_mov_intf(.aclk(aclk),.areset_n(arset_n));
+    axi_cdma_interrupt_intf     cdma_interrupt_intf(.aclk(aclk));
+
+//cpu interface    
+    //cpu_intf   cpu_i(.aclk(clk_i),.areset_n(rst_n_i));
+    
+    axi_cdma_config_obj         cdma_config_obj;
 
     core_wrapper dut(
         .clk_i(aclk),
@@ -112,60 +128,201 @@ module top;
         .ext_axi4_master(master_if),
         .ext_axi4_slave(slave_if),
 
-//instructions and data interfaces
+    //instructions and data interfaces
         //S00
         .inst_bridge2axi_int(axil_riscv_if),
         //S02
         .data_bridge2axi_int(lite_data_if)
     );
 
-
-    assign lite_intc_if.axi_araddr  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_ARADDR;
-    assign lite_intc_if.axi_arready = dut.IPS_CORE.axi_interconnect_0_M02_AXI_ARREADY;
-    assign lite_intc_if.axi_arvalid = dut.IPS_CORE.axi_interconnect_0_M02_AXI_ARVALID;
-    assign lite_intc_if.axi_awaddr  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_AWADDR;
-    assign lite_intc_if.axi_awready = dut.IPS_CORE.axi_interconnect_0_M02_AXI_AWREADY;
-    assign lite_intc_if.axi_awvalid = dut.IPS_CORE.axi_interconnect_0_M02_AXI_AWVALID;
-    assign lite_intc_if.axi_bready  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_BREADY;
-    assign lite_intc_if.axi_bresp   = dut.IPS_CORE.axi_interconnect_0_M02_AXI_BRESP;
-    assign lite_intc_if.axi_bvalid  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_BVALID;
-    assign lite_intc_if.axi_rdata   = dut.IPS_CORE.axi_interconnect_0_M02_AXI_RDATA;
-    assign lite_intc_if.axi_rready  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_RREADY;
-    assign lite_intc_if.axi_rresp   = dut.IPS_CORE.axi_interconnect_0_M02_AXI_RRESP;
-    assign lite_intc_if.axi_rvalid  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_RVALID;
-    assign lite_intc_if.axi_wdata   = dut.IPS_CORE.axi_interconnect_0_M02_AXI_WDATA;
-    assign lite_intc_if.axi_wready  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_WREADY;
-    assign lite_intc_if.axi_wstrb   = dut.IPS_CORE.axi_interconnect_0_M02_AXI_WSTRB;
-    assign lite_intc_if.axi_wvalid  = dut.IPS_CORE.axi_interconnect_0_M02_AXI_WVALID;
-
-    assign intc_if.intc_irq         = dut.intr_ctrl_irq;
-    assign intc_if.intc_intr        = dut.intr_0;
+    // Cpu 
+    assign axil_riscv_if.ACLK    = aclk;
+    assign axil_riscv_if.ARESETn = areset_n;
     
-    assign axil_riscv_if.ACLK       = aclk;
-    assign axil_riscv_if.ARESETn    = areset_n;
+    // Interuppt controller
+    // --- Write Channels (AW) ---
+    assign lite_intc_if.axi_awaddr  = dut.IPS_CORE.axi_intc_0.s_axi_awaddr;
+    assign lite_intc_if.axi_awvalid = dut.IPS_CORE.axi_intc_0.s_axi_awvalid;
+    assign lite_intc_if.axi_awready = dut.IPS_CORE.axi_intc_0.s_axi_awready;
+    // --- Write Data Channel (W) ---
+    assign lite_intc_if.axi_wdata   = dut.IPS_CORE.axi_intc_0.s_axi_wdata;
+    assign lite_intc_if.axi_wstrb   = dut.IPS_CORE.axi_intc_0.s_axi_wstrb;
+    assign lite_intc_if.axi_wvalid  = dut.IPS_CORE.axi_intc_0.s_axi_wvalid;
+    assign lite_intc_if.axi_wready  = dut.IPS_CORE.axi_intc_0.s_axi_wready;
+    // --- Write Response Channel (B) ---
+    assign lite_intc_if.axi_bresp   = dut.IPS_CORE.axi_intc_0.s_axi_bresp;
+    assign lite_intc_if.axi_bvalid  = dut.IPS_CORE.axi_intc_0.s_axi_bvalid;
+    assign lite_intc_if.axi_bready  = dut.IPS_CORE.axi_intc_0.s_axi_bready;
+    
+    // --- Read Channels (AR) ---
+    assign lite_intc_if.axi_araddr  = dut.IPS_CORE.axi_intc_0.s_axi_araddr;
+    assign lite_intc_if.axi_arvalid = dut.IPS_CORE.axi_intc_0.s_axi_arvalid;
+    assign lite_intc_if.axi_arready = dut.IPS_CORE.axi_intc_0.s_axi_arready;
+    // --- Read Data Channel (R) ---
+    assign lite_intc_if.axi_rdata   = dut.IPS_CORE.axi_intc_0.s_axi_rdata;
+    assign lite_intc_if.axi_rresp   = dut.IPS_CORE.axi_intc_0.s_axi_rresp;
+    assign lite_intc_if.axi_rvalid  = dut.IPS_CORE.axi_intc_0.s_axi_rvalid;
+    assign lite_intc_if.axi_rready  = dut.IPS_CORE.axi_intc_0.s_axi_rready;
+
+
+    // Interrupt Wires
+    assign intc_if.intc_intr        = dut.IPS_CORE.intr_0;   //CDMA is 26 | Core Peri is 27
+    assign intc_if.intc_irq         = dut.IPS_CORE.irq_0;
+
+
+    //cdma connect
+
+    assign cdma_reg_intf.arready=dut.IPS_CORE.axi_interconnect_0_M00_AXI_ARREADY;
+    assign cdma_reg_intf.arvalid=dut.IPS_CORE.axi_interconnect_0_M00_AXI_ARVALID;
+    assign cdma_reg_intf.araddr=dut.IPS_CORE.axi_interconnect_0_M00_AXI_ARADDR;
+
+    assign cdma_reg_intf.rdata=dut.IPS_CORE.axi_interconnect_0_M00_AXI_RDATA;
+    assign cdma_reg_intf.rvalid=dut.IPS_CORE.axi_interconnect_0_M00_AXI_RVALID;
+    assign cdma_reg_intf.rready=dut.IPS_CORE.axi_interconnect_0_M00_AXI_RREADY;
+    assign cdma_reg_intf.rresp=dut.IPS_CORE.axi_interconnect_0_M00_AXI_RRESP;
+    
+    assign cdma_reg_intf.awaddr=dut.IPS_CORE.axi_interconnect_0_M00_AXI_AWADDR;
+    assign cdma_reg_intf.awvalid=dut.IPS_CORE.axi_interconnect_0_M00_AXI_AWVALID;
+    assign cdma_reg_intf.awready=dut.IPS_CORE.axi_interconnect_0_M00_AXI_AWREADY;
+    
+    assign cdma_reg_intf.wdata=dut.IPS_CORE.axi_interconnect_0_M00_AXI_WDATA;
+    assign cdma_reg_intf.wvalid=dut.IPS_CORE.axi_interconnect_0_M00_AXI_WVALID;
+    assign cdma_reg_intf.wready=dut.IPS_CORE.axi_interconnect_0_M00_AXI_WREADY;
+    
+    assign cdma_reg_intf.bvalid=dut.IPS_CORE.axi_interconnect_0_M00_AXI_BVALID;
+    assign cdma_reg_intf.bready=dut.IPS_CORE.axi_interconnect_0_M00_AXI_BREADY;
+    assign cdma_reg_intf.bresp=dut.IPS_CORE.axi_interconnect_0_M00_AXI_BRESP;
+
+    assign cdma_sg_intf.awaddr=dut.IPS_CORE.S01_AXI_1_AWADDR;
+    assign cdma_sg_intf.awlen=dut.IPS_CORE.S01_AXI_1_AWLEN;
+    assign cdma_sg_intf.awsize=dut.IPS_CORE.S01_AXI_1_AWSIZE;
+    assign cdma_sg_intf.awburst=dut.IPS_CORE.S01_AXI_1_AWBURST;
+    assign cdma_sg_intf.awvalid=dut.IPS_CORE.S01_AXI_1_AWVALID;
+    assign cdma_sg_intf.awready=dut.IPS_CORE.S01_AXI_1_AWREADY;
+    assign cdma_sg_intf.awcache=dut.IPS_CORE.S01_AXI_1_AWCACHE;
+    assign cdma_sg_intf.awprot=dut.IPS_CORE.S01_AXI_1_AWPROT;
+        
+    assign cdma_sg_intf.bresp=dut.IPS_CORE.S01_AXI_1_BRESP;
+    assign cdma_sg_intf.bvalid=dut.IPS_CORE.S01_AXI_1_BVALID;
+    assign cdma_sg_intf.bready=dut.IPS_CORE.S01_AXI_1_BREADY;
+
+    assign cdma_sg_intf.wdata=dut.IPS_CORE.S01_AXI_1_WDATA;
+    assign cdma_sg_intf.wstrobe=dut.IPS_CORE.S01_AXI_1_WSTRB;
+    assign cdma_sg_intf.wlast=dut.IPS_CORE.S01_AXI_1_WLAST;
+    assign cdma_sg_intf.wvalid=dut.IPS_CORE.S01_AXI_1_WVALID;
+    assign cdma_sg_intf.wready=dut.IPS_CORE.S01_AXI_1_WREADY;
+
+    assign cdma_sg_intf.araddr=dut.IPS_CORE.S01_AXI_1_ARADDR;
+    assign cdma_sg_intf.arlen=dut.IPS_CORE.S01_AXI_1_ARLEN;
+    assign cdma_sg_intf.arsize=dut.IPS_CORE.S01_AXI_1_ARSIZE;
+    assign cdma_sg_intf.arburst=dut.IPS_CORE.S01_AXI_1_ARBURST;
+    assign cdma_sg_intf.arvalid=dut.IPS_CORE.S01_AXI_1_ARVALID;
+    assign cdma_sg_intf.arready=dut.IPS_CORE.S01_AXI_1_ARREADY;
+    assign cdma_sg_intf.arcache=dut.IPS_CORE.S01_AXI_1_ARCACHE;
+    assign cdma_sg_intf.arprot=dut.IPS_CORE.S01_AXI_1_ARPROT;
+    assign cdma_sg_intf.rvalid=dut.IPS_CORE.S01_AXI_1_RVALID;
+    assign cdma_sg_intf.rready=dut.IPS_CORE.S01_AXI_1_RREADY;
+    assign cdma_sg_intf.rdata=dut.IPS_CORE.S01_AXI_1_RDATA;
+    assign cdma_sg_intf.rlast=dut.IPS_CORE.S01_AXI_1_RLAST;
+    assign cdma_sg_intf.rresp=dut.IPS_CORE.S01_AXI_1_RRESP;
+
+    assign cdma_data_mov_intf.awlen=dut.IPS_CORE.S03_AXI_1_AWLEN;
+    assign cdma_data_mov_intf.awsize=dut.IPS_CORE.S03_AXI_1_AWSIZE;
+    assign cdma_data_mov_intf.awaddr=dut.IPS_CORE.S03_AXI_1_AWADDR;
+    assign cdma_data_mov_intf.awburst=dut.IPS_CORE.S03_AXI_1_AWBURST;
+    assign cdma_data_mov_intf.awvalid=dut.IPS_CORE.S03_AXI_1_AWVALID;
+    assign cdma_data_mov_intf.awready=dut.IPS_CORE.S03_AXI_1_AWREADY;
+    assign cdma_data_mov_intf.awprot=dut.IPS_CORE.S03_AXI_1_AWPROT;
+    assign cdma_data_mov_intf.awcache=dut.IPS_CORE.S03_AXI_1_AWCACHE;
+    
+    assign cdma_data_mov_intf.bresp=dut.IPS_CORE.S03_AXI_1_BRESP;
+    assign cdma_data_mov_intf.bvalid=dut.IPS_CORE.S03_AXI_1_BVALID;
+    assign cdma_data_mov_intf.bready=dut.IPS_CORE.S03_AXI_1_BREADY;
+
+    assign cdma_data_mov_intf.wdata=dut.IPS_CORE.S03_AXI_1_WDATA;
+    assign cdma_data_mov_intf.wstrobe=dut.IPS_CORE.S03_AXI_1_WSTRB;
+    assign cdma_data_mov_intf.wlast=dut.IPS_CORE.S03_AXI_1_WLAST;
+    assign cdma_data_mov_intf.wvalid=dut.IPS_CORE.S03_AXI_1_WVALID;
+    assign cdma_data_mov_intf.wready=dut.IPS_CORE.S03_AXI_1_WREADY;
+    assign cdma_data_mov_intf.araddr=dut.IPS_CORE.S03_AXI_1_ARADDR;
+    assign cdma_data_mov_intf.arlen=dut.IPS_CORE.S03_AXI_1_ARLEN;
+    assign cdma_data_mov_intf.arsize=dut.IPS_CORE.S03_AXI_1_ARSIZE;
+    assign cdma_data_mov_intf.arburst=dut.IPS_CORE.S03_AXI_1_ARBURST;
+    assign cdma_data_mov_intf.arvalid=dut.IPS_CORE.S03_AXI_1_ARVALID;
+    assign cdma_data_mov_intf.arready=dut.IPS_CORE.S03_AXI_1_ARREADY;
+    assign cdma_data_mov_intf.rdata=dut.IPS_CORE.S03_AXI_1_RDATA;
+    assign cdma_data_mov_intf.rvalid=dut.IPS_CORE.S03_AXI_1_RVALID;
+    assign cdma_data_mov_intf.rresp=dut.IPS_CORE.S03_AXI_1_RRESP;
+    assign cdma_data_mov_intf.rready=dut.IPS_CORE.S03_AXI_1_RREADY;
+    assign cdma_data_mov_intf.rlast=dut.IPS_CORE.S03_AXI_1_RLAST;
+    assign cdma_data_mov_intf.arprot=dut.IPS_CORE.S03_AXI_1_ARPROT;
+    assign cdma_data_mov_intf.arcache=dut.IPS_CORE.S03_AXI_1_ARCACHE;
+        //unused signals in axi cdma
+    assign cdma_reg_intf.awid=0;
+    assign cdma_reg_intf.awlen=0;
+    assign cdma_reg_intf.awburst=0;
+    assign cdma_reg_intf.awsize=0;
+    assign cdma_reg_intf.awlock=0;
+    assign cdma_reg_intf.awcache=0;
+    assign cdma_reg_intf.awprot=0;
+    assign cdma_reg_intf.awqos=0;
+    assign cdma_reg_intf.awregion=0;
+    assign cdma_reg_intf.bid=0;
+    assign cdma_reg_intf.arid=0;
+    assign cdma_reg_intf.arlen=0;
+    assign cdma_reg_intf.arsize=0;
+    assign cdma_reg_intf.arlock=0;
+    assign cdma_reg_intf.arcache=0;
+    assign cdma_reg_intf.arprot=0;
+    assign cdma_reg_intf.arregion=0;
+    assign cdma_reg_intf.arqos=0;
+    assign cdma_reg_intf.arburst=0;
+    assign cdma_reg_intf.wstrobe=0;
+    assign cdma_reg_intf.wlast=0;
+    assign cdma_sg_intf.awid=0;
+    assign cdma_sg_intf.bid=0;
+    assign cdma_sg_intf.arid=0;
+
+    assign cdma_data_mov_intf.arlock=0;
+    assign cdma_data_mov_intf.awid=0;
+    assign cdma_data_mov_intf.bid=0;
+    assign cdma_data_mov_intf.arid=0;
+    assign cdma_data_mov_intf.rid=0;
+    assign cdma_sg_intf.awlock=0;
+    assign cdma_sg_intf.awqos=0;
+    assign cdma_sg_intf.awregion=0;
+    assign cdma_sg_intf.arqos= 0;  
+    assign cdma_sg_intf.arregion=0;
+    assign cdma_sg_intf.arlock=0;
+    assign cdma_data_mov_intf.arqos=0;
+    assign cdma_data_mov_intf.arregion=0;
+    assign cdma_data_mov_intf.awqos=0;
+    assign cdma_data_mov_intf.awregion=0;
+    assign cdma_data_mov_intf.awlock=0;
 
     //Memory assignment
-    assign mem_intf.ARADDR  = dut.IPS_CORE.axi_int2main_mem.ARADDR;   
-    assign mem_intf.ARREADY = dut.IPS_CORE.axi_int2main_mem.ARREADY;  
-    assign mem_intf.ARVALID = dut.IPS_CORE.axi_int2main_mem.ARVALID;
-    assign mem_intf.AWADDR  = dut.IPS_CORE.axi_int2main_mem.AWADDR;   
-    assign mem_intf.AWREADY = dut.IPS_CORE.axi_int2main_mem.AWREADY;  
-    assign mem_intf.AWVALID = dut.IPS_CORE.axi_int2main_mem.AWVALID; 
-    assign mem_intf.BREADY  = dut.IPS_CORE.axi_int2main_mem.BREADY;   
-    assign mem_intf.BRESP   = dut.IPS_CORE.axi_int2main_mem.BRESP;    
-    assign mem_intf.BVALID  = dut.IPS_CORE.axi_int2main_mem.BVALID;   
-    assign mem_intf.RDATA   = dut.IPS_CORE.axi_int2main_mem.RDATA;    
-    assign mem_intf.RREADY  = dut.IPS_CORE.axi_int2main_mem.RREADY;   
-    assign mem_intf.RRESP   = dut.IPS_CORE.axi_int2main_mem.RRESP;    
-    assign mem_intf.RVALID  = dut.IPS_CORE.axi_int2main_mem.RVALID;   
-    assign mem_intf.WDATA   = dut.IPS_CORE.axi_int2main_mem.WDATA;    
-    assign mem_intf.WREADY  = dut.IPS_CORE.axi_int2main_mem.WREADY;   
-    assign mem_intf.WSTRB   = dut.IPS_CORE.axi_int2main_mem.WSTRB;    
-    assign mem_intf.WVALID  = dut.IPS_CORE.axi_int2main_mem.WVALID;   
+    assign mem_intf.ARADDR  = dut.AXI_SLAVE_MEM.s_axi_intf.ARADDR;   
+    assign mem_intf.ARREADY = dut.AXI_SLAVE_MEM.s_axi_intf.ARREADY;  
+    assign mem_intf.ARVALID = dut.AXI_SLAVE_MEM.s_axi_intf.ARVALID;
+    assign mem_intf.AWADDR  = dut.AXI_SLAVE_MEM.s_axi_intf.AWADDR;   
+    assign mem_intf.AWREADY = dut.AXI_SLAVE_MEM.s_axi_intf.AWREADY;  
+    assign mem_intf.AWVALID = dut.AXI_SLAVE_MEM.s_axi_intf.AWVALID; 
+    assign mem_intf.BREADY  = dut.AXI_SLAVE_MEM.s_axi_intf.BREADY;   
+    assign mem_intf.BRESP   = dut.AXI_SLAVE_MEM.s_axi_intf.BRESP;    
+    assign mem_intf.BVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.BVALID;   
+    assign mem_intf.RDATA   = dut.AXI_SLAVE_MEM.s_axi_intf.RDATA;    
+    assign mem_intf.RREADY  = dut.AXI_SLAVE_MEM.s_axi_intf.RREADY;   
+    assign mem_intf.RRESP   = dut.AXI_SLAVE_MEM.s_axi_intf.RRESP;    
+    assign mem_intf.RVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.RVALID;   
+    assign mem_intf.WDATA   = dut.AXI_SLAVE_MEM.s_axi_intf.WDATA;    
+    assign mem_intf.WREADY  = dut.AXI_SLAVE_MEM.s_axi_intf.WREADY;   
+    assign mem_intf.WSTRB   = dut.AXI_SLAVE_MEM.s_axi_intf.WSTRB;    
+    assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
  
 
     initial begin
-        run_test("load_bram_test");
+        run_test("config_intc_test");
+        //run_test("load_bram_test");
         //run_test("read_bram_test");
         //run_test("config_cdma_ral_test");
         //run_test("read_cdma_test");
@@ -183,28 +340,54 @@ module top;
         //#3000;
         //$finish();
     end
+    //interrupt controller config object
+    intc_config_obj                 intc_obj;
+    //cpu config object
+    config_obj                      obj;
 
     initial begin
     	uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
     end
-    
    
-    intc_config_obj                 obj;
-    cpu_config_obj                  cpu_obj;
     
     initial begin
-        obj                     =   new("obj");
         //INTC
-        obj.axi_lite_is_active  =   UVM_PASSIVE;
-        obj.lite_intc_intf      =   lite_intc_if;
-        obj.intc_is_active      =   UVM_PASSIVE;
-        obj.intc_if             =   intc_if;
-        uvm_config_db #(intc_config_obj)::  set(null,"*","intc_config_obj",obj);
+        intc_obj                     =   new("intc_obj");
+        intc_obj.axi_lite_is_active  =   UVM_PASSIVE;
+        intc_obj.lite_intc_intf      =   lite_intc_if;
+        intc_obj.intc_is_active      =   UVM_PASSIVE;
+        intc_obj.intc_if             =   intc_if;
+        uvm_config_db #(intc_config_obj)::  set(null,"*","intc_config_obj",intc_obj);
 
         //CPU
-        cpu_obj                   =   new("cpu_obj");
-        cpu_obj.riscv_is_active   =   UVM_ACTIVE;
-        cpu_obj.riscv_lite_if     =   axil_riscv_if;
-        uvm_config_db #(cpu_config_obj)::   set(null,"*","cpu_config_obj",cpu_obj);
+        obj = config_obj :: type_id :: create ("obj");
+        obj.cpu_i  = axil_riscv_if;
+        //obj.cpu_i  = cpu_i;
+        obj.mas_is_active = 1;        // agent active
+        uvm_config_db #(config_obj) :: set (null , "*" , "config_obj" , obj);
+
+
+        //CDMA
+        cdma_config_obj=axi_cdma_config_obj::type_id::create("cdma_config_obj");
+        cdma_config_obj.no_of_masters=1;
+        cdma_config_obj.no_of_slaves=2;
+
+        cdma_config_obj.mas_if=new[1];
+        cdma_config_obj.mas_if[0]=cdma_reg_intf;
+
+        cdma_config_obj.slv_if=new[2];
+        cdma_config_obj.slv_if[0]=cdma_sg_intf;
+        cdma_config_obj.slv_if[1]=cdma_data_mov_intf;
+
+        cdma_config_obj.intrpt_if=cdma_interrupt_intf;
+
+        cdma_config_obj.mas_is_active=new[1];
+        cdma_config_obj.mas_is_active='{1{UVM_PASSIVE}};
+
+        cdma_config_obj.slv_is_active=new[2];
+        cdma_config_obj.slv_is_active='{2{UVM_PASSIVE}};
+
+        uvm_config_db#(axi_cdma_config_obj)::set(null,"*","axi_cdma_config_obj",cdma_config_obj);
+        
     end
 endmodule
