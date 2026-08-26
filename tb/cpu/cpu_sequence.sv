@@ -165,7 +165,6 @@ class config_intc_seq extends base_cpu_sequence;
         intc_d      = 0;
         intc_d[26]  = 1; //CDMA
         intc_d[27]  = 0; //Peripherals
-        intc_d      = 'hffff_ffff;
 
         start_item(pkt);
         if(!pkt.randomize() with {

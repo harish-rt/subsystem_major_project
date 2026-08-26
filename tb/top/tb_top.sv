@@ -6,6 +6,7 @@ import uvm_pkg :: *;
 `include "../ips_core/axi_intc/intc_interface.sv"
 import intc_package :: *;
 import axi_cdma_env_pkg ::*;
+
 module top;
 
     bit aclk;
@@ -25,7 +26,7 @@ module top;
     axi4_lite_intf lite_data_if();
 
 // AXI Interrupt Controller
-    assign intc_proc_rst = ~areset_n;
+    assign intc_proc_rst    =   ~areset_n;
     axi4_lite_intc_intf         lite_intc_if(.aclk(aclk),.areset_n(areset_n));
     intc_intf                   intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
      
@@ -348,6 +349,7 @@ module top;
         cdma_config_obj.slv_is_active='{2{UVM_PASSIVE}};
 
         uvm_config_db#(axi_cdma_config_obj)::set(null,"*","axi_cdma_config_obj",cdma_config_obj);
-        
+
+        //Lite MEMORY
     end
 endmodule

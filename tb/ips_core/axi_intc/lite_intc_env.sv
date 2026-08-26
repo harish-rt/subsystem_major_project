@@ -13,11 +13,11 @@ class axi_lite_intc_env extends uvm_env;
         if(!uvm_config_db #(intc_config_obj)::get(this,"","intc_config_obj",obj))
             `uvm_fatal(get_full_name(),"Config_obj get Failure")
 
-            lite_intc_agt   = axi_lite_intc_agent::type_id::create("lite_intc_agt",this);
-            intc_agt        = intc_agent::type_id::create("intc_agt",this);
+        lite_intc_agt   = axi_lite_intc_agent::type_id::create("lite_intc_agt",this);
+        intc_agt        = intc_agent::type_id::create("intc_agt",this);
 
-            lite_intc_agt.is_active     = obj.axi_lite_is_active;
-            intc_agt.is_active          = obj.intc_is_active;
+        lite_intc_agt.is_active     = obj.axi_lite_is_active;
+        intc_agt.is_active          = obj.intc_is_active;
     endfunction
 
     function void connect_phase(uvm_phase phase);
