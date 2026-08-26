@@ -1,17 +1,15 @@
 `timescale 1ns/1ps
+
+module top;
 `include "uvm_macros.svh"
 import uvm_pkg :: *;
 
-`include "../cpu/cpu_intf.sv"
-`include "../ips_core/axi_intc/lite_intc_interface.sv"
-`include "../ips_core/axi_intc/intc_interface.sv"
-
-import mem_package :: *;
 import cpu_package ::*;
 import axi_cdma_env_pkg ::*;
+import mem_package :: *;
 import intc_package ::*;
 
-module top;
+import soc_package ::*;
 
     bit aclk;
     bit areset_n;
@@ -33,21 +31,17 @@ module top;
     axi4_lite_intf mem_intf();
 
 // AXI Interrupt Controller
-    assign intc_proc_rst = ~areset_n;
+    assign intc_proc_rst    =   ~areset_n;
     axi4_lite_intc_intf         lite_intc_if(.aclk(aclk),.areset_n(areset_n));
     intc_intf                   intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
      
 //axi cdma interfaces 
     axi_cdma_axi_master_intf    cdma_reg_intf(.aclk(aclk),.areset_n(areset_n));
     axi_cdma_axi_slave_intf     cdma_sg_intf(.aclk(aclk),.areset_n(areset_n));
-    axi_cdma_axi_slave_intf     cdma_data_mov_intf(.aclk(aclk),.areset_n(arset_n));
+    axi_cdma_axi_slave_intf     cdma_data_mov_intf(.aclk(aclk),.areset_n(areset_n));
     axi_cdma_interrupt_intf     cdma_interrupt_intf(.aclk(aclk));
 
-//cpu interface    
-    //cpu_intf   cpu_i(.aclk(clk_i),.areset_n(rst_n_i));
     
-    axi_cdma_config_obj         cdma_config_obj;
-
     core_wrapper dut(
         .clk_i(aclk),
         .rst_n_i(areset_n),
@@ -343,7 +337,10 @@ module top;
     //interrupt controller config object
     intc_config_obj                 intc_obj;
     //cpu config object
-    config_obj                      obj;
+    cpu_config_obj                  obj;
+    //cdma config object
+    axi_cdma_config_obj             cdma_config_obj;
+
 
     initial begin
     	uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
@@ -360,11 +357,10 @@ module top;
         uvm_config_db #(intc_config_obj)::  set(null,"*","intc_config_obj",intc_obj);
 
         //CPU
-        obj = config_obj :: type_id :: create ("obj");
+        obj = cpu_config_obj :: type_id :: create ("obj");
         obj.cpu_i  = axil_riscv_if;
-        //obj.cpu_i  = cpu_i;
         obj.mas_is_active = 1;        // agent active
-        uvm_config_db #(config_obj) :: set (null , "*" , "config_obj" , obj);
+        uvm_config_db #(cpu_config_obj) :: set (null , "*" , "cpu_config_obj" , obj);
 
 
         //CDMA
@@ -388,6 +384,7 @@ module top;
         cdma_config_obj.slv_is_active='{2{UVM_PASSIVE}};
 
         uvm_config_db#(axi_cdma_config_obj)::set(null,"*","axi_cdma_config_obj",cdma_config_obj);
-        
+
+        //Lite MEMORY
     end
 endmodule
