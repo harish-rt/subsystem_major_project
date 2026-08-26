@@ -29,7 +29,7 @@ vlog -work xil_defaultlib -uvmver 1.2 \
 -l core_wrapper \
 "../tb/common/config_tb.sv" \
 "../tb/top/cpu_package.sv" \
-"../tb/ips_core/axi_cdma_env/axi_cdma_env_pkg.sv" \
+"../tb/ips_core/axi_cdma_env/top/axi_cdma_env_pkg.sv" \
 "../mem_agent/mem_pkg.sv" \
 "../tb/ips_core/axi_intc/intc_package.sv" \
 "../tb/top/soc_package.sv" \

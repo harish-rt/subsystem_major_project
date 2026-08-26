@@ -1,7 +1,7 @@
 import axi_cdma_regblock_pkg ::*;
-class env extends uvm_env;
+class axi_cdma_axi_env extends uvm_env;
 
-   `uvm_component_utils (env)
+   `uvm_component_utils (axi_cdma_axi_env)
     master_agent        m_agt[];
     slave_agent         s_agt[];
 
@@ -26,10 +26,9 @@ class env extends uvm_env;
    extern function void connect_phase            (uvm_phase phase);
    extern function void start_of_simulation_phase(uvm_phase phase);
    extern task main_phase                        (uvm_phase phase);
+endclass
 
-endclass :env
-
-  function void env :: build_phase (uvm_phase phase);
+  function void axi_cdma_axi_env :: build_phase (uvm_phase phase);
      super.build_phase (phase);
      `uvm_info ("env::build" , phase.get_name() , UVM_MEDIUM)
      if (!uvm_config_db #(axi_cdma_config_obj) :: get (null , "*" , "axi_cdma_config_obj" , obj))
@@ -65,7 +64,7 @@ endclass :env
         uvm_config_db#(axi_slave_mem_model)::set(this,"*","memory",mem_model);
   endfunction : build_phase
 
-  function void env :: connect_phase (uvm_phase phase);
+  function void axi_cdma_axi_env :: connect_phase (uvm_phase phase);
      super.connect_phase (phase);
      `uvm_info ("env::connect" ,"inside env_connect phase", UVM_MEDIUM)
 
@@ -111,11 +110,11 @@ endclass :env
         //s_agt[0].mem_model=mem_model; 
   endfunction : connect_phase
 
-  function void env :: start_of_simulation_phase (uvm_phase phase);
+  function void axi_cdma_axi_env :: start_of_simulation_phase (uvm_phase phase);
      super.start_of_simulation_phase (phase);
      `uvm_info ("env::sim" , phase.get_name() , UVM_MEDIUM)
   endfunction : start_of_simulation_phase
 
-  task env :: main_phase (uvm_phase phase);
+  task axi_cdma_axi_env :: main_phase (uvm_phase phase);
      `uvm_info ("env::main" , phase.get_name() , UVM_MEDIUM)
   endtask : main_phase
