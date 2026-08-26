@@ -2,7 +2,7 @@ class cpu_env extends uvm_env;
    `uvm_component_utils(cpu_env)
 
    cpu_agent   cpu_agt;
-   config_obj  obj;
+   cpu_config_obj  obj;
 
    function new(string name="cpu_env", uvm_component parent=null);
       super.new(name, parent);
@@ -10,8 +10,8 @@ class cpu_env extends uvm_env;
 
    virtual function void build_phase(uvm_phase phase);
       super.build_phase(phase);
-      if (!uvm_config_db#(config_obj)::get(null, "*", "config_obj", obj))
-         `uvm_fatal(get_full_name(), "config_obj get failed!")
+      if (!uvm_config_db#(cpu_config_obj)::get(this, "", "cpu_config_obj", obj))
+         `uvm_fatal(get_full_name(), "cpu_config_obj get failed!")
       cpu_agt = cpu_agent::type_id::create("cpu_agt", this);
    endfunction
 
