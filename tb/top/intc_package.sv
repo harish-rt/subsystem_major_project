@@ -1,6 +1,8 @@
 package intc_package;
     import uvm_pkg::*;
     `include "uvm_macros.svh"
+    
+    import mem_package :: *;
     import axi_cdma_env_pkg ::*;
     import cpu_package ::*;
 
