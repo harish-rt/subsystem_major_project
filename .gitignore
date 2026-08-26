@@ -22,6 +22,9 @@ riscv_tb/
 *.swq
 *asdbw*
 *tmp
+*.cmd
+*ref 
+
 
 # Ignore Siemens Questa / ModelSim databases
 work/

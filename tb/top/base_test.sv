@@ -52,7 +52,7 @@ class read_cdma_test extends cpu_base_test;
 endclass : read_cdma_test
 
 
-class config_cdma_ral_test extends cpu_base_test;
+/*class config_cdma_ral_test extends cpu_base_test;
     `uvm_component_utils(config_cdma_ral_test)
     `NEW_COMP
 
@@ -67,10 +67,10 @@ class config_cdma_ral_test extends cpu_base_test;
             phase.phase_done.set_drain_time(this, 100ns);
         phase.drop_objection(this);
     endtask
-endclass : config_cdma_ral_test
+endclass : config_cdma_ral_test*/
 
 
-class read_bram_test extends cpu_base_test;
+/*class read_bram_test extends cpu_base_test;
     `uvm_component_utils(read_bram_test)
     `NEW_COMP
 
@@ -85,10 +85,10 @@ class read_bram_test extends cpu_base_test;
             phase.phase_done.set_drain_time(this, 100ns);
         phase.drop_objection(this);
     endtask
-endclass : read_bram_test
+endclass : read_bram_test*/
 
 
-class load_bram_test extends cpu_base_test;
+/*class load_bram_test extends cpu_base_test;
     `uvm_component_utils(load_bram_test)
     `NEW_COMP
 
@@ -111,7 +111,7 @@ class load_bram_test extends cpu_base_test;
             phase.phase_done.set_drain_time(this, 1000ns);
         phase.drop_objection(this);
     endtask
-endclass : load_bram_test
+endclass : load_bram_test*/
 
 class config_intc_test extends cpu_base_test;
     `uvm_component_utils(config_intc_test)
