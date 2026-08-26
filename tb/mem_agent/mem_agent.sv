@@ -6,7 +6,8 @@ class mem_agent extends uvm_agent;
     endfunction
     
     //mem_driver mem_drv;
-    mem_monitor mem_mon;
+    mem_monitor     mem_mon;
+    bram_monitor    bram_mon;
 
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
@@ -17,6 +18,7 @@ class mem_agent extends uvm_agent;
   //          end
   //      else
             mem_mon = mem_monitor   :: type_id ::create ("mem_mon",this);
+            bram_mon = bram_monitor   :: type_id ::create ("bram_mon",this);
      endfunction 
 
 endclass
