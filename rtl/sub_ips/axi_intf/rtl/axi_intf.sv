@@ -188,6 +188,24 @@ interface axi4_intf();
    logic [DATA_WIDTH>>3-1:0] 	WSTRB	;
    logic  			WVALID	;
    logic [USER_SIGNAL_WIDTH-1:0]WUSER	;
+
+
+    clocking axi4_mon_cb @(posedge ACLK);
+        default input #1ns output #1ns;
+
+        input ARADDR, ARBURST, ARCACHE, ARID, ARLEN, ARLOCK, ARPROT, ARQOS, ARREADY, ARREGION, ARSIZE, ARVALID, ARUSER;
+
+        input AWADDR, AWBURST, AWCACHE, AWID, AWLEN, AWLOCK, AWPROT, AWQOS, AWREADY, AWREGION, AWSIZE, AWVALID, AWUSER;
+
+        input WDATA, WSTRB, WLAST, WVALID, WREADY, WUSER;
+
+        input BID, BRESP, BVALID, BREADY, BUSER;
+
+        input RID, RDATA, RRESP, RLAST, RVALID, RREADY, RUSER;
+    endclocking
+
+    modport MONITOR_MOD (clocking axi4_mon_cb, input ACLK, input ARESETn);
+
 endinterface
 /*
 //default param config to AXI4_lite
