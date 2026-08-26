@@ -11,7 +11,15 @@ riscv_tb/
 *.acdb
 *.awc
 *.error
+*.swh
+*.swi
 *.swj
+*.swl
+*.swm
+*.swn
+*.swo
+*.swp
+*.swq
 *asdbw*
 *tmp
 *.cmd
