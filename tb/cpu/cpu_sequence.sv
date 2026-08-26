@@ -220,8 +220,6 @@ class config_cdma_seq extends base_cpu_sequence;
         start_item(pkt);
         if(!pkt.randomize() with {
             AWADDR  == cdmacr;
-            WDATA   == ;
-            operation   == WRITE;
             })begin
             `uvm_error(get_full_name(), "randomization_failed")
         end
