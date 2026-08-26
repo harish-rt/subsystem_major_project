@@ -9,9 +9,7 @@ class mem_env extends uvm_env;
 
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-       // if (!uvm_config_db #(config_obj) :: get (null , "*" , "config_obj" , obj))
-       //     `uvm_fatal(get_full_name(),"Config_obj get Failure");
-       //     uvm_config_db#(uvm_active_passive_enum)::set(this,"mem_agt","AGT",obj.is_active);
+
             mem_agt = mem_agent :: type_id :: create ("mem_agt",this);   
             
     endfunction

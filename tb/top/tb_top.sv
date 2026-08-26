@@ -4,7 +4,10 @@ import uvm_pkg :: *;
 
 `include "../ips_core/axi_intc/lite_intc_interface.sv"
 `include "../ips_core/axi_intc/intc_interface.sv"
+//`include "../../rtl/sub_ips/axi_intf/rtl/axi_lite_intf.sv" 
+
 import soc_package :: *;
+import mem_package :: *;
 
 module top;
 
@@ -21,6 +24,9 @@ module top;
     axi4_lite_intf axil_riscv_if();
     //S02
     axi4_lite_intf lite_data_if();
+
+    //memory interface
+    axi4_lite_intf mem_intf(.ACLK(aclk), .ARESETn(areset_n));
 
 // AXI Interrupt Controller
     axi4_lite_intc_intf lite_intc_if(.aclk(aclk),.areset_n(areset_n));
@@ -138,6 +144,26 @@ module top;
     assign axil_riscv_if.ACLK       = aclk;
     assign axil_riscv_if.ARESETn    = areset_n;
 
+    //Memory assignment
+    assign mem_intf.ARADDR  = dut.IPS_CORE.axi_int2main_mem.ARADDR;   
+    assign mem_intf.ARREADY = dut.IPS_CORE.axi_int2main_mem.ARREADY;  
+    assign mem_intf.ARVALID = dut.IPS_CORE.axi_int2main_mem.ARVALID;
+    assign mem_intf.AWADDR  = dut.IPS_CORE.axi_int2main_mem.AWADDR;   
+    assign mem_intf.AWREADY = dut.IPS_CORE.axi_int2main_mem.AWREADY;  
+    assign mem_intf.AWVALID = dut.IPS_CORE.axi_int2main_mem.AWVALID; 
+    assign mem_intf.BREADY  = dut.IPS_CORE.axi_int2main_mem.BREADY;   
+    assign mem_intf.BRESP   = dut.IPS_CORE.axi_int2main_mem.BRESP;    
+    assign mem_intf.BVALID  = dut.IPS_CORE.axi_int2main_mem.BVALID;   
+    assign mem_intf.RDATA   = dut.IPS_CORE.axi_int2main_mem.RDATA;    
+    assign mem_intf.RREADY  = dut.IPS_CORE.axi_int2main_mem.RREADY;   
+    assign mem_intf.RRESP   = dut.IPS_CORE.axi_int2main_mem.RRESP;    
+    assign mem_intf.RVALID  = dut.IPS_CORE.axi_int2main_mem.RVALID;   
+    assign mem_intf.WDATA   = dut.IPS_CORE.axi_int2main_mem.WDATA;    
+    assign mem_intf.WREADY  = dut.IPS_CORE.axi_int2main_mem.WREADY;   
+    assign mem_intf.WSTRB   = dut.IPS_CORE.axi_int2main_mem.WSTRB;    
+    assign mem_intf.WVALID  = dut.IPS_CORE.axi_int2main_mem.WVALID;   
+ 
+
     initial begin
         run_test("load_bram_test");
         //run_test("read_bram_test");
@@ -158,6 +184,11 @@ module top;
         //$finish();
     end
 
+    initial begin
+    	uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
+    end
+    
+   
     intc_config_obj                 obj;
     cpu_config_obj                  cpu_obj;
     
