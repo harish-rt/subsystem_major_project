@@ -352,41 +352,41 @@ import soc_package ::*;
           soc_config_obj=soc_config::type_id::create("soc_config_obj");
         //INTC
         soc_config_obj.intc_obj                     =   new("intc_obj");
-        soc_config_obj.intc_obj.axi_lite_is_active  =   UVM_PASSIVE;
-        soc_config_obj.intc_obj.lite_intc_intf      =   lite_intc_if;
-        soc_config_obj.intc_obj.intc_is_active      =   UVM_PASSIVE;
-        soc_config_obj.intc_obj.intc_if             =   intc_if;
-        uvm_config_db #(intc_config_obj)::  set(null,"*","intc_config_obj",soc_config_obj.intc_obj);
+        intc_obj.axi_lite_is_active  =   UVM_PASSIVE;
+        intc_obj.lite_intc_intf      =   lite_intc_if;
+        intc_obj.intc_is_active      =   UVM_PASSIVE;
+        intc_obj.intc_if             =   intc_if;
+        uvm_config_db #(intc_config_obj)::  set(null,"*","intc_config_obj",intc_obj);
 
         //CPU
         soc_config_obj.cpu_obj = cpu_config_obj :: type_id :: create ("obj");
         soc_config_obj.cpu_obj.cpu_i  = axil_riscv_if;
         soc_config_obj.cpu_obj.mas_is_active = 1;        // agent active
-        uvm_config_db #(cpu_config_obj) :: set (null , "*" , "cpu_config_obj" ,soc_config_obj.cpu_obj);
+        uvm_config_db #(cpu_config_obj) :: set (null , "*" , "cpu_config_obj" , obj);
 
 
         //CDMA
-        soc_config_obj.cdma_config_obj=axi_cdma_config_obj::type_id::create("cdma_config_obj");
-        soc_config_obj.cdma_config_obj.no_of_masters=1;
-        soc_config_obj.cdma_config_obj.no_of_slaves=2;
-        soc_config_obj.cdma_config_obj.enable_scoreboard=0;
+        cdma_config_obj=axi_cdma_config_obj::type_id::create("cdma_config_obj");
+        cdma_config_obj.no_of_masters=1;
+        cdma_config_obj.no_of_slaves=2;
+        cdma_config_obj.enable_scoreboard=0;
 
-        soc_config_obj.cdma_config_obj.mas_if=new[1];
-        soc_config_obj.cdma_config_obj.mas_if[0]=cdma_reg_intf;
+        cdma_config_obj.mas_if=new[1];
+        cdma_config_obj.mas_if[0]=cdma_reg_intf;
 
-        soc_config_obj.cdma_config_obj.slv_if=new[2];
-        soc_config_obj.cdma_config_obj.slv_if[0]=cdma_sg_intf;
-        soc_config_obj.cdma_config_obj.slv_if[1]=cdma_data_mov_intf;
+        cdma_config_obj.slv_if=new[2];
+        cdma_config_obj.slv_if[0]=cdma_sg_intf;
+        cdma_config_obj.slv_if[1]=cdma_data_mov_intf;
 
-        soc_config_obj.cdma_config_obj.intrpt_if=cdma_interrupt_intf;
+        cdma_config_obj.intrpt_if=cdma_interrupt_intf;
 
-        soc_config_obj.cdma_config_obj.mas_is_active=new[1];
-        soc_config_obj.cdma_config_obj.mas_is_active='{1{UVM_PASSIVE}};
+        cdma_config_obj.mas_is_active=new[1];
+        cdma_config_obj.mas_is_active='{1{UVM_PASSIVE}};
 
-        soc_config_obj.cdma_config_obj.slv_is_active=new[2];
-        soc_config_obj.cdma_config_obj.slv_is_active='{2{UVM_PASSIVE}};
+        cdma_config_obj.slv_is_active=new[2];
+        cdma_config_obj.slv_is_active='{2{UVM_PASSIVE}};
 
-        uvm_config_db#(axi_cdma_config_obj)::set(null,"*","axi_cdma_config_obj",soc_config_obj.cdma_config_obj);
+        uvm_config_db#(axi_cdma_config_obj)::set(null,"*","axi_cdma_config_obj",cdma_config_obj);
 
         //Lite MEMORY
     end
