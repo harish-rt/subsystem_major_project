@@ -207,6 +207,7 @@ class config_cdma_seq extends base_cpu_sequence;
         super.body();
         `uvm_info("config_cdma_seq", "Start of Config CDMA Sequence", UVM_MEDIUM)
 
+
         do begin
             //reg_block.cdmasr.read(status,tdata);
         end while(tdata[1]==0);
