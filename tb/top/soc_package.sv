@@ -6,6 +6,7 @@ package soc_package;
     import mem_package :: *;
     import intc_package ::*;
 
+    `include "soc_config.sv"
     export *::*;
 //IPS_CORE
     `include "../ips_core/ips_core_env.sv"
