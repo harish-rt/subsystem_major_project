@@ -45,7 +45,7 @@ class read_cdma_test extends cpu_base_test;
     task main_phase(uvm_phase phase);
         master_seq = read_cdma_seq::type_id::create("master_seq");
         phase.raise_objection(this);
-            master_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
+            master_seq.start(w_env.c_env.cpu_agt.sqr);
             phase.phase_done.set_drain_time(this, 100ns);
         phase.drop_objection(this);
     endtask
@@ -61,9 +61,9 @@ endclass : read_cdma_test
     task main_phase(uvm_phase phase);
         master_seq = config_cdma_ral_seq::type_id::create("master_seq");
         phase.raise_objection(this);
-            master_seq.reg_block = w_env.c_env.reg_block;
+            //master_seq.reg_block = w_env.c_env.reg_block;
 
-            master_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
+            master_seq.start(w_env.c_env.cpu_agt.sqr);
             phase.phase_done.set_drain_time(this, 100ns);
         phase.drop_objection(this);
     endtask
@@ -79,9 +79,9 @@ endclass : config_cdma_ral_test*/
     task main_phase(uvm_phase phase);
         master_seq = read_bram_seq::type_id::create("master_seq");
         phase.raise_objection(this);
-            master_seq.reg_block = w_env.c_env.reg_block;
+            //master_seq.reg_block = w_env.c_env.reg_block;
 
-            master_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
+            master_seq.start(w_env.c_env.cpu_agt.sqr);
             phase.phase_done.set_drain_time(this, 100ns);
         phase.drop_objection(this);
     endtask
@@ -102,11 +102,11 @@ endclass : read_bram_test*/
         cdma_seq = config_cdma_seq::type_id::create("cdma_seq");
 
         phase.raise_objection(this);
-            cdma_seq.reg_block = w_env.c_env.reg_block;
+            //cdma_seq.reg_block = w_env.c_env.reg_block;
 
-            mem_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
-            intc_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
-            cdma_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
+            mem_seq.start(w_env.c_env.cpu_agt.sqr);
+            intc_seq.start(w_env.c_env.cpu_agt.sqr);
+            cdma_seq.start(w_env.c_env.cpu_agt.sqr);
 
             phase.phase_done.set_drain_time(this, 1000ns);
         phase.drop_objection(this);
@@ -124,7 +124,7 @@ class config_intc_test extends cpu_base_test;
 
         phase.raise_objection(this);
 
-            intc_seq.start(w_env.c_env.cpu_agt.cpu_sqr);
+            intc_seq.start(w_env.c_env.cpu_agt.sqr);
 
             phase.phase_done.set_drain_time(this, 100ns);
         phase.drop_objection(this);

@@ -1,26 +1,28 @@
-class cpu_env extends uvm_agent;
-    `uvm_component_utils(cpu_env)
-    `NEW_COMP
+class cpu_env extends uvm_env;
+   `uvm_component_utils(cpu_env)
 
+   cpu_agent   cpu_agt;
+   config_obj  obj;
 
-    cpu_agent               cpu_agt;
-    cpu_config_obj          cpu_obj;
+   function new(string name="cpu_env", uvm_component parent=null);
+      super.new(name, parent);
+   endfunction
 
-    function void build_phase(uvm_phase phase);
-        super.build_phase(phase);
-        `uvm_info("cpu_env::build", "inside_lite_cpu_env_build_phase", UVM_MEDIUM)
-        if(!uvm_config_db #(cpu_config_obj)::get(this,"","cpu_config_obj",cpu_obj))
-            `uvm_fatal(get_full_name(),"Config_obj get Failure")
+   virtual function void build_phase(uvm_phase phase);
+      super.build_phase(phase);
+      if (!uvm_config_db#(config_obj)::get(null, "*", "config_obj", obj))
+         `uvm_fatal(get_full_name(), "config_obj get failed!")
+      cpu_agt = cpu_agent::type_id::create("cpu_agt", this);
+   endfunction
 
-        cpu_agt         = cpu_agent::type_id::create("cpu_agt",this);
-        cpu_agt.is_active       = cpu_obj.riscv_is_active;
-    endfunction
+   virtual function void connect_phase(uvm_phase phase);
+      super.connect_phase(phase);
+      cpu_agt.mon.cpu_mon_intf = obj.cpu_i.MONITOR_MOD;
+      cpu_agt.drv.cpu_drv_intf = obj.cpu_i.DRIVER_MOD;
+      cpu_agt.drv.seq_item_port.connect(cpu_agt.sqr.seq_item_export);
+   endfunction
 
-    function void connect_phase(uvm_phase phase);
-        super.connect_phase(phase);
-            if (cpu_obj.riscv_is_active == UVM_ACTIVE) begin            
-                cpu_agt.cpu_drv.axil_drv_if   = cpu_obj.riscv_lite_if;
-               cpu_agt.cpu_drv.seq_item_port.connect(cpu_agt.cpu_sqr.seq_item_export);
-            end
-        endfunction
-endclass
+   virtual task main_phase(uvm_phase phase);
+      `uvm_info("cpu_env::main", phase.get_name(), UVM_MEDIUM)
+   endtask
+endclass:cpu_env
