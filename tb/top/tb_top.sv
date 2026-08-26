@@ -265,6 +265,7 @@ import soc_package ::*;
     assign cdma_reg_intf.awregion=0;
     assign cdma_reg_intf.bid=0;
     assign cdma_reg_intf.arid=0;
+    assign cdma_reg_intf.rid=0;
     assign cdma_reg_intf.arlen=0;
     assign cdma_reg_intf.arsize=0;
     assign cdma_reg_intf.arlock=0;
@@ -369,8 +370,8 @@ import soc_package ::*;
         //run_test("load_bram_test");
         //run_test("read_bram_test");
         //run_test("config_cdma_ral_test");
-        //run_test("read_cdma_test");
-        run_test("cpu_base_test");
+        run_test("read_cdma_test");
+        //run_test("cpu_base_test");
     end
 
     initial begin
