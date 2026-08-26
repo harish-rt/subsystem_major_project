@@ -29,6 +29,8 @@ import soc_package ::*;
 
     //memory interface
     axi4_lite_intf mem_intf();
+    //BRAM interface
+    axi4_intf axi4_bram_if();
 
 // AXI Interrupt Controller
     assign intc_proc_rst    =   ~areset_n;
@@ -294,7 +296,55 @@ import soc_package ::*;
     assign cdma_data_mov_intf.awregion=0;
     assign cdma_data_mov_intf.awlock=0;
 
-    //Memory assignment
+    //BRAM
+    // BRAM MEMORY
+    // CLK RESET
+    assign axi4_bram_if.ACLK        = aclk;
+    assign axi4_bram_if.ARESETn     = areset_n;
+    // --- Write Address Channel (AW) ---
+    assign axi4_bram_if.AWADDR   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awaddr;
+    assign axi4_bram_if.AWBURST  = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awburst;
+    assign axi4_bram_if.AWCACHE  = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awcache;
+    assign axi4_bram_if.AWID     = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awid;
+    assign axi4_bram_if.AWLEN    = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awlen;
+    assign axi4_bram_if.AWLOCK   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awlock;
+    assign axi4_bram_if.AWPROT   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awprot;
+    assign axi4_bram_if.AWREADY  = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awready;
+    assign axi4_bram_if.AWSIZE   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awsize;
+    assign axi4_bram_if.AWVALID  = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awvalid;
+    // --- Write Data Channel (W) ---
+    assign axi4_bram_if.WDATA    = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wdata;
+    assign axi4_bram_if.WLAST    = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wlast;
+    assign axi4_bram_if.WREADY   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wready;
+    assign axi4_bram_if.WSTRB    = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wstrb;
+    assign axi4_bram_if.WVALID   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wvalid;
+    // --- Write Response Channel (B) ---
+    assign axi4_bram_if.BID      = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_bid;
+    assign axi4_bram_if.BRESP    = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_bresp;
+    assign axi4_bram_if.BVALID   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_bvalid;
+    assign axi4_bram_if.BREADY   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_bready;
+    
+    // --- Read Address Channel (AR) ---
+    assign axi4_bram_if.ARADDR   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_araddr;
+    assign axi4_bram_if.ARBURST  = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_arburst;
+    assign axi4_bram_if.ARCACHE  = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_arcache;
+    assign axi4_bram_if.ARID     = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_arid;
+    assign axi4_bram_if.ARLEN    = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_arlen;
+    assign axi4_bram_if.ARLOCK   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_arlock;
+    assign axi4_bram_if.ARPROT   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_arprot;
+    assign axi4_bram_if.ARREADY  = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_arready;
+    assign axi4_bram_if.ARSIZE   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_arsize;
+    assign axi4_bram_if.ARVALID  = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_arvalid;
+    // --- Read Data Channel (R) ---
+    assign axi4_bram_if.RDATA    = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_rdata;
+    assign axi4_bram_if.RID      = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_rid;
+    assign axi4_bram_if.RLAST    = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_rlast;
+    assign axi4_bram_if.RRESP    = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_rresp;
+    assign axi4_bram_if.RVALID   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_rvalid;
+    assign axi4_bram_if.RREADY   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_rready;
+
+
+    //Lite Memory assignment
     assign mem_intf.ARADDR  = dut.AXI_SLAVE_MEM.s_axi_intf.ARADDR;   
     assign mem_intf.ARREADY = dut.AXI_SLAVE_MEM.s_axi_intf.ARREADY;  
     assign mem_intf.ARVALID = dut.AXI_SLAVE_MEM.s_axi_intf.ARVALID;
@@ -344,6 +394,7 @@ import soc_package ::*;
 
     initial begin
     	uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
+    	uvm_config_db#(virtual axi4_intf.MONITOR_MOD)::set(null,"*","BRAM_MON",axi4_bram_if);
     end
    
     
@@ -361,7 +412,6 @@ import soc_package ::*;
         obj.cpu_i  = axil_riscv_if;
         obj.mas_is_active = 1;        // agent active
         uvm_config_db #(cpu_config_obj) :: set (null , "*" , "cpu_config_obj" , obj);
-
 
         //CDMA
         cdma_config_obj=axi_cdma_config_obj::type_id::create("cdma_config_obj");
