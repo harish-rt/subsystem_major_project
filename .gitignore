@@ -43,6 +43,7 @@ msim/
 *.wlf
 *.ucdb
 transcript
+work sessions/
 
 # Ignore all simulation log files and temporary dumps
 *.log
