@@ -1,4 +1,4 @@
-class intc_config_obj extends uvm_object();
+class intc_config_obj extends uvm_object;
     `uvm_object_utils(intc_config_obj)
     `NEW_OBJ
 

@@ -11,9 +11,20 @@ riscv_tb/
 *.acdb
 *.awc
 *.error
+*.swh
+*.swi
 *.swj
+*.swl
+*.swm
+*.swn
+*.swo
+*.swp
+*.swq
 *asdbw*
 *tmp
+*.cmd
+*ref 
+
 
 # Ignore Siemens Questa / ModelSim databases
 work/

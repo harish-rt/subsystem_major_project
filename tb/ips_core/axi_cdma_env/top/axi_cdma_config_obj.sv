@@ -1,11 +1,11 @@
 /* RAITON_COPYRIGHT_BEGIN                                                 */
 /* This is an automatically generated prolog.                             */
 /*                                                                        */
-/* HOME/AXI_CDMA/tb/axi_cdma_interrupt_seq_item.sv                                    */
+/* AXI_INTERCONNECT_DESIGN/AXI_TB/config_obj.sv                           */
 /*                                                                        */
 /* RAITON CONFIDENTIAL                                                    */
 /*                                                                        */
-/* COPYRIGHT RAITON SEMICONDUCTOR PVT LTD 2018,2021                       */
+/* COPYRIGHT RAITON SEMICONDUCTOR PVT LTD 2018,2022                       */
 /*                                                                        */
 /* All Rights Reserved                                                    */
 /*                                                                        */
@@ -19,15 +19,21 @@
 /* permission is obtained from Raiton semiconductor PVT. LTD.             */
 /*                                                                        */
 /* RAITON_COPYRIGHT_END                                                   */
-class axi_cdma_interrupt_seq_item extends uvm_sequence_item;
-   bit interrupt_out;
+class axi_cdma_config_obj extends uvm_object();
+`uvm_object_utils(axi_cdma_config_obj)
 
-   `uvm_object_utils_begin(axi_cdma_interrupt_seq_item)
-   `uvm_field_int(interrupt_out,UVM_ALL_ON)
-   `uvm_object_utils_end
-  
-  function new(string name="axi_cdma_interrupt_seq_item");
-            super.new(name);
+//config members
+   int no_of_masters, no_of_slaves;
+   virtual axi_cdma_axi_master_intf mas_if[];
+   virtual axi_cdma_axi_slave_intf  slv_if[];
+   virtual axi_cdma_interrupt_intf intrpt_if;
+   int total_trans;
+   bit enable_scoreboard;
+   uvm_active_passive_enum mas_is_active[] ,slv_is_active[];
+   int slave_width [4], master_width[4];
+
+  function new (string name = "axi_cdma_config_obj");
+     super.new (name);
   endfunction
-   
-endclass :axi_cdma_interrupt_seq_item
+endclass
+
