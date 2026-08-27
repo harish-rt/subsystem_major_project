@@ -20,6 +20,17 @@ riscv_tb/
 *.swo
 *.swp
 *.swq
+*.mgf
+*.gen
+*.info
+*.lib
+*.cfg
+*.bin
+*.off
+*.ff
+*.out
+*.so
+
 *asdbw*
 *tmp
 *.cmd
@@ -32,6 +43,7 @@ msim/
 *.wlf
 *.ucdb
 transcript
+work sessions/
 
 # Ignore all simulation log files and temporary dumps
 *.log
