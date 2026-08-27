@@ -1,7 +1,0 @@
-# Aldec, Inc. Riviera-PRO version 2025.04.139.9738 built for Linux64 on May 30, 2025.
-# HDL, SystemC, and Assertions simulator, debugger, and design environment.
-# (c) 1999-2025 Aldec, Inc. All rights reserved.
-# ELBREAD: Elaboration process.
-# ELBREAD: Error: ELBREAD_0081 core_ip_wraps_auto_cc_0.v (314): Design unit "axi_clock_converter_v2_1_19_axi_clock_converter" instantiated in "core_ip_wraps.core_ip_wraps_auto_cc_0" not found in searched libraries: core_ip_wraps, work, xil_defaultlib.
-# ELBREAD: Error: Elaboration process completed with errors.
-# VSIM: Error: Simulation initialization failed.
