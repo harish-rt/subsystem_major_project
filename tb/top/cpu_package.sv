@@ -2,6 +2,7 @@
 package cpu_package;
  `include "uvm_macros.svh"
   import  uvm_pkg :: *;
+    import soc_addr_pkg::*;
 
  `include "../cpu/parameters.sv"
  `include "../cpu/cpu_config_obj.sv"
