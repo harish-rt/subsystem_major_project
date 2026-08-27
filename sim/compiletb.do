@@ -27,10 +27,13 @@ vlog -work xil_defaultlib -uvmver 1.2 \
 -l core_perif \
 -l spi_mem \
 -l core_wrapper \
-"../mem_agent/mem_pkg.sv" \
+"../tb/common/config_tb.sv" \
+"../tb/common/axi_parameters.sv" \
 "../tb/top/cpu_package.sv" \
-"../tb/ips_core/axi_cdma_env/axi_cdma_env_pkg.sv" \
-"../tb/top/intc_package.sv" \
+"../tb/ips_core/axi_cdma_env/top/axi_cdma_env_pkg.sv" \
+"../tb/mem_agent/mem_pkg.sv" \
+"../tb/ips_core/axi_intc/intc_package.sv" \
+"../tb/top/soc_package.sv" \
 "../tb/top/tb_top.sv" 
 #2>&1 | tee compiletb.log
 
