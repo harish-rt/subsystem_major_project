@@ -130,3 +130,18 @@ class config_intc_test extends cpu_base_test;
         phase.drop_objection(this);
     endtask
 endclass : config_intc_test
+
+class cdma_wr_rd_test extends cpu_base_test;
+    `uvm_component_utils(cdma_wr_rd_test)
+    `NEW_COMP
+
+    cdma_read_write_seq seq;
+
+    task main_phase(uvm_phase phase);
+        seq = cdma_read_write_seq::type_id::create("seq");
+        phase.raise_objection(this);
+            seq.start(w_env.c_env.cpu_agt.sqr);
+            phase.phase_done.set_drain_time(this, 100ns);
+        phase.drop_objection(this);
+    endtask
+endclass : cdma_wr_rd_test
