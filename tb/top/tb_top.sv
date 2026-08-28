@@ -19,18 +19,19 @@ import soc_package ::*;
     wire axi_intr;
     wire axi_irq;
 
-    axi4_intf master_if();
-    axi4_intf slave_if();
+    axi4_intf       master_if();
+    axi4_intf       slave_if();
 
     //S00
-    axi4_lite_intf axil_riscv_if();
+    axi4_lite_intf  axil_riscv_if();
     //S02
-    axi4_lite_intf lite_data_if();
+    axi4_lite_intf  lite_data_if();
 
     //memory interface
-    axi4_lite_intf mem_intf();
+    axi4_lite_intf  mem_intf();
+
     //BRAM interface
-    axi4_intf axi4_bram_if();
+    axi4_intf       axi4_bram_if();
 
 // AXI Interrupt Controller
     assign intc_proc_rst    =   ~areset_n;
@@ -134,6 +135,8 @@ import soc_package ::*;
     // Cpu 
     assign axil_riscv_if.ACLK    = aclk;
     assign axil_riscv_if.ARESETn = areset_n;
+    
+
     
     // Interuppt controller
     // --- Write Channels (AW) ---
@@ -344,6 +347,9 @@ import soc_package ::*;
     assign axi4_bram_if.RVALID   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_rvalid;
     assign axi4_bram_if.RREADY   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_rready;
 
+    // SLAVE_MEM 
+    assign mem_intf.ACLK    = aclk;
+    assign mem_intf.ARESETn = areset_n;
 
     //Lite Memory assignment
     assign mem_intf.ARADDR  = dut.AXI_SLAVE_MEM.s_axi_intf.ARADDR;   
@@ -370,8 +376,9 @@ import soc_package ::*;
         //run_test("load_bram_test");
         //run_test("read_bram_test");
         //run_test("config_cdma_ral_test");
-        run_test("read_cdma_test");
+        //run_test("read_cdma_test");
         //run_test("cpu_base_test");
+        run_test("cdma_wr_rd_test");
     end
 
     initial begin

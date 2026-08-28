@@ -61,6 +61,8 @@ class read_cdma_seq extends base_cpu_sequence;
 endclass : read_cdma_seq
 
 
+
+
 class config_cdma_ral_seq extends base_cpu_sequence;
     `uvm_object_utils(config_cdma_ral_seq)
     `NEW_OBJ
@@ -261,3 +263,84 @@ class config_intc_seq extends base_cpu_sequence;
 
 endclass : config_intc_seq
 */
+
+class cdma_read_write_seq extends base_cpu_sequence;
+    `uvm_object_utils(cdma_read_write_seq)
+    `NEW_OBJ
+    
+    int addr;
+
+    task body();
+        super.body();
+    
+        for (int i = 0; i < 10; i++) begin        
+            addr = 32'h8000_0000 + (i*4);
+            start_item(pkt);
+            if(!pkt.randomize() with {
+                AWADDR  == addr;
+                //WSTRB   == {(DATA_WIDTH/8){1'b1}};
+                WSTRB   == 'hf; 
+                operation   == WRITE;
+                })begin
+                `uvm_error(get_full_name(), "randomization_failed")
+            end
+            finish_item(pkt);
+            get_response(pkt);             
+        end
+
+    do begin
+        start_item(pkt);
+
+        if (!pkt.randomize() with {
+            ARADDR    == 32'h7000_0004;
+            operation == READ;
+        }) begin
+            `uvm_error(get_full_name(), "randomization_failed")
+        end
+
+        finish_item(pkt);
+        get_response(pkt);
+
+    end while (pkt.RDATA[1] == 0);
+
+        `uvm_do_with(pkt, {
+            AWADDR    == 32'h7000_0000;
+            operation == WRITE;
+            WDATA     == 32'h1000;
+        })
+
+        get_response(pkt);
+
+        `uvm_do_with(pkt, {
+            AWADDR    == 32'h7000_0018;
+            operation == WRITE;
+            WDATA     == 32'h8000_0000;
+        })
+        
+        `uvm_do_with(pkt, {
+            AWADDR    == 32'h7000_0028;
+            operation == WRITE;
+            WDATA     == 32'h10;
+        })
+        get_response(pkt);
+              
+       `uvm_do_with(pkt, {
+            AWADDR    == 32'h7000_0020;
+            operation == WRITE;
+            WDATA     == 32'h8000_0010;
+        })
+        
+        get_response(pkt);
+
+        `uvm_do_with(pkt, {
+            ARADDR    == 32'h8000_0010;
+            operation == READ;
+        })
+        
+        get_response(pkt);
+
+
+    endtask
+
+endclass:cdma_read_write_seq
+
