@@ -44,7 +44,8 @@ class read_cdma_seq extends base_cpu_sequence;
         //this.set_response_queue_depth(20);         //clears
 
         for (int i = 0; i < 11; i++) begin        
-            addr = 'h7000_0000 + (i*4);
+            addr = CDMA_BASE + (i*4);
+            //addr = 'h7000_0000 + (i*4);
             start_item(pkt);
             if(!pkt.randomize() with {
                 ARADDR  == addr;
@@ -344,3 +345,11 @@ class cdma_read_write_seq extends base_cpu_sequence;
 
 endclass:cdma_read_write_seq
 
+class isr_seq extends base_cpu_sequence;
+    `uvm_object_utils(isr_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+    endtask
+endclass : isr_seq
