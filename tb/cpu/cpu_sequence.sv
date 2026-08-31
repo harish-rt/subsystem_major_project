@@ -44,7 +44,8 @@ class read_cdma_seq extends base_cpu_sequence;
         //this.set_response_queue_depth(20);         //clears
 
         for (int i = 0; i < 11; i++) begin        
-            addr = 'h7000_0000 + (i*4);
+            addr = CDMA_BASE + (i*4);
+            //addr = 'h7000_0000 + (i*4);
             start_item(pkt);
             if(!pkt.randomize() with {
                 ARADDR  == addr;
@@ -273,6 +274,8 @@ class cdma_read_write_seq extends base_cpu_sequence;
     task body();
         super.body();
     
+        `uvm_info("cdma_rd_wr_seq", "start of Config CDMA Sequence", UVM_MEDIUM)
+
         for (int i = 0; i < 10; i++) begin        
             addr = 32'h8000_0000 + (i*4);
             start_item(pkt);
@@ -292,7 +295,7 @@ class cdma_read_write_seq extends base_cpu_sequence;
         start_item(pkt);
 
         if (!pkt.randomize() with {
-            ARADDR    == 32'h7000_0004;
+            ARADDR    == CDMA_BASE + 4; 
             operation == READ;
         }) begin
             `uvm_error(get_full_name(), "randomization_failed")
@@ -304,7 +307,7 @@ class cdma_read_write_seq extends base_cpu_sequence;
     end while (pkt.RDATA[1] == 0);
 
         `uvm_do_with(pkt, {
-            AWADDR    == 32'h7000_0000;
+            AWADDR    == CDMA_BASE;
             operation == WRITE;
             WDATA     == 32'h1000;
         })
@@ -312,35 +315,49 @@ class cdma_read_write_seq extends base_cpu_sequence;
         get_response(pkt);
 
         `uvm_do_with(pkt, {
-            AWADDR    == 32'h7000_0018;
+            AWADDR    == CDMA_BASE + 18; 
             operation == WRITE;
-            WDATA     == 32'h8000_0000;
+            WDATA     == LITE_MEM_BASE; 
         })
         
         `uvm_do_with(pkt, {
-            AWADDR    == 32'h7000_0028;
+            AWADDR    == CDMA_BASE + 28; 
             operation == WRITE;
             WDATA     == 32'h10;
         })
         get_response(pkt);
               
        `uvm_do_with(pkt, {
-            AWADDR    == 32'h7000_0020;
+            AWADDR    == CDMA_BASE + 20; 
             operation == WRITE;
-            WDATA     == 32'h8000_0010;
-        })
+            WDATA     == LITE_MEM_BASE + 10; 
+            })
         
         get_response(pkt);
 
         `uvm_do_with(pkt, {
-            ARADDR    == 32'h8000_0010;
+            ARADDR    == LITE_MEM_BASE + 10; 
             operation == READ;
         })
         
         get_response(pkt);
+        
+        `uvm_info("cdma_rd_wr_seq", "end of Config CDMA Sequence", UVM_MEDIUM)
 
 
     endtask
 
 endclass:cdma_read_write_seq
+
+
+class isr_seq extends base_cpu_sequence;
+    `uvm_object_utils(isr_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+    endtask
+endclass : isr_seq
+
+
 
