@@ -325,7 +325,7 @@ int x ,no_addr, no_data; //indicates number of completed write transactions wait
    merged_pkt.wstrobe  = data_pkt.wstrobe;
   //adding packets to array waiting for response
   // `uvm_info("master_monitor :: merge_write_info",$sformatf("putting merged pkt to wresp_array awaddr = %b",merged_pkt.awaddr),UVM_LOW);
-    //`uvm_info("master_monitor::merge_write_info_",merged_pkt.sprint(),UVM_LOW)
+    `uvm_info("master_monitor_merge_write_info",merged_pkt.sprint(),UVM_LOW)
     if(!wresp_array.exists(merged_pkt.awid)) wresp_array[merged_pkt.awid] = new();
     wresp_array[merged_pkt.awid].put(merged_pkt);
 
