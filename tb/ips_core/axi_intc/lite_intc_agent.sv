@@ -3,7 +3,6 @@ class axi_lite_intc_agent extends uvm_agent;
     `NEW_COMP
     
     lite_intc_monitor           mon;
-    intc_config_obj             obj;
     uvm_active_passive_enum     is_active;
 
     function void build_phase(uvm_phase phase);

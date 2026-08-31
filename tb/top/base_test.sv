@@ -130,3 +130,29 @@ class config_intc_test extends cpu_base_test;
         phase.drop_objection(this);
     endtask
 endclass : config_intc_test
+
+class sample_test extends cpu_base_test;
+    `uvm_component_utils(sample_test)
+    `NEW_COMP
+
+    cpu_config_intc_vseq     intc_seq;
+    cpu_isr_vseq             isr_seq;
+    //cpu_config_intc_seq     intc_seq;
+    //cpu_isr_seq             isr_seq;
+
+    task main_phase(uvm_phase phase);
+        intc_seq = cpu_config_intc_vseq  ::type_id::create("intc_seq");
+        isr_seq  = cpu_isr_vseq          ::type_id::create("isr_seq");
+
+        phase.raise_objection(this);
+            fork
+                isr_seq.start(w_env.vsqr);
+            join_none
+            intc_seq.start(w_env.vsqr);
+            //intc_seq.start(w_env.c_env.cpu_agt.sqr);
+            //isr_seq.start(w_env.c_env.cpu_agt.sqr);
+
+            phase.phase_done.set_drain_time(this, 100ns);
+        phase.drop_objection(this);
+    endtask
+endclass : sample_test
