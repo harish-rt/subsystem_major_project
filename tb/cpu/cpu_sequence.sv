@@ -248,8 +248,9 @@ class config_cdma_seq extends base_cpu_sequence;
 
 endclass : config_cdma_seq
 
-class cdma_read_write_seq extends base_cpu_sequence;
-    `uvm_object_utils(cdma_read_write_seq)
+
+class load_mem_seq extends base_cpu_sequence;
+    `uvm_object_utils(load_mem_seq)
     `NEW_OBJ
     
     int addr;
@@ -270,13 +271,13 @@ class cdma_read_write_seq extends base_cpu_sequence;
         end while (pkt.RDATA[1] == 0);
 
         `uvm_do_with(pkt, {
-            AWADDR    == 32'h7000_0000;
+            AWADDR    == CDMA_BASE;
             operation == WRITE;
             WDATA     == 32'h5000;
         })
 
         `uvm_do_with(pkt, {
-            AWADDR    == 32'h7000_0018;
+            AWADDR    == CDMA_BASE + 18; 
             operation == WRITE;
             WDATA     == 32'h7100_0000;
         })
