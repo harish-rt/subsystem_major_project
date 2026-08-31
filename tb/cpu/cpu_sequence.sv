@@ -227,7 +227,7 @@ class config_cdma_seq extends base_cpu_sequence;
 
         do begin
             //reg_block.cdmasr.read(status,tdata);
-        end while(tdata[1]==1);
+        end while(tdata[1]==0);
         
         //reg_block.cdmacr.operation(status,'h5000);
         //reg_block.sa.operation(status,'h7100_0000);
@@ -355,20 +355,20 @@ class cpu_isr_seq extends base_cpu_sequence;
         
         if (cdmasr_data[12]) begin
             `uvm_info("cpu_isr_seq", "CDMA IOC Asserted", UVM_LOW)
-            write_reg(CDMA_BASE + 'h4, (1 << 12));    
+            write_reg(CDMA_BASE + 'h4, (1 << 12));  // W1C
         end 
         else if (cdmasr_data[14]) begin
             `uvm_warning("cpu_isr_seq", "CDMA ERR Asserted")
             read_reg(CDMA_BASE + 'h0, cdmacr_data);
-            cdmacr_data[4] = 1'b1; 
+            cdmacr_data[2] = 1'b1;                  // CDMA Reset
             write_reg(CDMA_BASE + 'h0, cdmacr_data);
         end
         
-        write_reg(INTC_BASE + 'hc, (1 << 26));
+        write_reg(INTC_BASE + 'hc, (1 << 26));      // INTC ACK
     endtask
 
     task handle_core_perif_isr();
-        write_reg(INTC_BASE + 'hc, (1 << 27));
+        write_reg(INTC_BASE + 'hc, (1 << 27));      // INTC ACK
     endtask
 
 endclass : cpu_isr_seq
@@ -386,7 +386,7 @@ class cdma_config_seq extends base_cpu_sequence;
 
         do begin
             read_reg(CDMA_BASE + 'h4,cdmasr_data);
-        end while(cdmasr_data[1]==1);
+        end while(cdmasr_data[1]==0);
         `uvm_info("cdma_config_seq","idle cleared",UVM_LOW)
         write_reg(CDMA_BASE + 'h0,cdmacr_data);
         write_reg(CDMA_BASE + 'h18,sa_data);

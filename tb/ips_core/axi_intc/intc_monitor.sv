@@ -3,6 +3,90 @@ class intc_monitor extends uvm_monitor;
     `NEW_COMP
     
     uvm_event                           irq_event;
+    intc_seq_item                       pkt;
+    intc_config_obj                     cfg;
+
+    virtual intc_intf                   mon_intc_intf;
+    uvm_analysis_port #(intc_seq_item)  mon_intc_ap;
+
+    bit                          [31:0] prev_intr;
+    bit                                 prev_irq;
+
+    extern function void build_phase    (uvm_phase phase);
+    extern task main_phase              (uvm_phase phase);
+
+endclass : intc_monitor
+
+function void intc_monitor::build_phase(uvm_phase phase);
+    `uvm_info("intc_monitor", "build_phase started", UVM_LOW)
+    super.build_phase(phase);
+    
+    mon_intc_ap = new("mon_intc_ap",this);
+
+    if (!uvm_config_db#(intc_config_obj)::get(this,"","intc_config_obj",cfg)) begin
+        `uvm_fatal("INTC_MON", "Failed to get intc_config_obj from config DB")
+    end
+
+    `uvm_info("intc_monitor", "build_phase ended", UVM_LOW)
+endfunction 
+
+task intc_monitor::main_phase(uvm_phase phase);       
+    // Wait for reset de-assertion
+    wait(mon_intc_intf.intc_procss_rst == 0);
+    `uvm_info("intc_monitor", "main_phase started after reset", UVM_LOW)
+    
+    forever begin
+        @(posedge mon_intc_intf.intc_irq);
+        phase.raise_objection(this, "IRQ asserted, holding simulation");
+        
+        `uvm_info("INTC_MON", "Hardware IRQ Asserted -> Triggering event", UVM_LOW)
+        irq_event.trigger();
+
+        @(mon_intc_intf.intc_interface_monitor_cb);
+        if ((mon_intc_intf.intc_interface_monitor_cb.intc_intr != prev_intr) ||
+            (mon_intc_intf.intc_interface_monitor_cb.intc_irq != prev_irq)) begin
+            
+            pkt = intc_seq_item::type_id::create("pkt");
+            pkt.intc_intr = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
+            pkt.intc_irq  = mon_intc_intf.intc_interface_monitor_cb.intc_irq;
+
+            mon_intc_ap.write(pkt);
+            `uvm_info("intc_monitor_pkt", pkt.sprint(), UVM_MEDIUM)            
+
+            prev_intr = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
+            prev_irq  = mon_intc_intf.intc_interface_monitor_cb.intc_irq;
+        end
+
+        @(negedge mon_intc_intf.intc_irq);
+        `uvm_info("INTC_MON", "Hardware IRQ De-asserted -> Releasing objection", UVM_LOW)
+        
+        phase.drop_objection(this, "IRQ cleared, dropping objection");
+    end
+endtask : main_phase
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+class intc_monitor extends uvm_monitor;
+    `uvm_component_utils(intc_monitor)
+    `NEW_COMP
+    
+    uvm_event                           irq_event;
 	intc_seq_item 					    pkt;
 
     bit                          [31:0] prev_intr;
