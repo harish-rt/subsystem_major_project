@@ -2,6 +2,7 @@ class intc_monitor extends uvm_monitor;
     `uvm_component_utils(intc_monitor)
     `NEW_COMP
     
+    uvm_event                           irq_event;
 	intc_seq_item 					    pkt;
 
     bit                          [31:0] prev_intr;
@@ -28,7 +29,12 @@ task intc_monitor :: main_phase(uvm_phase phase);
     `uvm_info ("intc_monitor :: main_phase started ", "",UVM_LOW)
     
     forever begin
-        @(mon_intc_intf.intc_interface_monitor_cb);
+        `uvm_info("INTC_MON", "Before Triggering irq event", UVM_LOW)
+        @(posedge mon_intc_intf.intc_interface_monitor_cb.intc_irq);
+        `uvm_info("INTC_MON", "Hardware IRQ Asserted -> Triggering event", UVM_LOW)
+        irq_event.trigger();
+
+        //@(mon_intc_intf.intc_interface_monitor_cb);
         if((mon_intc_intf.intc_interface_monitor_cb.intc_intr != prev_intr) ||
             (mon_intc_intf.intc_interface_monitor_cb.intc_irq != prev_irq)) begin
 	        
@@ -43,6 +49,7 @@ task intc_monitor :: main_phase(uvm_phase phase);
             prev_intr   = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
             prev_irq    = mon_intc_intf.intc_interface_monitor_cb.intc_irq;
         end
+        @(negedge mon_intc_intf.intc_interface_monitor_cb.intc_irq);
     end
     `uvm_info ("mon_intc :: main_phase ended ", "",UVM_LOW) 
 endtask : main_phase
