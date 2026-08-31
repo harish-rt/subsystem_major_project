@@ -379,7 +379,8 @@ import soc_package ::*;
         //run_test("config_cdma_ral_test");
         //run_test("read_cdma_test");
         //run_test("cpu_base_test");
-        run_test("cdma_wr_rd_test");
+        //run_test("cdma_wr_rd_test");
+        run_test("mem_wr_rd_test");
     end
 
     initial begin
