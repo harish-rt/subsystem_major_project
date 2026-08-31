@@ -359,5 +359,3 @@ class isr_seq extends base_cpu_sequence;
     endtask
 endclass : isr_seq
 
-
-
