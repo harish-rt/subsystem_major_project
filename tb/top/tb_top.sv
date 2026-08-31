@@ -372,6 +372,7 @@ import soc_package ::*;
  
 
     initial begin
+        run_test("sample_test");
         //run_test("config_intc_test");
         //run_test("load_bram_test");
         //run_test("read_bram_test");
@@ -410,7 +411,8 @@ import soc_package ::*;
         //soc_config
           soc_config_obj=soc_config::type_id::create("soc_config_obj");
         //INTC
-        soc_config_obj.intc_obj                     =   new("intc_obj");
+        //soc_config_obj.intc_obj                     =   new("intc_obj");
+        soc_config_obj.intc_obj = intc_config_obj::type_id::create("intc_obj");
         soc_config_obj.intc_obj.axi_lite_is_active  =   UVM_PASSIVE;
         soc_config_obj.intc_obj.lite_intc_intf      =   lite_intc_if;
         soc_config_obj.intc_obj.intc_is_active      =   UVM_PASSIVE;
