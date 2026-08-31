@@ -14,6 +14,9 @@ class base_cpu_sequence extends uvm_sequence#(cpu_seq_item);
     bit [31:0]          iar_data;
     bit [31:0]          cdmacr_data;
     bit [31:0]          cdmasr_data;
+    bit [31:0]          sa_data;
+    bit [31:0]          da_data;
+    bit [31:0]          btt_data;
 
     task pre_body();
         phase   =   get_starting_phase();
@@ -153,37 +156,18 @@ class load_bram_seq extends base_cpu_sequence;
 
     task body();
         super.body();
-        start_item(pkt);
-        if(!pkt.randomize() with {
-            AWADDR  == 'h7100_0000;
-            WDATA   == 'ha;
-            WSTRB   == 'hf;
-            operation   == WRITE;
-            })begin
-            `uvm_error(get_full_name(), "randomization_failed")
+        for(int i=0;i<8;i=i+4)begin
+            start_item(pkt);
+            if(!pkt.randomize() with {
+                AWADDR  == 'h7100_0000 + i;
+                WSTRB   == 'hf;
+                operation   == WRITE;
+                })begin
+                `uvm_error(get_full_name(), "randomization_failed")
+            end
+            finish_item(pkt);
+            get_response(pkt);             
         end
-        finish_item(pkt);
-        get_response(pkt);             
-
-        start_item(pkt);
-        if(!pkt.randomize() with {
-            ARADDR  == 'h7100_0000;
-            operation   == READ;
-            })begin
-            `uvm_error(get_full_name(), "randomization_failed")
-        end
-        finish_item(pkt);
-        get_response(pkt);             
-/*
-        start_item(pkt);
-        if(!pkt.randomize() with {
-            ARADDR  == 'h7100_0000;
-            operation   == READ;
-            })begin
-            `uvm_error(get_full_name(), "randomization_failed")
-        end
-        finish_item(pkt);
-        get_response(pkt);*/
     endtask
 endclass : load_bram_seq
 
@@ -273,78 +257,54 @@ class cdma_read_write_seq extends base_cpu_sequence;
     task body();
         super.body();
     
-        for (int i = 0; i < 10; i++) begin        
-            addr = 32'h8000_0000 + (i*4);
+        do begin
             start_item(pkt);
-            if(!pkt.randomize() with {
-                AWADDR  == addr;
-                //WSTRB   == {(DATA_WIDTH/8){1'b1}};
-                WSTRB   == 'hf; 
-                operation   == WRITE;
-                })begin
+            if (!pkt.randomize() with {
+                ARADDR    == 32'h7000_0004;
+                operation == READ;
+            }) begin
                 `uvm_error(get_full_name(), "randomization_failed")
             end
             finish_item(pkt);
-            get_response(pkt);             
-        end
-
-    do begin
-        start_item(pkt);
-
-        if (!pkt.randomize() with {
-            ARADDR    == 32'h7000_0004;
-            operation == READ;
-        }) begin
-            `uvm_error(get_full_name(), "randomization_failed")
-        end
-
-        finish_item(pkt);
-        get_response(pkt);
-
-    end while (pkt.RDATA[1] == 0);
+            get_response(pkt);
+        end while (pkt.RDATA[1] == 0);
 
         `uvm_do_with(pkt, {
             AWADDR    == 32'h7000_0000;
             operation == WRITE;
-            WDATA     == 32'h1000;
+            WDATA     == 32'h5000;
         })
-
-        get_response(pkt);
 
         `uvm_do_with(pkt, {
             AWADDR    == 32'h7000_0018;
             operation == WRITE;
-            WDATA     == 32'h8000_0000;
+            WDATA     == 32'h7100_0000;
         })
         
         `uvm_do_with(pkt, {
-            AWADDR    == 32'h7000_0028;
-            operation == WRITE;
-            WDATA     == 32'h10;
-        })
-        get_response(pkt);
-              
-       `uvm_do_with(pkt, {
             AWADDR    == 32'h7000_0020;
             operation == WRITE;
-            WDATA     == 32'h8000_0010;
+            WDATA     == 32'h8000_0000;
+        })
+              
+       `uvm_do_with(pkt, {
+            AWADDR    == 32'h7000_0028;
+            operation == WRITE;
+            WDATA     == 32'h8;
         })
         
-        get_response(pkt);
-
-        `uvm_do_with(pkt, {
-            ARADDR    == 32'h8000_0010;
-            operation == READ;
-        })
+        for(int i=0;i<8;i=i+4)begin
+            `uvm_do_with(pkt, {
+                ARADDR    == 32'h8000_0000 + i;
+                operation == READ;
+            })
+        end
         
-        get_response(pkt);
-      
     endtask
 
 endclass:cdma_read_write_seq
 
-
-  class cpu_config_intc_seq extends base_cpu_sequence;
+class cpu_config_intc_seq extends base_cpu_sequence;
     `uvm_object_utils(cpu_config_intc_seq)
     `NEW_OBJ
 

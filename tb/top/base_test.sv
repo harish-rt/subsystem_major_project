@@ -73,27 +73,34 @@ class sample_test extends cpu_base_test;
     `uvm_component_utils(sample_test)
     `NEW_COMP
 
-    cpu_config_intc_vseq     intc_seq;
-    cpu_isr_vseq             isr_seq;
+    cpu_config_intc_vseq    intc_seq;
+    cpu_isr_vseq            isr_seq;
+    cdma_read_write_vseq     cdma_seq;
+    load_bram_vseq           bram_seq;
     //cpu_config_intc_seq     intc_seq;
     //cpu_isr_seq             isr_seq;
 
     task main_phase(uvm_phase phase);
-        intc_seq = cpu_config_intc_vseq  ::type_id::create("intc_seq");
-        isr_seq  = cpu_isr_vseq          ::type_id::create("isr_seq");
+        intc_seq = cpu_config_intc_vseq ::type_id::create("intc_seq");
+        isr_seq  = cpu_isr_vseq         ::type_id::create("isr_seq");
+        cdma_seq = cdma_read_write_vseq ::type_id::create("cdma_seq");
+        bram_seq = load_bram_vseq       ::type_id::create("bram_seq");
 
         phase.raise_objection(this);
             fork
                 isr_seq.start(w_env.vsqr);
             join_none
+            bram_seq.start(w_env.vsqr);
             intc_seq.start(w_env.vsqr);
+            cdma_seq.start(w_env.vsqr);
             //intc_seq.start(w_env.c_env.cpu_agt.sqr);
             //isr_seq.start(w_env.c_env.cpu_agt.sqr);
 
-            phase.phase_done.set_drain_time(this, 100ns);
+            phase.phase_done.set_drain_time(this, 1000ns);
         phase.drop_objection(this);
     endtask
 endclass : sample_test
+
 class cdma_wr_rd_test extends cpu_base_test;
     `uvm_component_utils(cdma_wr_rd_test)
     `NEW_COMP
