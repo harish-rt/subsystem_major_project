@@ -103,7 +103,7 @@ endclass
             aw_pkt = lite_intc_seq_item :: type_id :: create ("aw_pkt");
             aw_pkt.axi_awaddr     = mon_if.axi4_lite_mon_cb.axi_awaddr;
             aw_pkt.write          = lite_intc_seq_item::WRITE;
-            `uvm_info("axi4_lite_mon_AW",$sformatf("write_address = %0h,write=%s",aw_pkt.axi_awaddr,aw_pkt.write.name),UVM_NONE)
+            `uvm_info("axi4_lite_intc_mon_AW",$sformatf("write_address = %0h,write=%s",aw_pkt.axi_awaddr,aw_pkt.write.name),UVM_NONE)
             wr_addr_queue.push_back(aw_pkt);
         end
     endtask
@@ -113,7 +113,7 @@ endclass
             w_pkt = lite_intc_seq_item :: type_id :: create ("w_pkt");
             w_pkt.axi_wdata      = mon_if.axi4_lite_mon_cb.axi_wdata;
             w_pkt.axi_wstrb      = mon_if.axi4_lite_mon_cb.axi_wstrb;
-            `uvm_info("axi4_lite_mon_WD",$sformatf("write_data = %0h",w_pkt.axi_wdata),UVM_LOW)
+            `uvm_info("axi4_lite_intc_mon_WD",$sformatf("write_data = %0h",w_pkt.axi_wdata),UVM_LOW)
             wr_data_queue.push_back(w_pkt);
         end
     endtask
@@ -122,7 +122,7 @@ endclass
         wait(mon_if.axi4_lite_mon_cb.axi_bvalid && mon_if.axi4_lite_mon_cb.axi_bready) begin
             b_pkt = lite_intc_seq_item :: type_id :: create ("b_pkt");
             b_pkt.axi_bresp      = mon_if.axi4_lite_mon_cb.axi_bresp;
-            `uvm_info("axi4_lite_mon_bresp",$sformatf("write_bresp = %b",b_pkt.axi_bresp),UVM_LOW)
+            `uvm_info("axi4_lite_intc_mon_BR",$sformatf("write_bresp = %b",b_pkt.axi_bresp),UVM_LOW)
             wr_resp_queue.push_back(b_pkt);
         end
     endtask
@@ -132,7 +132,7 @@ endclass
             ar_pkt = lite_intc_seq_item :: type_id :: create ("ar_pkt");
             ar_pkt.axi_araddr     = mon_if.axi4_lite_mon_cb.axi_araddr;
             ar_pkt.write          = lite_intc_seq_item::READ;
-            `uvm_info("axi4_lite_mon_read_addr",$sformatf("read_address = %0h,write=%s",ar_pkt.axi_araddr,ar_pkt.write),UVM_LOW)
+            `uvm_info("axi4_lite_intc_mon_AR",$sformatf("read_address = %0h,write=%s",ar_pkt.axi_araddr,ar_pkt.write),UVM_LOW)
             rd_addr_queue.push_back(ar_pkt); 
         end
     endtask
@@ -142,7 +142,7 @@ endclass
             r_pkt = lite_intc_seq_item :: type_id :: create ("r_pkt");
             r_pkt.axi_rdata      = mon_if.axi4_lite_mon_cb.axi_rdata;
             r_pkt.axi_rresp      = mon_if.axi4_lite_mon_cb.axi_rresp;
-            `uvm_info("axi4_lite_mon_read_data",$sformatf("rdata = %0h",r_pkt.axi_rdata),UVM_LOW)
+            `uvm_info("axi4_lite_intc_mon_RD",$sformatf("rdata = %0h",r_pkt.axi_rdata),UVM_LOW)
             rd_data_queue.push_back(r_pkt);
         end 
     endtask
@@ -155,13 +155,13 @@ endclass
                 w_merge.axi_awaddr 	= wr_addr_queue[0].axi_awaddr;
                 w_merge.axi_wdata 	= wr_data_queue[0].axi_wdata;
                 w_merge.axi_wstrb 	= wr_data_queue[0].axi_wstrb;
-                //w_merge.axi_wstrb 	= sq_itm_h.axi_wstrb;
                 w_merge.axi_bresp 	= wr_resp_queue[0].axi_bresp;
-                w_merge.write 		= wr_addr_queue[0].write;
+                //w_merge.write 		= wr_addr_queue[0].write;
+                w_merge.write       = lite_intc_seq_item::WRITE;
                 void'(wr_addr_queue.pop_front);
                 void'(wr_data_queue.pop_front);
                 void'(wr_resp_queue.pop_front);
-                `uvm_info("axi4_lite_mon_WRITE",w_merge.sprint(),UVM_LOW)
+                `uvm_info("AXI4_Lite_INTC_MON_MERGE_WRITE",w_merge.sprint(),UVM_LOW)
                 mon_ap.write(w_merge);
             end
     endtask
@@ -172,11 +172,12 @@ endclass
             begin
                 r_merge.axi_araddr    = rd_addr_queue[0].axi_araddr;
                 r_merge.axi_rdata     = rd_data_queue[0].axi_rdata;
-		        r_merge.axi_rresp 	= rd_data_queue[0].axi_rresp;
-                r_merge.write         = rd_addr_queue[0].write;
+		        r_merge.axi_rresp 	  = rd_data_queue[0].axi_rresp;
+                //r_merge.write         = rd_addr_queue[0].write;
+                r_merge.write         = lite_intc_seq_item::READ;
                 void'(rd_addr_queue.pop_front);
                 void'(rd_data_queue.pop_front);
-                `uvm_info("axi4_lite_mon_READ",r_merge.sprint(),UVM_LOW)
+                `uvm_info("AXI4_Lite_INTC_MON_MERGE_READ",r_merge.sprint(),UVM_LOW)
                 mon_ap.write(r_merge);
             end
     endtask

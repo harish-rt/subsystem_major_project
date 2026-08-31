@@ -12,6 +12,8 @@ package soc_package;
 //IPS_CORE
     `include "../ips_core/ips_core_env.sv"
 // TOP
+    `include "soc_virtual_sequencer.sv"
+    `include "soc_virtual_sequence.sv"
     `include "wrapper_env.sv"
     `include "base_test.sv"
 endpackage : soc_package
