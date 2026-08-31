@@ -39,10 +39,10 @@ import soc_package ::*;
     intc_intf                   intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
      
 //axi cdma interfaces 
-    axi_cdma_axi_master_intf    cdma_reg_intf(.aclk(aclk),.areset_n(areset_n));
-    axi_cdma_axi_slave_intf     cdma_sg_intf(.aclk(aclk),.areset_n(areset_n));
-    axi_cdma_axi_slave_intf     cdma_data_mov_intf(.aclk(aclk),.areset_n(areset_n));
-    axi_cdma_interrupt_intf     cdma_interrupt_intf(.aclk(aclk));
+    axi_cdma_axi_master_intf    cdma_reg_intf       (.aclk(aclk),.areset_n(areset_n));
+    axi_cdma_axi_slave_intf     cdma_sg_intf        (.aclk(aclk),.areset_n(areset_n));
+    axi_cdma_axi_slave_intf     cdma_data_mov_intf  (.aclk(aclk),.areset_n(areset_n));
+    axi_cdma_interrupt_intf     cdma_interrupt_intf (.aclk(aclk));
 
     
     core_wrapper dut(
