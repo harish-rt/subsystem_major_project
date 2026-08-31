@@ -35,7 +35,7 @@ vlog -work xil_defaultlib -uvmver 1.2 \
 "../tb/mem_agent/mem_pkg.sv" \
 "../tb/ips_core/axi_intc/intc_package.sv" \
 "../tb/top/soc_package.sv" \
-"../tb/top/tb_top.sv" 
+"../tb/top/tb_top.sv"  
 #2>&1 | tee compiletb.log
 
 

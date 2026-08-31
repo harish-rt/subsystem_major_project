@@ -98,6 +98,8 @@ class read_cdma_seq extends base_cpu_sequence;
 endclass : read_cdma_seq
 
 
+
+
 class config_cdma_ral_seq extends base_cpu_sequence;
     `uvm_object_utils(config_cdma_ral_seq)
     `NEW_OBJ
@@ -144,10 +146,6 @@ class read_bram_seq extends base_cpu_sequence;
 
 endclass : read_bram_seq
 
-//config mem seq
-//config intr seq
-//config cdma seq
-//config isr seq execute based on monitored event
 
 class load_bram_seq extends base_cpu_sequence;
     `uvm_object_utils(load_bram_seq)
@@ -266,38 +264,87 @@ class config_cdma_seq extends base_cpu_sequence;
 
 endclass : config_cdma_seq
 
-/*
-class config_intc_seq extends base_cpu_sequence;
-    `uvm_object_utils(config_intc_seq)
+class cdma_read_write_seq extends base_cpu_sequence;
+    `uvm_object_utils(cdma_read_write_seq)
     `NEW_OBJ
     
     int addr;
 
     task body();
         super.body();
-        `uvm_info("config_intc_seq", "Start of Config CDMA Sequence", UVM_LOW)
-        //KERNEL: UVM_ERROR Response queue overflow, response was dropped
-        //this.set_response_queue_depth(20);         //clears
-
+    
         for (int i = 0; i < 10; i++) begin        
-            addr = 'h7000_1000 + (i*4);
+            addr = 32'h8000_0000 + (i*4);
             start_item(pkt);
             if(!pkt.randomize() with {
-                ARADDR  == addr;
-                operation   == READ;
+                AWADDR  == addr;
+                //WSTRB   == {(DATA_WIDTH/8){1'b1}};
+                WSTRB   == 'hf; 
+                operation   == WRITE;
                 })begin
                 `uvm_error(get_full_name(), "randomization_failed")
             end
             finish_item(pkt);
             get_response(pkt);             
         end
-        `uvm_info("config_intc_seq", "End of Config CDMA Sequence", UVM_LOW)
+
+    do begin
+        start_item(pkt);
+
+        if (!pkt.randomize() with {
+            ARADDR    == 32'h7000_0004;
+            operation == READ;
+        }) begin
+            `uvm_error(get_full_name(), "randomization_failed")
+        end
+
+        finish_item(pkt);
+        get_response(pkt);
+
+    end while (pkt.RDATA[1] == 0);
+
+        `uvm_do_with(pkt, {
+            AWADDR    == 32'h7000_0000;
+            operation == WRITE;
+            WDATA     == 32'h1000;
+        })
+
+        get_response(pkt);
+
+        `uvm_do_with(pkt, {
+            AWADDR    == 32'h7000_0018;
+            operation == WRITE;
+            WDATA     == 32'h8000_0000;
+        })
+        
+        `uvm_do_with(pkt, {
+            AWADDR    == 32'h7000_0028;
+            operation == WRITE;
+            WDATA     == 32'h10;
+        })
+        get_response(pkt);
+              
+       `uvm_do_with(pkt, {
+            AWADDR    == 32'h7000_0020;
+            operation == WRITE;
+            WDATA     == 32'h8000_0010;
+        })
+        
+        get_response(pkt);
+
+        `uvm_do_with(pkt, {
+            ARADDR    == 32'h8000_0010;
+            operation == READ;
+        })
+        
+        get_response(pkt);
+      
     endtask
 
-endclass : config_intc_seq
-*/
+endclass:cdma_read_write_seq
 
-class cpu_config_intc_seq extends base_cpu_sequence;
+
+  class cpu_config_intc_seq extends base_cpu_sequence;
     `uvm_object_utils(cpu_config_intc_seq)
     `NEW_OBJ
 
@@ -313,45 +360,6 @@ class cpu_config_intc_seq extends base_cpu_sequence;
         write_reg(INTC_BASE + 'h1c, reg_data);    //MER
     endtask
 endclass : cpu_config_intc_seq
-
-/*
-class cpu_isr_seq extends base_cpu_sequence;
-    `uvm_object_utils(cpu_isr_seq)
-    `NEW_OBJ
-
-    task body();
-        super.body();
-    // Reading ISR
-        read_reg(INTC_BASE + 'h0, isr_data);
-        if(isr_data[26])begin
-            `uvm_info("cpu_isr_seq","intc from cdma",UVM_LOW)
-        end
-        else if(isr_data[27])begin
-            `uvm_info("cpu_isr_seq","intc from core perif",UVM_LOW)
-        end 
-        else begin
-            `uvm_info("cpu_isr_seq","intc from emo telidu",UVM_LOW)
-        end
-    // Reading IPR
-        read_reg(INTC_BASE + 'h4, ipr_data);
-        if(ipr_data[26]) begin
-            read_reg(CDMA_BASE + 'h4, cdmasr_data);
-            if(cdmasr_data[12]) begin
-                `uvm_info("cpu_isr_seq","CDMA IOC Asserted",UVM_LOW)
-                write_reg(CDMA_BASE + 'h4, cdmasr_data);    //W1C
-            end
-            else if(cdmasr_data[14]) begin
-                `uvm_warning("cpu_isr_seq","CDMA ERR Asserted")
-                cdmacr_data[4]  = 1;                            //Reset
-                write_reg(CDMA_BASE + 'h0, cdmacr_data);
-            end
-        end
-    // Writing to IAR
-        iar_data[26]    = 1;
-        write_reg(INTC_BASE + 'hc, iar_data);
-    endtask
-endclass : cpu_isr_seq
-*/
 
 class cpu_isr_seq extends base_cpu_sequence;
     `uvm_object_utils(cpu_isr_seq)
