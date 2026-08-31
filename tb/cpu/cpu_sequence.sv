@@ -261,3 +261,170 @@ class config_intc_seq extends base_cpu_sequence;
 
 endclass : config_intc_seq
 */
+
+
+class bram_multiple_wr_rd_seq extends base_cpu_sequence;
+    `uvm_object_utils(bram_multiple_wr_rd_seq)
+
+    `NEW_OBJ
+    int  addr;
+    task body();
+        super.body();
+            for (int i=0;i<64;i+=4)begin
+                addr=32'h7100_0000+i;
+                start_item(pkt);
+                    if(!pkt.randomize() with {
+                        AWADDR==addr;
+                        operation==WRITE;
+                        WSTRB==4'b1111;})
+                    begin    
+                   `uvm_error("RAND_ERR","Randomization failed")
+                   end
+                finish_item(pkt);
+            end
+            for (int i=0;i<64;i+=4)begin
+                addr=32'h7100_0000+i;
+                start_item(pkt);
+                    if(!pkt.randomize() with {
+                        ARADDR==addr;
+                        operation==READ;})
+                    begin    
+                   `uvm_error("RAND_ERR","Randomization failed")
+                   end
+                finish_item(pkt);
+            end
+
+        endtask
+endclass
+
+class bram_lower_invalid_addr_seq extends base_cpu_sequence;
+    `uvm_object_utils(bram_lower_invalid_addr_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        start_item(pkt);
+            if(!pkt.randomize() with {
+                AWADDR      ==  32'h70FF_FFFC;
+                operation   ==  WRITE;
+                WSTRB       ==  4'b1111;})
+            `uvm_error("RAND_FAIL","Randomization Fail")
+        finish_item(pkt);
+    endtask
+endclass
+
+class bram_upper_invalid_addr_seq extends base_cpu_sequence;
+    `uvm_object_utils(bram_upper_invalid_addr_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+
+        start_item(pkt);
+            if(!pkt.randomize() with  {
+                AWADDR      ==  32'h7140_0000;
+                operation   ==  WRITE;
+                WSTRB       ==  4'b1111;})
+                `uvm_error("RAND_FAIL","RANDOMIAZATION FAILED")
+        finish_item(pkt);
+    endtask
+endclass
+
+
+class bram_address_range_seq extends base_cpu_sequence;
+    `uvm_object_utils(bram_address_range_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        start_item(pkt);
+            if(!pkt.randomize() with {operation ==WRITE;
+            AWADDR==32'h7100_0100;
+            WDATA==32'h5555_5555;
+            WSTRB==4'b1111;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+
+        finish_item(pkt);
+        start_item(pkt);
+            if(!pkt.randomize() with {operation ==WRITE;
+            AWADDR==32'h7100_0100;
+            WDATA==32'h1111_1111;
+            WSTRB==4'b1111;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {
+            operation ==WRITE;
+            AWADDR==32'h7110_0000;
+            WDATA==32'h2222_2222;
+            WSTRB==4'b1111;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {
+            operation ==WRITE;
+            AWADDR==32'h7120_0000;
+            WDATA==32'h3333_3333;
+           WSTRB==4'b1111;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {operation == WRITE;
+            AWADDR==32'h7130_0000;
+            WDATA==32'h4444_4444;
+            WSTRB==4'b1111;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {
+            AWADDR      ==  32'h713F_FFFC;
+            operation   ==  WRITE;
+            WSTRB       ==  4'b1111;})
+            `uvm_error("RAND_FAIL","RANDOMIZATION FAIL")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {operation ==READ;
+            ARADDR==32'h7100_0000;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {operation ==READ;
+            ARADDR==32'h7100_0100;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {operation ==READ; ARADDR == 32'h7110_0000;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+         start_item(pkt);
+            if(!pkt.randomize() with {operation ==READ;
+            ARADDR==32'h7120_0000;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {operation ==READ;
+            ARADDR==32'h7130_0000;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with  {
+            ARADDR      ==  32'h713F_FFFC;
+            operation   ==  READ;})
+            `uvm_error("RAND_FAIL","Randomization Fail")
+        finish_item(pkt);
+
+    endtask
+endclass
+
+
+
