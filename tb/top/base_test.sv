@@ -130,8 +130,6 @@ class sample_test extends cpu_base_test;
     cpu_isr_vseq            isr_seq;
     cdma_read_write_vseq     cdma_seq;
     load_bram_vseq           bram_seq;
-    //cpu_config_intc_seq     intc_seq;
-    //cpu_isr_seq             isr_seq;
 
     task main_phase(uvm_phase phase);
         intc_seq = cpu_config_intc_vseq ::type_id::create("intc_seq");
@@ -139,35 +137,35 @@ class sample_test extends cpu_base_test;
         cdma_seq = cdma_read_write_vseq ::type_id::create("cdma_seq");
         bram_seq = load_bram_vseq       ::type_id::create("bram_seq");
 
+        fork
+            isr_seq.start(w_env.vsqr);
+        join_none
+
         phase.raise_objection(this);
-            fork
-                isr_seq.start(w_env.vsqr);
-            join_none
+
             bram_seq.start(w_env.vsqr);
             intc_seq.start(w_env.vsqr);
             cdma_seq.start(w_env.vsqr);
-            //intc_seq.start(w_env.c_env.cpu_agt.sqr);
-            //isr_seq.start(w_env.c_env.cpu_agt.sqr);
 
-            phase.phase_done.set_drain_time(this, 1000ns);
+        phase.phase_done.set_drain_time(this, 300ns);
         phase.drop_objection(this);
     endtask
 endclass : sample_test
 
-class cdma_wr_rd_test extends cpu_base_test;
-    `uvm_component_utils(cdma_wr_rd_test)
+class soc_master_test extends cpu_base_test;
+    `uvm_component_utils(soc_master_test)
     `NEW_COMP
 
-    load_mem_seq mem_seq;
-    cdma_read_write_seq seq;
+    soc_master_vseq master_vseq;
 
     task main_phase(uvm_phase phase);
-        seq     = cdma_read_write_seq::type_id::create("seq");
-        mem_seq = load_mem_seq :: type_id :: create("mem_seq");
+        master_vseq = soc_master_vseq::type_id::create("master_vseq");
+
         phase.raise_objection(this);
-            mem_seq.start(w_env.c_env.cpu_agt.sqr);
-            seq.start(w_env.c_env.cpu_agt.sqr);
-            phase.phase_done.set_drain_time(this, 100ns);
+
+            master_vseq.start(w_env.vsqr);
+
+        phase.phase_done.set_drain_time(this, 1000ns);
         phase.drop_objection(this);
     endtask
-endclass : cdma_wr_rd_test
+endclass : soc_master_test
