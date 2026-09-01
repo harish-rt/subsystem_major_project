@@ -13,7 +13,8 @@ work/
 msim/
 compile/
 
-*.qp*
+*.qpb
+*.qpg
 *.f
 *.cmd
 *.dataset
