@@ -165,7 +165,7 @@ class soc_master_test extends cpu_base_test;
 
             master_vseq.start(w_env.vsqr);
 
-        phase.phase_done.set_drain_time(this, 1000ns);
+        phase.phase_done.set_drain_time(this, 3000ns);
         phase.drop_objection(this);
     endtask
 endclass : soc_master_test

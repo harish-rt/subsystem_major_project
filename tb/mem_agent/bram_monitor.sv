@@ -2,7 +2,7 @@ class bram_monitor extends uvm_monitor;
     `uvm_component_utils(bram_monitor)
     `NEW_COMP
     
-    uvm_analysis_port #(bram_seq_item)     mon_ap;
+    uvm_analysis_port #(bram_seq_item)          mon_ap;
 	virtual axi4_intf.MONITOR_MOD               bram_if;
    mailbox #(bram_seq_item)  write_address_mbx ,write_data_mbx;      //to capture transactions on write address channel // Preserve ordering
    mailbox #(bram_seq_item) wresp_array [id_t];    //associative array of mailboxes. Will hold packets waiting for write response.Mailboxes will preserve ordering based on ID.
@@ -39,6 +39,7 @@ task bram_monitor :: main_phase (uvm_phase phase);
   capture_write_response();
   capture_read_address();
   capture_read_data();
+  merge_write_info();
  join
 endtask
 
@@ -188,6 +189,76 @@ task  bram_monitor ::  capture_read_data();
  end
 endtask
 
+task bram_monitor::merge_write_info();
+    bram_seq_item addr_pkt, data_pkt, merged_pkt;
+    
+    forever begin
+        // Block until BOTH an address and data item are available
+        write_address_mbx.get(addr_pkt);
+        write_data_mbx.get(data_pkt);
+
+        merged_pkt = bram_seq_item::type_id::create("merged_pkt");
+        merged_pkt.write       = bram_seq_item::WRITE;
+        merged_pkt.AWBURST     = addr_pkt.AWBURST;
+        merged_pkt.AWADDR      = addr_pkt.AWADDR;
+        merged_pkt.AWSIZE      = addr_pkt.AWSIZE;
+        merged_pkt.AWID        = addr_pkt.AWID;
+        merged_pkt.AWLEN       = addr_pkt.AWLEN;
+        merged_pkt.AWLOCK      = addr_pkt.AWLOCK;
+        merged_pkt.AWPROT      = addr_pkt.AWPROT;
+        merged_pkt.AWQOS       = addr_pkt.AWQOS;
+        merged_pkt.AWCACHE     = addr_pkt.AWCACHE;
+        merged_pkt.WDATA       = data_pkt.WDATA;
+        merged_pkt.WSTRB       = data_pkt.WSTRB;
+
+        if (!wresp_array.exists(merged_pkt.AWID)) begin
+            wresp_array[merged_pkt.AWID] = new();
+        end
+        wresp_array[merged_pkt.AWID].put(merged_pkt);
+        
+        `uvm_info("bram_monitor::merge", $sformatf("Successfully merged and queued AWID=%0h", merged_pkt.AWID), UVM_HIGH)
+    end
+endtask
+
+/*
+task bram_monitor :: merge_write_info();
+    bram_seq_item addr_pkt, data_pkt, merged_pkt;
+    int x, no_addr, no_data;
+
+    no_addr = write_address_mbx.num();
+    no_data = write_data_mbx.num();
+    x = (no_addr < no_data) ? no_addr : no_data;
+
+    `uvm_info("bram_monitor::merge_write_info", 
+              $sformatf("Handshake fired: addr_mbx_count=%0d, data_mbx_count=%0d, merge_count=%0d", 
+                        no_addr, no_data, x), UVM_LOW)
+
+    repeat(x) begin
+        merged_pkt = bram_seq_item :: type_id :: create("merged_pkt");
+        write_address_mbx.get(addr_pkt);
+        write_data_mbx.get(data_pkt);
+
+        merged_pkt.write       = bram_seq_item::WRITE;
+        merged_pkt.AWBURST     = addr_pkt.AWBURST;
+        merged_pkt.AWADDR      = addr_pkt.AWADDR;
+        merged_pkt.AWSIZE      = addr_pkt.AWSIZE;
+        merged_pkt.AWID        = addr_pkt.AWID;
+        merged_pkt.AWLEN       = addr_pkt.AWLEN;
+        merged_pkt.AWLOCK      = addr_pkt.AWLOCK;
+        merged_pkt.AWPROT      = addr_pkt.AWPROT;
+        merged_pkt.AWQOS       = addr_pkt.AWQOS;
+        merged_pkt.AWCACHE     = addr_pkt.AWCACHE;
+        merged_pkt.WDATA       = data_pkt.WDATA;
+        merged_pkt.WSTRB       = data_pkt.WSTRB;
+
+        if (!wresp_array.exists(merged_pkt.AWID)) begin
+            wresp_array[merged_pkt.AWID] = new();
+        end
+        wresp_array[merged_pkt.AWID].put(merged_pkt);
+    end
+endtask
+*/
+/*
 task bram_monitor :: merge_write_info();
 bram_seq_item addr_pkt,data_pkt,merged_pkt;
 int x ,no_addr, no_data; //indicates number of completed write transactions waiting for response.
@@ -221,6 +292,7 @@ int x ,no_addr, no_data; //indicates number of completed write transactions wait
     wresp_array[merged_pkt.AWID].put(merged_pkt);
   end
 endtask
+*/
 
 /*
 task bram_monitor :: capture_reset();
@@ -589,3 +661,4 @@ task bram_monitor::merge_read();
       // end 
     end
 endtask
+*/

@@ -8,8 +8,6 @@
 
 package axi_cdma_regblock_pkg;
 
-    `pragma warning(push, disable=VCP3003)
-
     import uvm_pkg::*;
     `include "uvm_macros.svh"
 
@@ -280,6 +278,29 @@ package axi_cdma_regblock_pkg;
     class cdma_reg_block extends uvm_reg_block;
         `uvm_object_utils(cdma_reg_block)
 
+        covergroup bus_map_cg with function sample(uvm_reg_addr_t offset, bit is_read);
+            option.per_instance = 1;
+            OFFSET : coverpoint offset{
+                bins cdmacr = {[0:3]};
+                bins cdmasr = {[4:7]};
+                bins curdesc_pnt = {[8:11]};
+                bins curdesc_pnt_msb = {[12:15]};
+                bins taildesc_pnt = {[16:19]};
+                bins taildesc_pnt_msb = {[20:23]};
+                bins sa = {[24:27]};
+                bins sa_msb = {[28:31]};
+                bins da = {[32:35]};
+                bins da_msb = {[36:39]};
+                bins btt = {[40:43]};
+            }
+            RW:coverpoint is_read{
+                bins read = {1};
+                bins write = {0};
+            }
+            OFFSET_RW : cross OFFSET, RW{
+            }
+        endgroup
+
         function new(string name = "reg_block");
             super.new(name, build_coverage(UVM_CVR_ADDR_MAP));
             if (has_coverage(UVM_CVR_ADDR_MAP))begin
@@ -374,29 +395,6 @@ package axi_cdma_regblock_pkg;
             lock_model();
         endfunction
 
-        covergroup bus_map_cg with function sample(uvm_reg_addr_t offset, bit is_read);
-            option.per_instance = 1;
-            OFFSET : coverpoint offset{
-                bins cdmacr = {[0:3]};
-                bins cdmasr = {[4:7]};
-                bins curdesc_pnt = {[8:11]};
-                bins curdesc_pnt_msb = {[12:15]};
-                bins taildesc_pnt = {[16:19]};
-                bins taildesc_pnt_msb = {[20:23]};
-                bins sa = {[24:27]};
-                bins sa_msb = {[28:31]};
-                bins da = {[32:35]};
-                bins da_msb = {[36:39]};
-                bins btt = {[40:43]};
-            }
-            RW:coverpoint is_read{
-                bins read = {1};
-                bins write = {0};
-            }
-            OFFSET_RW : cross OFFSET, RW{
-            }
-        endgroup
-
         protected virtual function void  sample(uvm_reg_addr_t offset,bit is_read,uvm_reg_map map);
             if ((map != null) && get_coverage(UVM_CVR_ADDR_MAP)) begin
                 if ( map == bus_map )
@@ -404,7 +402,5 @@ package axi_cdma_regblock_pkg;
             end
         endfunction
     endclass
-
-    `pragma warning(pop)
 
 endpackage

@@ -201,8 +201,6 @@ class cdma_read_write_seq extends base_cpu_sequence;
     `uvm_object_utils(cdma_read_write_seq)
     `NEW_OBJ
     
-    int addr;
-
     task body();
         super.body();
     
@@ -225,19 +223,19 @@ class cdma_read_write_seq extends base_cpu_sequence;
         })
 
         `uvm_do_with(pkt, {
-            AWADDR    == CDMA_BASE + 18; //sa
+            AWADDR    == CDMA_BASE + 'h18; //sa
             operation == WRITE;
             WDATA     == 32'h7100_0000;
         })
         
         `uvm_do_with(pkt, {
-            AWADDR    == CDMA_BASE + 20; //da
+            AWADDR    == CDMA_BASE + 'h20; //da
             operation == WRITE;
             WDATA     == 32'h8000_0000;
         })
               
        `uvm_do_with(pkt, {
-            AWADDR    == CDMA_BASE + 28;//btt
+            AWADDR    == CDMA_BASE + 'h28;//btt
             operation == WRITE;
             WDATA     == 32'h8;
         })
@@ -336,10 +334,10 @@ class cdma_config_seq extends base_cpu_sequence;
             read_reg(CDMA_BASE + 'h4,cdmasr_data);
         end while(cdmasr_data[1]==1);
         `uvm_info("cdma_config_seq","idle cleared",UVM_LOW)
-        write_reg(CDMA_BASE + 'h0,cdmacr_data);
-        write_reg(CDMA_BASE + 'h18,sa_data);
-        write_reg(CDMA_BASE + 'h20,da_data);
-        write_reg(CDMA_BASE + 'h28,btt_data);
+        write_reg(CDMA_BASE + 0,cdmacr_data);
+        write_reg(CDMA_BASE + 18,sa_data);
+        write_reg(CDMA_BASE + 20,da_data);
+        write_reg(CDMA_BASE + 28,btt_data);
         `uvm_info("cdma_config_seq","btt written",UVM_LOW)
     endtask
 endclass : cdma_config_seq
