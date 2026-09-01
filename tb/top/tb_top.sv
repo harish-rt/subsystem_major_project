@@ -19,18 +19,19 @@ import soc_package ::*;
     wire axi_intr;
     wire axi_irq;
 
-    axi4_intf master_if();
-    axi4_intf slave_if();
+    axi4_intf       master_if();
+    axi4_intf       slave_if();
 
     //S00
-    axi4_lite_intf axil_riscv_if();
+    axi4_lite_intf  axil_riscv_if();
     //S02
-    axi4_lite_intf lite_data_if();
+    axi4_lite_intf  lite_data_if();
 
     //memory interface
-    axi4_lite_intf mem_intf();
+    axi4_lite_intf  mem_intf();
+
     //BRAM interface
-    axi4_intf axi4_bram_if();
+    axi4_intf       axi4_bram_if();
 
 // AXI Interrupt Controller
     assign intc_proc_rst    =   ~areset_n;
@@ -38,10 +39,10 @@ import soc_package ::*;
     intc_intf                   intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
      
 //axi cdma interfaces 
-    axi_cdma_axi_master_intf    cdma_reg_intf(.aclk(aclk),.areset_n(areset_n));
-    axi_cdma_axi_slave_intf     cdma_sg_intf(.aclk(aclk),.areset_n(areset_n));
-    axi_cdma_axi_slave_intf     cdma_data_mov_intf(.aclk(aclk),.areset_n(areset_n));
-    axi_cdma_interrupt_intf     cdma_interrupt_intf(.aclk(aclk));
+    axi_cdma_axi_master_intf    cdma_reg_intf       (.aclk(aclk),.areset_n(areset_n));
+    axi_cdma_axi_slave_intf     cdma_sg_intf        (.aclk(aclk),.areset_n(areset_n));
+    axi_cdma_axi_slave_intf     cdma_data_mov_intf  (.aclk(aclk),.areset_n(areset_n));
+    axi_cdma_interrupt_intf     cdma_interrupt_intf (.aclk(aclk));
 
     
     core_wrapper dut(
@@ -134,6 +135,8 @@ import soc_package ::*;
     // Cpu 
     assign axil_riscv_if.ACLK    = aclk;
     assign axil_riscv_if.ARESETn = areset_n;
+    
+
     
     // Interuppt controller
     // --- Write Channels (AW) ---
@@ -344,6 +347,9 @@ import soc_package ::*;
     assign axi4_bram_if.RVALID   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_rvalid;
     assign axi4_bram_if.RREADY   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_rready;
 
+    // SLAVE_MEM 
+    assign mem_intf.ACLK    = aclk;
+    assign mem_intf.ARESETn = areset_n;
 
     //Lite Memory assignment
     assign mem_intf.ARADDR  = dut.AXI_SLAVE_MEM.s_axi_intf.ARADDR;   
@@ -370,12 +376,15 @@ import soc_package ::*;
         //run_test("bram_upper_invalid_addr_test");
         //run_test("bram_lower_invalid_addr_test");
         //run_test("bram_multiple_write_read_test");
+        run_test("sample_test");
         //run_test("config_intc_test");
         //run_test("load_bram_test");
         //run_test("read_bram_test");
         //run_test("config_cdma_ral_test");
         //run_test("read_cdma_test");
         //run_test("cpu_base_test");
+        //run_test("cdma_wr_rd_test");
+        run_test("mem_wr_rd_test");
     end
 
     initial begin
@@ -402,7 +411,8 @@ import soc_package ::*;
         //soc_config
           soc_config_obj=soc_config::type_id::create("soc_config_obj");
         //INTC
-        soc_config_obj.intc_obj                     =   new("intc_obj");
+        //soc_config_obj.intc_obj                     =   new("intc_obj");
+        soc_config_obj.intc_obj = intc_config_obj::type_id::create("intc_obj");
         soc_config_obj.intc_obj.axi_lite_is_active  =   UVM_PASSIVE;
         soc_config_obj.intc_obj.lite_intc_intf      =   lite_intc_if;
         soc_config_obj.intc_obj.intc_is_active      =   UVM_PASSIVE;

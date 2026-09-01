@@ -11,7 +11,6 @@ class lite_intc_seq_item extends uvm_sequence_item;
          logic  [31:0]  axi_rdata;     
          logic  [1:0]   axi_rresp;     
     rand write_t        write;
-    rand register_t     reg_type;
  
     constraint c_w_strobe {axi_wstrb == 4'b1111;}
  
@@ -24,7 +23,6 @@ class lite_intc_seq_item extends uvm_sequence_item;
         `uvm_field_int (axi_rdata,UVM_ALL_ON) 
         `uvm_field_int (axi_rresp,UVM_ALL_ON) 
         `uvm_field_enum (write_t,write,UVM_ALL_ON)
-        `uvm_field_enum (register_t,reg_type,UVM_ALL_ON)
     `uvm_object_utils_end 
  
     extern function new(string name="lite_intc_seq_item"); 
