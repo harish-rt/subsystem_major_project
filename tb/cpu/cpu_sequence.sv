@@ -101,25 +101,6 @@ class read_cdma_seq extends base_cpu_sequence;
 endclass : read_cdma_seq
 
 
-
-
-class config_cdma_ral_seq extends base_cpu_sequence;
-    `uvm_object_utils(config_cdma_ral_seq)
-    `NEW_OBJ
-    
-    task body();
-        super.body();
-        `uvm_info("config_cdma_seq", "Start of Config CDMA RAL Sequence", UVM_LOW)
-        //KERNEL: UVM_ERROR Response queue overflow, response was dropped
-        //this.set_response_queue_depth(20);         //clears
-
-        //reg_block.cdmacr.read(status,tdata);
-        `uvm_info("config_cdma_seq", "End of Config CDMA Sequence", UVM_LOW)
-    endtask
-
-endclass : config_cdma_ral_seq
-
-
 class read_bram_seq extends base_cpu_sequence;
     `uvm_object_utils(read_bram_seq)
     `NEW_OBJ
@@ -216,39 +197,6 @@ class config_intc_seq extends base_cpu_sequence;
 endclass : config_intc_seq
 
 
-class config_cdma_seq extends base_cpu_sequence;
-    `uvm_object_utils(config_cdma_seq)
-    `NEW_OBJ
-    
-    task body();
-        super.body();
-        `uvm_info("config_cdma_seq", "Start of Config CDMA Sequence", UVM_LOW)
-
-
-        do begin
-            //reg_block.cdmasr.read(status,tdata);
-        end while(tdata[1]==0);
-        
-        //reg_block.cdmacr.operation(status,'h5000);
-        //reg_block.sa.operation(status,'h7100_0000);
-        //reg_block.da.operation(status,'h8000_0000);
-        //reg_block.btt.operation(status,1);
-
-        /*
-        start_item(pkt);
-        if(!pkt.randomize() with {
-            AWADDR  == cdmacr;
-            })begin
-            `uvm_error(get_full_name(), "randomization_failed")
-        end
-        finish_item(pkt);
-        get_response(pkt);*/
-        `uvm_info("config_cdma_seq", "End of Config CDMA Sequence", UVM_LOW)
-    endtask
-
-endclass : config_cdma_seq
-
-
 class cdma_read_write_seq extends base_cpu_sequence;
     `uvm_object_utils(cdma_read_write_seq)
     `NEW_OBJ
@@ -261,7 +209,7 @@ class cdma_read_write_seq extends base_cpu_sequence;
         do begin
             start_item(pkt);
             if (!pkt.randomize() with {
-                ARADDR    == CDMA_BASE + 'h4;
+                ARADDR    == CDMA_BASE + 04;
                 operation == READ;
             }) begin
                 `uvm_error(get_full_name(), "randomization_failed")
@@ -277,19 +225,19 @@ class cdma_read_write_seq extends base_cpu_sequence;
         })
 
         `uvm_do_with(pkt, {
-            AWADDR    == CDMA_BASE + 18; 
+            AWADDR    == CDMA_BASE + 18; //sa
             operation == WRITE;
             WDATA     == 32'h7100_0000;
         })
         
         `uvm_do_with(pkt, {
-            AWADDR    == CDMA_BASE + 'h20;
+            AWADDR    == CDMA_BASE + 20; //da
             operation == WRITE;
             WDATA     == 32'h8000_0000;
         })
               
        `uvm_do_with(pkt, {
-            AWADDR    == CDMA_BASE + 'h28;
+            AWADDR    == CDMA_BASE + 28;//btt
             operation == WRITE;
             WDATA     == 32'h8;
         })
@@ -355,20 +303,20 @@ class cpu_isr_seq extends base_cpu_sequence;
         
         if (cdmasr_data[12]) begin
             `uvm_info("cpu_isr_seq", "CDMA IOC Asserted", UVM_LOW)
-            write_reg(CDMA_BASE + 'h4, (1 << 12));  // W1C
+            write_reg(CDMA_BASE + 'h4, (1 << 12));    
         end 
         else if (cdmasr_data[14]) begin
             `uvm_warning("cpu_isr_seq", "CDMA ERR Asserted")
             read_reg(CDMA_BASE + 'h0, cdmacr_data);
-            cdmacr_data[2] = 1'b1;                  // CDMA Reset
+            cdmacr_data[2] = 1'b1; 
             write_reg(CDMA_BASE + 'h0, cdmacr_data);
         end
         
-        write_reg(INTC_BASE + 'hc, (1 << 26));      // INTC ACK
+        write_reg(INTC_BASE + 'hc, (1 << 26));
     endtask
 
     task handle_core_perif_isr();
-        write_reg(INTC_BASE + 'hc, (1 << 27));      // INTC ACK
+        write_reg(INTC_BASE + 'hc, (1 << 27));
     endtask
 
 endclass : cpu_isr_seq
@@ -386,7 +334,7 @@ class cdma_config_seq extends base_cpu_sequence;
 
         do begin
             read_reg(CDMA_BASE + 'h4,cdmasr_data);
-        end while(cdmasr_data[1]==0);
+        end while(cdmasr_data[1]==1);
         `uvm_info("cdma_config_seq","idle cleared",UVM_LOW)
         write_reg(CDMA_BASE + 'h0,cdmacr_data);
         write_reg(CDMA_BASE + 'h18,sa_data);
@@ -395,3 +343,166 @@ class cdma_config_seq extends base_cpu_sequence;
         `uvm_info("cdma_config_seq","btt written",UVM_LOW)
     endtask
 endclass : cdma_config_seq
+
+
+class bram_multiple_wr_rd_seq extends base_cpu_sequence;
+    `uvm_object_utils(bram_multiple_wr_rd_seq)
+
+    `NEW_OBJ
+    int  addr;
+    task body();
+        super.body();
+            for (int i=0;i<64;i+=4)begin
+                addr=32'h7100_0000+i;
+                start_item(pkt);
+                    if(!pkt.randomize() with {
+                        AWADDR==addr;
+                        operation==WRITE;
+                        WSTRB==4'b1111;})
+                    begin    
+                   `uvm_error("RAND_ERR","Randomization failed")
+                   end
+                finish_item(pkt);
+            end
+            for (int i=0;i<64;i+=4)begin
+                addr=32'h7100_0000+i;
+                start_item(pkt);
+                    if(!pkt.randomize() with {
+                        ARADDR==addr;
+                        operation==READ;})
+                    begin    
+                   `uvm_error("RAND_ERR","Randomization failed")
+                   end
+                finish_item(pkt);
+            end
+
+        endtask
+endclass
+
+class bram_lower_invalid_addr_seq extends base_cpu_sequence;
+    `uvm_object_utils(bram_lower_invalid_addr_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        start_item(pkt);
+            if(!pkt.randomize() with {
+                AWADDR      ==  32'h70FF_FFFC;
+                operation   ==  WRITE;
+                WSTRB       ==  4'b1111;})
+            `uvm_error("RAND_FAIL","Randomization Fail")
+        finish_item(pkt);
+    endtask
+endclass
+
+class bram_upper_invalid_addr_seq extends base_cpu_sequence;
+    `uvm_object_utils(bram_upper_invalid_addr_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+
+        start_item(pkt);
+            if(!pkt.randomize() with  {
+                AWADDR      ==  32'h7140_0000;
+                operation   ==  WRITE;
+                WSTRB       ==  4'b1111;})
+                `uvm_error("RAND_FAIL","RANDOMIAZATION FAILED")
+        finish_item(pkt);
+    endtask
+endclass
+
+class bram_address_range_seq extends base_cpu_sequence;
+    `uvm_object_utils(bram_address_range_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        start_item(pkt);
+            if(!pkt.randomize() with {operation ==WRITE;
+            AWADDR==32'h7100_0100;
+            WDATA==32'h5555_5555;
+            WSTRB==4'b1111;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+
+        finish_item(pkt);
+        start_item(pkt);
+            if(!pkt.randomize() with {operation ==WRITE;
+            AWADDR==32'h7100_0100;
+            WDATA==32'h1111_1111;
+            WSTRB==4'b1111;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {
+            operation ==WRITE;
+            AWADDR==32'h7110_0000;
+            WDATA==32'h2222_2222;
+            WSTRB==4'b1111;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {
+            operation ==WRITE;
+            AWADDR==32'h7120_0000;
+            WDATA==32'h3333_3333;
+           WSTRB==4'b1111;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {operation == WRITE;
+            AWADDR==32'h7130_0000;
+            WDATA==32'h4444_4444;
+            WSTRB==4'b1111;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {
+            AWADDR      ==  32'h713F_FFFC;
+            operation   ==  WRITE;
+            WSTRB       ==  4'b1111;})
+            `uvm_error("RAND_FAIL","RANDOMIZATION FAIL")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {operation ==READ;
+            ARADDR==32'h7100_0000;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {operation ==READ;
+            ARADDR==32'h7100_0100;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {operation ==READ; ARADDR == 32'h7110_0000;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+         start_item(pkt);
+            if(!pkt.randomize() with {operation ==READ;
+            ARADDR==32'h7120_0000;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with {operation ==READ;
+            ARADDR==32'h7130_0000;})
+            `uvm_error("RAND_FAIL","Randomization fail")
+        finish_item(pkt);
+
+        start_item(pkt);
+            if(!pkt.randomize() with  {
+            ARADDR      ==  32'h713F_FFFC;
+            operation   ==  READ;})
+            `uvm_error("RAND_FAIL","Randomization Fail")
+        finish_item(pkt);
+
+    endtask
+endclass

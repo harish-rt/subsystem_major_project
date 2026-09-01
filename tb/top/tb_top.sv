@@ -374,6 +374,10 @@ import soc_package ::*;
     initial begin
         run_test("soc_master_test");
         //run_test("sample_test");
+        //run_test("bram_address_range_test");
+        //run_test("bram_upper_invalid_addr_test");
+        //run_test("bram_lower_invalid_addr_test");
+        //run_test("bram_multiple_write_read_test");
         //run_test("config_intc_test");
         //run_test("load_bram_test");
         //run_test("read_bram_test");
@@ -395,14 +399,9 @@ import soc_package ::*;
         //#3000;
         //$finish();
     end
-    //interrupt controller config object
-    //intc_config_obj                 intc_obj;
-    //cpu config object
-    //cpu_config_obj                  obj;
-    //cdma config object
-    //axi_cdma_config_obj             cdma_config_obj;
-
+     
      soc_config     soc_config_obj;
+
     initial begin
     	uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
     	uvm_config_db#(virtual axi4_intf.MONITOR_MOD)::set(null,"*","BRAM_MON",axi4_bram_if);

@@ -69,6 +69,59 @@ class config_intc_test extends cpu_base_test;
     endtask
 endclass : config_intc_test
 
+class bram_multiple_write_read_test extends cpu_base_test;
+    `uvm_component_utils(bram_multiple_write_read_test)
+    `NEW_COMP
+
+    task main_phase(uvm_phase phase);
+        bram_multiple_wr_rd_seq multiple_wr_rd_seq=bram_multiple_wr_rd_seq::type_id::create("multiple_wr_rd_seq");
+        phase.raise_objection(this);
+            multiple_wr_rd_seq.start(w_env.c_env.cpu_agt.sqr);
+            phase.phase_done.set_drain_time(this,100ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
+
+class bram_upper_invalid_addr_test extends cpu_base_test;
+    `uvm_component_utils(bram_upper_invalid_addr_test)
+
+    `NEW_COMP
+    task main_phase(uvm_phase phase);
+        bram_upper_invalid_addr_seq bram_seq=bram_upper_invalid_addr_seq::type_id::create("bram_seq");
+        phase.raise_objection(this);
+            bram_seq.start(w_env.c_env.cpu_agt.sqr);
+            phase.phase_done.set_drain_time(this,100ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
+class bram_lower_invalid_addr_test extends cpu_base_test;
+    `uvm_component_utils(bram_lower_invalid_addr_test)
+
+    `NEW_COMP
+    task main_phase(uvm_phase phase);
+        bram_lower_invalid_addr_seq bram_seq=bram_lower_invalid_addr_seq::type_id::create("bram_seq");
+        phase.raise_objection(this);
+            bram_seq.start(w_env.c_env.cpu_agt.sqr);
+            phase.phase_done.set_drain_time(this,100ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
+class bram_address_range_test extends cpu_base_test;
+    `uvm_component_utils(bram_address_range_test)
+
+    `NEW_COMP
+    task main_phase(uvm_phase phase);
+        bram_address_range_seq bram_seq=bram_address_range_seq::type_id::create("bram_seq");
+        phase.raise_objection(this);
+            bram_seq.start(w_env.c_env.cpu_agt.sqr);
+            phase.phase_done.set_drain_time(this,100ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
 class sample_test extends cpu_base_test;
     `uvm_component_utils(sample_test)
     `NEW_COMP
