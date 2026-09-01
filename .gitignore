@@ -4,6 +4,17 @@ riviera/
 tb2/
 tbold/
 riscv_tb/
+secureip/
+unimacro/
+unimacro_ver/
+unisim/
+unisims_ver/
+work/
+msim/
+compile/
+
+*.qp*
+*.f
 *.cmd
 *.dataset
 *.vstf
@@ -39,8 +50,6 @@ riscv_tb/
 
 
 # Ignore Siemens Questa / ModelSim databases
-work/
-msim/
 *.wlf
 *.ucdb
 transcript
