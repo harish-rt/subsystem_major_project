@@ -249,8 +249,8 @@ class config_cdma_seq extends base_cpu_sequence;
 endclass : config_cdma_seq
 
 
-class load_mem_seq extends base_cpu_sequence;
-    `uvm_object_utils(load_mem_seq)
+class cdma_read_write_seq extends base_cpu_sequence;
+    `uvm_object_utils(cdma_read_write_seq)
     `NEW_OBJ
     
     int addr;
@@ -261,7 +261,7 @@ class load_mem_seq extends base_cpu_sequence;
         do begin
             start_item(pkt);
             if (!pkt.randomize() with {
-                ARADDR    == 32'h7000_0004;
+                ARADDR    == CDMA_BASE + 'h4;
                 operation == READ;
             }) begin
                 `uvm_error(get_full_name(), "randomization_failed")
@@ -283,20 +283,20 @@ class load_mem_seq extends base_cpu_sequence;
         })
         
         `uvm_do_with(pkt, {
-            AWADDR    == 32'h7000_0020;
+            AWADDR    == CDMA_BASE + 'h20;
             operation == WRITE;
             WDATA     == 32'h8000_0000;
         })
               
        `uvm_do_with(pkt, {
-            AWADDR    == 32'h7000_0028;
+            AWADDR    == CDMA_BASE + 'h28;
             operation == WRITE;
             WDATA     == 32'h8;
         })
         
         for(int i=0;i<8;i=i+4)begin
             `uvm_do_with(pkt, {
-                ARADDR    == 32'h8000_0000 + i;
+                ARADDR    == LITE_MEM_BASE + i;
                 operation == READ;
             })
         end
