@@ -1,4 +1,86 @@
 //default param config to AXI
+interface axi4_intf();
+   parameter ADDR_WIDTH 	= 32	;
+   parameter DATA_WIDTH 	= 32	;
+   parameter ID_WIDTH 		= 4	;
+   parameter USER_SIGNAL_WIDTH 	= 8	;
+
+   //Global signals
+   logic			ACLK	;
+   logic 			ARESETn	;
+
+   //Read address channel signals
+   logic [ID_WIDTH-1:0]		ARID	;
+   logic [ADDR_WIDTH-1:0]	ARADDR	;
+   logic [7:0]			    ARLEN	;
+   logic [2:0]			    ARSIZE	;
+   logic [1:0]  		    ARBURST	;
+   logic			        ARVALID	;
+   logic 			        ARREADY	;
+   logic [3:0] 			    ARCACHE	;
+   logic 			        ARLOCK	;
+   logic [2:0] 			    ARPROT	;
+   logic [3:0] 			    ARQOS	;
+   logic [3:0] 			    ARREGION;
+   logic [USER_SIGNAL_WIDTH-1:0]ARUSER	;
+   
+   //Write address channel signals
+   logic [ID_WIDTH-1:0]		AWID	;
+   logic [ADDR_WIDTH-1:0]	AWADDR	;
+   logic [7:0]			    AWLEN	;
+   logic [2:0]			    AWSIZE	;
+   logic [1:0]  		    AWBURST	;
+   logic  			        AWVALID	;
+   logic  			        AWREADY	;
+   logic [3:0] 			    AWCACHE	;
+   logic 			        AWLOCK	;
+   logic [2:0] 			    AWPROT	;
+   logic [3:0] 			    AWQOS	;
+   logic [3:0] 			    AWREGION;
+   logic [USER_SIGNAL_WIDTH-1:0]AWUSER	;
+
+   //Write response channel signals
+   logic [ID_WIDTH-1:0]		BID	;
+   logic [1:0]			    BRESP	;
+   logic 			        BVALID	;
+   logic			        BREADY	;
+   logic [USER_SIGNAL_WIDTH-1:0]BUSER	;
+   
+   //Read data channel signals
+   logic [ID_WIDTH-1:0]		RID	;
+   logic [DATA_WIDTH-1:0]	RDATA	;
+   logic 			        RLAST	;
+   logic [1:0]			    RRESP	;
+   logic 			        RVALID	;
+   logic 			        RREADY	;
+   logic [USER_SIGNAL_WIDTH-1:0]RUSER	;
+
+   //Write data channel signals
+   logic [DATA_WIDTH-1:0]	WDATA	;
+   logic [DATA_WIDTH>>3-1:0]WSTRB	;
+   logic 			        WLAST	;
+   logic  			        WVALID	;
+   logic  			        WREADY	;
+   logic [USER_SIGNAL_WIDTH-1:0]WUSER	;
+
+
+    clocking axi4_mon_cb @(posedge ACLK);
+        default input #1ns output #1ns;
+
+        input ARADDR, ARBURST, ARCACHE, ARID, ARLEN, ARLOCK, ARPROT, ARQOS, ARREADY, ARREGION, ARSIZE, ARVALID, ARUSER;
+
+        input AWADDR, AWBURST, AWCACHE, AWID, AWLEN, AWLOCK, AWPROT, AWQOS, AWREADY, AWREGION, AWSIZE, AWVALID, AWUSER;
+
+        input WDATA, WSTRB, WLAST, WVALID, WREADY, WUSER;
+
+        input BID, BRESP, BVALID, BREADY, BUSER;
+
+        input RID, RDATA, RRESP, RLAST, RVALID, RREADY, RUSER;
+    endclocking
+
+    modport MONITOR_MOD (clocking axi4_mon_cb, input ACLK, input ARESETn);
+
+endinterface
 /*interface axi_intf();
    parameter ADDR_WIDTH 	= 32	;
    parameter DATA_WIDTH 	= 32	;
@@ -125,88 +207,6 @@ interface axi3_intf();
 endinterface
 */
 //default param config to AXI
-interface axi4_intf();
-   parameter ADDR_WIDTH 	= 32	;
-   parameter DATA_WIDTH 	= 32	;
-   parameter ID_WIDTH 		= 4	;
-   parameter USER_SIGNAL_WIDTH 	= 8	;
-
-   //Global signals
-   logic			ACLK	;
-   logic 			ARESETn	;
-
-   //Read address channel signals
-   logic [ADDR_WIDTH-1:0]	ARADDR	;
-   logic [1:0]  		ARBURST	;
-   logic [3:0] 			ARCACHE	;
-   logic [ID_WIDTH-1:0]		ARID	;
-   logic [7:0]			ARLEN	;
-   logic 			ARLOCK	;
-   logic [2:0] 			ARPROT	;
-   logic [3:0] 			ARQOS	;
-   logic 			ARREADY	;
-   logic [3:0] 			ARREGION;
-   logic [2:0]			ARSIZE	;
-   logic			ARVALID	;
-   logic [USER_SIGNAL_WIDTH-1:0]ARUSER	;
-   
-   //Write address channel signals
-   logic [ADDR_WIDTH-1:0]	AWADDR	;
-   logic [1:0]  		AWBURST	;
-   logic [3:0] 			AWCACHE	;
-   logic [ID_WIDTH-1:0]		AWID	;
-   logic [7:0]			AWLEN	;
-   logic 			AWLOCK	;
-   logic [2:0] 			AWPROT	;
-   logic [3:0] 			AWQOS	;
-   logic  			AWREADY	;
-   logic [3:0] 			AWREGION;
-   logic [2:0]			AWSIZE	;
-   logic  			AWVALID	;
-   logic [USER_SIGNAL_WIDTH-1:0]AWUSER	;
-
-   //Write response channel signals
-   logic [ID_WIDTH-1:0]		BID	;
-   logic			BREADY	;
-   logic [1:0]			BRESP	;
-   logic 			BVALID	;
-   logic [USER_SIGNAL_WIDTH-1:0]BUSER	;
-   
-   //Read data channel signals
-   logic [DATA_WIDTH-1:0]	RDATA	;
-   logic [ID_WIDTH-1:0]		RID	;
-   logic 			RLAST	;
-   logic 			RREADY	;
-   logic [1:0]			RRESP	;
-   logic 			RVALID	;
-   logic [USER_SIGNAL_WIDTH-1:0]RUSER	;
-
-   //Write data channel signals
-   logic [DATA_WIDTH-1:0]	WDATA	;
-   logic 			WLAST	;
-   logic  			WREADY	;
-   logic [DATA_WIDTH>>3-1:0] 	WSTRB	;
-   logic  			WVALID	;
-   logic [USER_SIGNAL_WIDTH-1:0]WUSER	;
-
-
-    clocking axi4_mon_cb @(posedge ACLK);
-        default input #1ns output #1ns;
-
-        input ARADDR, ARBURST, ARCACHE, ARID, ARLEN, ARLOCK, ARPROT, ARQOS, ARREADY, ARREGION, ARSIZE, ARVALID, ARUSER;
-
-        input AWADDR, AWBURST, AWCACHE, AWID, AWLEN, AWLOCK, AWPROT, AWQOS, AWREADY, AWREGION, AWSIZE, AWVALID, AWUSER;
-
-        input WDATA, WSTRB, WLAST, WVALID, WREADY, WUSER;
-
-        input BID, BRESP, BVALID, BREADY, BUSER;
-
-        input RID, RDATA, RRESP, RLAST, RVALID, RREADY, RUSER;
-    endclocking
-
-    modport MONITOR_MOD (clocking axi4_mon_cb, input ACLK, input ARESETn);
-
-endinterface
 /*
 //default param config to AXI4_lite
 interface axi4_lite_intf();
