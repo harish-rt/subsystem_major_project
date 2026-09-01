@@ -12,7 +12,9 @@ unisims_ver/
 work/
 msim/
 compile/
+sim/xil_defaultlib/
 
+*.mgf
 *.qpb
 *.qpg
 *.f
