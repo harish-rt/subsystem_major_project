@@ -18,13 +18,16 @@ class axi_lite_intc_env extends uvm_env;
 
         lite_intc_agt.is_active     = obj.axi_lite_is_active;
         intc_agt.is_active          = obj.intc_is_active;
+        //bcz obj of irq_event didn't sent from top
+        uvm_config_db #(intc_config_obj)::set(this,"*","intc_config_obj",obj);
     endfunction
 
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
-            lite_intc_agt.mon.mon_if    = obj.lite_intc_intf;            
+            lite_intc_agt.mon.mon_if    = obj.lite_intc_intf;
             if (obj.axi_lite_is_active == UVM_ACTIVE) begin
             end
+            intc_agt.mon.irq_event      = obj.irq_event;
             intc_agt.mon.mon_intc_intf  = obj.intc_if;            
             if (obj.intc_is_active == UVM_ACTIVE) begin
             end

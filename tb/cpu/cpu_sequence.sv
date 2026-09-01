@@ -330,7 +330,6 @@ class bram_upper_invalid_addr_seq extends base_cpu_sequence;
     endtask
 endclass
 
-
 class bram_address_range_seq extends base_cpu_sequence;
     `uvm_object_utils(bram_address_range_seq)
     `NEW_OBJ
@@ -425,6 +424,5 @@ class bram_address_range_seq extends base_cpu_sequence;
 
     endtask
 endclass
-
 
 

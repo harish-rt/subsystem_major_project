@@ -50,10 +50,10 @@ class mem_seq_item extends uvm_sequence_item;
 	`uvm_field_enum(RESPONSE_TYPE,bresp,UVM_ALL_ON)
     `uvm_field_int(bvalid,UVM_ALL_ON)
 
-    `uvm_field_int(araddr,UVM_ALL_ON)
-    `uvm_field_int(arprot,UVM_ALL_ON)
-    `uvm_field_int(arready,UVM_ALL_ON)
-    `uvm_field_int(arvalid,UVM_ALL_ON)
+    `uvm_field_int(wdata,UVM_ALL_ON)
+    `uvm_field_int(wready,UVM_ALL_ON)
+    `uvm_field_int(wstrb,UVM_ALL_ON)
+    `uvm_field_int(wvalid,UVM_ALL_ON)
 
     `uvm_field_int(rdata,UVM_ALL_ON)
 	`uvm_field_enum(RESPONSE_TYPE,rresp,UVM_ALL_ON)

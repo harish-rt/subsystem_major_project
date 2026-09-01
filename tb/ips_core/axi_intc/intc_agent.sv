@@ -4,7 +4,6 @@ class intc_agent extends uvm_agent;
     
     intc_monitor                mon;
     uvm_active_passive_enum     is_active;
-    intc_config_obj             obj;
 
     function void build();
         mon = intc_monitor::type_id::create("mon",this); 
