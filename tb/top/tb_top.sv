@@ -372,7 +372,7 @@ import soc_package ::*;
  
 
     initial begin
-        run_test("soc_master_test");
+        //run_test("soc_master_test");
         //run_test("sample_test");
         //run_test("bram_address_range_test");
         //run_test("bram_upper_invalid_addr_test");
@@ -385,7 +385,7 @@ import soc_package ::*;
         //run_test("read_cdma_test");
         //run_test("cpu_base_test");
         //run_test("cdma_wr_rd_test");
-        //run_test("mem_wr_rd_test");
+        run_test("mem_wr_rd_test");
     end
 
     initial begin
