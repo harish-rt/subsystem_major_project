@@ -97,7 +97,11 @@ class intc_monitor extends uvm_monitor;
     bit                                 prev_irq;
 
     virtual intc_intf                   mon_intc_intf;
+<<<<<<< HEAD
+	uvm_analysis_port #(intc_seq_item) 	mon_intc_ap;
+=======
 	uvm_analysis_port #(intc_seq_item) 	intc_ap;
+>>>>>>> 169e3413009a18aaf60c1496503e57e630c46401
 
     extern function void build_phase	(uvm_phase phase);
     extern task main_phase				(uvm_phase phase);
@@ -108,7 +112,11 @@ function void intc_monitor :: build_phase (uvm_phase phase);
     `uvm_info ("intc_monitor :: build_phase started ", "",UVM_LOW)
     super.build_phase(phase);
     
+<<<<<<< HEAD
+    mon_intc_ap = new("mon_intc_ap", this);
+=======
     intc_ap = new("intc_ap", this);
+>>>>>>> 169e3413009a18aaf60c1496503e57e630c46401
     `uvm_info ("intc_monitor  :: build_phase ended ", "",UVM_LOW)
 endfunction 
 
@@ -131,7 +139,11 @@ task intc_monitor :: main_phase(uvm_phase phase);
             pkt.intc_intr       = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
             pkt.intc_irq        = mon_intc_intf.intc_interface_monitor_cb.intc_irq;
 
+<<<<<<< HEAD
+            mon_intc_ap.write(pkt);
+=======
             intc_ap.write(pkt);
+>>>>>>> 169e3413009a18aaf60c1496503e57e630c46401
             `uvm_info("intc_monitor_pkt",pkt.sprint(),UVM_MEDIUM)            
 
             prev_intr   = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
@@ -212,7 +224,11 @@ endclass
         tx_h.intc_intr          = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
         tx_h.intc_irq           = mon_intc_intf.intc_interface_monitor_cb.intc_irq; 
 
+<<<<<<< HEAD
+        mon_intc_ap.write(tx_h);
+=======
         intc_ap.write(tx_h);
+>>>>>>> 169e3413009a18aaf60c1496503e57e630c46401
 
   endtask
 	
@@ -230,3 +246,4 @@ endclass
 			end
 
 	endtask
+*/

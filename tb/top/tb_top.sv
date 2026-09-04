@@ -256,6 +256,8 @@ import soc_package ::*;
     assign cdma_data_mov_intf.rlast=dut.IPS_CORE.S03_AXI_1_RLAST;
     assign cdma_data_mov_intf.arprot=dut.IPS_CORE.S03_AXI_1_ARPROT;
     assign cdma_data_mov_intf.arcache=dut.IPS_CORE.S03_AXI_1_ARCACHE;
+    assign cdma_interrupt_intf.interrupt_out=dut.IPS_CORE.cdma_introut_0;
+
         //unused signals in axi cdma
     assign cdma_reg_intf.awid=0;
     assign cdma_reg_intf.awlen=0;
@@ -374,11 +376,14 @@ import soc_package ::*;
     initial begin
         run_test("soc_master_test");
         //run_test("sample_test");
+        //run_test("bram_address_range_test");
+        //run_test("bram_upper_invalid_addr_test");
+        //run_test("bram_lower_invalid_addr_test");
+        //run_test("bram_multiple_write_read_test");
         //run_test("config_intc_test");
         //run_test("load_bram_test");
         //run_test("read_bram_test");
         //run_test("config_cdma_ral_test");
-        //run_test("read_cdma_test");
         //run_test("cpu_base_test");
         //run_test("cdma_wr_rd_test");
         //run_test("mem_wr_rd_test");
@@ -395,14 +400,9 @@ import soc_package ::*;
         //#3000;
         //$finish();
     end
-    //interrupt controller config object
-    //intc_config_obj                 intc_obj;
-    //cpu config object
-    //cpu_config_obj                  obj;
-    //cdma config object
-    //axi_cdma_config_obj             cdma_config_obj;
+     
+    soc_config     soc_config_obj;
 
-     soc_config     soc_config_obj;
     initial begin
     	uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
     	uvm_config_db#(virtual axi4_intf.MONITOR_MOD)::set(null,"*","BRAM_MON",axi4_bram_if);

@@ -167,7 +167,7 @@ module core_wrapper
     .M01_AXI_0_arvalid	    (axi_int2core_peri.ARVALID  ),
     .M01_AXI_0_awaddr		(axi_int2core_peri.AWADDR	),
     .M01_AXI_0_awprot		(				            ),
-    .M01_AXI_0_awready	    (axi_int2core_peri.ARREADY  ),
+    .M01_AXI_0_awready	    (axi_int2core_peri.AWREADY  ),
     .M01_AXI_0_awvalid	    (axi_int2core_peri.AWVALID  ),
     .M01_AXI_0_bready		(axi_int2core_peri.BREADY	),
     .M01_AXI_0_bresp		(axi_int2core_peri.BRESP	),

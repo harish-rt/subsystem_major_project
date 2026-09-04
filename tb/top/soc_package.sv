@@ -1,6 +1,7 @@
 package soc_package;
     `include "uvm_macros.svh"
     import uvm_pkg::*;
+    `include "../common/config_tb.sv"
     import soc_addr_pkg::*;
     import cpu_package ::*;
     import axi_cdma_env_pkg ::*;
