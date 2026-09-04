@@ -256,6 +256,8 @@ import soc_package ::*;
     assign cdma_data_mov_intf.rlast=dut.IPS_CORE.S03_AXI_1_RLAST;
     assign cdma_data_mov_intf.arprot=dut.IPS_CORE.S03_AXI_1_ARPROT;
     assign cdma_data_mov_intf.arcache=dut.IPS_CORE.S03_AXI_1_ARCACHE;
+    assign cdma_interrupt_intf.interrupt_out=dut.IPS_CORE.cdma_introut_0;
+
         //unused signals in axi cdma
     assign cdma_reg_intf.awid=0;
     assign cdma_reg_intf.awlen=0;

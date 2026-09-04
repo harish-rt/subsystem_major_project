@@ -12,7 +12,7 @@ class cpu_seq_item extends uvm_sequence_item;
 
    realtime radd_hndshk, rdata_hndshk[], wadd_hndshk, wdata_hndshk[], wresp_hndshk;
    realtime reset_asserted, reset_deasserted; 
-   reset_info_t reset_op = NO_RESET; 
+   reset_info_t reset_op = NO_RESET;
    
 
     `uvm_object_utils_begin(cpu_seq_item)

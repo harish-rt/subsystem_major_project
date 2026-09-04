@@ -41,16 +41,18 @@ vsim -t 1ps -voptargs="+acc" -suppress 12110,3009 -sv_seed random \
 xil_defaultlib.top core_ip_wraps.glbl \
 -l sim_txt.log
 
-add wave -r sim:/top/axi4_bram_if/*
-add wave -r sim:/top/mem_intf/*
-add wave -r sim:/top/axil_riscv_if/*
-add wave -r sim:/top/lite_intc_if/*
-add wave -r sim:/top/dut/IPS_CORE/cdma_introut_0
-add wave -r sim:/top/intc_if/*
-add wave -r sim:/top/cdma_reg_intf/*
-add wave -r sim:/top/cdma_interrupt_intf/*
-add wave -r sim:/top/cdma_data_mov_intf/*
-add wave -r sim:/top/cdma_sg_intf/*
+do wave.do
+
+#add wave -r sim:/top/axi4_bram_if/*
+#add wave -r sim:/top/mem_intf/*
+#add wave -r sim:/top/axil_riscv_if/*
+#add wave -r sim:/top/lite_intc_if/*
+#add wave -r sim:/top/dut/IPS_CORE/cdma_introut_0
+#add wave -r sim:/top/intc_if/*
+#add wave -r sim:/top/cdma_reg_intf/*
+#add wave -r sim:/top/cdma_interrupt_intf/*
+#add wave -r sim:/top/cdma_data_mov_intf/*
+#add wave -r sim:/top/cdma_sg_intf/*
 
 run -all
 
