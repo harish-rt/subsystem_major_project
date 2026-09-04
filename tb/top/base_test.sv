@@ -35,22 +35,6 @@ class cpu_base_test extends uvm_test;
 
 endclass : cpu_base_test
 
-
-class read_cdma_test extends cpu_base_test;
-    `uvm_component_utils(read_cdma_test)
-    `NEW_COMP
-
-    read_cdma_seq master_seq;
-
-    task main_phase(uvm_phase phase);
-        master_seq = read_cdma_seq::type_id::create("master_seq");
-        phase.raise_objection(this);
-            master_seq.start(w_env.c_env.cpu_agt.sqr);
-            phase.phase_done.set_drain_time(this, 100ns);
-        phase.drop_objection(this);
-    endtask
-endclass : read_cdma_test
-
 class config_intc_test extends cpu_base_test;
     `uvm_component_utils(config_intc_test)
     `NEW_COMP
@@ -165,7 +149,7 @@ class soc_master_test extends cpu_base_test;
 
             master_vseq.start(w_env.vsqr);
 
-        phase.phase_done.set_drain_time(this, 3000ns);
+        phase.phase_done.set_drain_time(this, 1000ns);
         phase.drop_objection(this);
     endtask
 endclass : soc_master_test

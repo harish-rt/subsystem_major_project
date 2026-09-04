@@ -31,6 +31,7 @@ vsim -sv_seed random +access +rwc +m+top +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJECTION
 -L xil_defaultlib \
 -O0 xil_defaultlib.top core_ip_wraps.glbl \
 -l sim_txt.log
+
 add wave -recursive /top/axi4_bram_if/*
 add wave -recursive /top/mem_intf/*
 add wave -recursive /top/axil_riscv_if/*

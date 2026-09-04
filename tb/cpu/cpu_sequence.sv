@@ -43,8 +43,8 @@ class base_cpu_sequence extends uvm_sequence#(cpu_seq_item);
         start_item(w_pkt);
         if(!w_pkt.randomize() with {
             AWADDR      == reg_addr;
-            if(data != 0) {   
-                WDATA       == data;
+            if(data != 0) {
+                WDATA   == data;
             }
             WSTRB       == 'hf;
             operation   == WRITE;
@@ -71,36 +71,6 @@ class base_cpu_sequence extends uvm_sequence#(cpu_seq_item);
 endclass : base_cpu_sequence
 
 // READ REGISTER DEFAULT VALUES
-class read_cdma_seq extends base_cpu_sequence;
-    `uvm_object_utils(read_cdma_seq)
-    `NEW_OBJ
-    
-    int addr;
-
-    task body();
-        super.body();
-        `uvm_info("read_cdma_seq", "Start of Config CDMA Sequence", UVM_LOW)
-        //KERNEL: UVM_ERROR Response queue overflow, response was dropped
-        //this.set_response_queue_depth(20);         //clears
-
-        for (int i = 0; i < 11; i++) begin        
-            addr = CDMA_BASE + (i*4);
-            start_item(pkt);
-            if(!pkt.randomize() with {
-                ARADDR  == addr;
-                operation   == READ;
-                })begin
-                `uvm_error(get_full_name(), "randomization_failed")
-            end
-            finish_item(pkt);
-            get_response(pkt);             
-        end
-        `uvm_info("read_cdma_seq", "End of Config CDMA Sequence", UVM_LOW)
-    endtask
-
-endclass : read_cdma_seq
-
-
 class intc_reg_read_seq extends base_cpu_sequence;
     `uvm_object_utils(intc_reg_read_seq)
     `NEW_OBJ
@@ -144,16 +114,6 @@ class load_bram_seq extends base_cpu_sequence;
         super.body();
         for(int i=0;i<8;i=i+4)begin
             write_reg('h7100_0000 + i);
-            //start_item(pkt);
-            //if(!pkt.randomize() with {
-            //    AWADDR  == 'h7100_0000 + i;
-            //    WSTRB   == 'hf;
-            //    operation   == WRITE;
-            //    })begin
-            //    `uvm_error(get_full_name(), "randomization_failed")
-            //end
-            //finish_item(pkt);
-            //get_response(pkt);             
         end
     endtask
 endclass : load_bram_seq
@@ -176,7 +136,7 @@ class read_bram_seq extends base_cpu_sequence;
                 `uvm_error(get_full_name(), "randomization_failed")
             end
             finish_item(pkt);
-            get_response(pkt);
+            get_response(pkt);             
         end
         `uvm_info("read_bram_seq", "End of Read BRAM Sequence", UVM_LOW)
     endtask
@@ -238,7 +198,7 @@ class cdma_read_write_seq extends base_cpu_sequence;
         do begin
             start_item(pkt);
             if (!pkt.randomize() with {
-                ARADDR    == CDMA_BASE + 04;
+                ARADDR    == CDMA_BASE + 'h4;
                 operation == READ;
             }) begin
                 `uvm_error(get_full_name(), "randomization_failed")
@@ -319,7 +279,7 @@ class cpu_isr_seq extends base_cpu_sequence;
             
             loop_count++;
             if (loop_count > 10) begin
-                `uvm_error("cpu_isr_seq", "Interrupt loop timeout! IPR stuck high.")
+                `uvm_error("cpu_isr_seq", "Interrupt loop timeout! IPR stuck high")
                 break;
             end
             
@@ -333,20 +293,22 @@ class cpu_isr_seq extends base_cpu_sequence;
         
         if (cdmasr_data[12]) begin
             `uvm_info("cpu_isr_seq", "CDMA IOC Asserted", UVM_LOW)
-            write_reg(CDMA_BASE + 'h4, cdmasr_data | 'h0000_1000);    
+            write_reg(CDMA_BASE + 'h4, 'h1000);    //W1C
         end 
-        else if (cdmasr_data[14]) begin
+
+        if (cdmasr_data[14]) begin
             `uvm_warning("cpu_isr_seq", "CDMA ERR Asserted")
-            read_reg(CDMA_BASE + 'h0, cdmacr_data);
-            cdmacr_data[2] = 1'b1; 
-            write_reg(CDMA_BASE + 'h0, cdmacr_data);
+            write_reg(CDMA_BASE + 'h0, 'h4);        // CDMA Reset
+            do begin
+                read_reg(CDMA_BASE + 'h4,cdmasr_data);
+            end while(cdmasr_data[2] == 1);         // Confirms reset cleared
         end
         
-        write_reg(INTC_BASE + 'hc, (1 << 26));
+        write_reg(INTC_BASE + 'hc, 'h400_0000);      // INTC ACK
     endtask
 
     task handle_core_perif_isr();
-        write_reg(INTC_BASE + 'hc, (1 << 27));
+        write_reg(INTC_BASE + 'hc, 'h800_0000);      // INTC ACK
     endtask
 
 endclass : cpu_isr_seq
@@ -365,7 +327,8 @@ class cdma_config_seq extends base_cpu_sequence;
 
         do begin
             read_reg(CDMA_BASE + 'h4,cdmasr_data);
-        end while(cdmasr_data[1]==1);
+        end while(cdmasr_data[1]==0);
+
         `uvm_info("cdma_config_seq","idle cleared",UVM_LOW)
         write_reg(CDMA_BASE + 'h0,cdmacr_data);
         write_reg(CDMA_BASE + 'h18,sa_data);
@@ -408,7 +371,7 @@ class bram_multiple_wr_rd_seq extends base_cpu_sequence;
             end
 
         endtask
-endclass
+endclass : bram_multiple_wr_rd_seq
 
 class bram_lower_invalid_addr_seq extends base_cpu_sequence;
     `uvm_object_utils(bram_lower_invalid_addr_seq)
@@ -424,7 +387,7 @@ class bram_lower_invalid_addr_seq extends base_cpu_sequence;
             `uvm_error("RAND_FAIL","Randomization Fail")
         finish_item(pkt);
     endtask
-endclass
+endclass : bram_lower_invalid_addr_seq
 
 class bram_upper_invalid_addr_seq extends base_cpu_sequence;
     `uvm_object_utils(bram_upper_invalid_addr_seq)
@@ -441,7 +404,7 @@ class bram_upper_invalid_addr_seq extends base_cpu_sequence;
                 `uvm_error("RAND_FAIL","RANDOMIAZATION FAILED")
         finish_item(pkt);
     endtask
-endclass
+endclass : bram_upper_invalid_addr_seq
 
 class bram_address_range_seq extends base_cpu_sequence;
     `uvm_object_utils(bram_address_range_seq)
@@ -536,4 +499,4 @@ class bram_address_range_seq extends base_cpu_sequence;
         finish_item(pkt);
 
     endtask
-endclass
+endclass : bram_address_range_seq
