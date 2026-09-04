@@ -77,10 +77,10 @@ RTL_LIBS      = -L unisims_ver -L unimacro_ver -L secureip \
 TB_SRCS       = $(TB_DIR)/common/soc_addr_pkg.sv \
                 $(TB_DIR)/common/config_tb.sv \
                 $(TB_DIR)/common/axi_parameters.sv \
-                $(TB_DIR)/top/cpu_package.sv \
-                $(TB_DIR)/ips_core/axi_cdma_env/top/axi_cdma_env_pkg.sv \
                 $(TB_DIR)/mem_agent/mem_pkg.sv \
                 $(TB_DIR)/ips_core/axi_intc/intc_package.sv \
+                $(TB_DIR)/ips_core/axi_cdma_env/top/axi_cdma_env_pkg.sv \
+                $(TB_DIR)/top/cpu_package.sv \
                 $(TB_DIR)/top/soc_package.sv \
                 $(TB_DIR)/top/tb_top.sv
 

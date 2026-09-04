@@ -36,16 +36,11 @@ add wave -recursive /top/mem_intf/*
 add wave -recursive /top/axil_riscv_if/*
 add wave -recursive /top/lite_intc_if/*
 add wave -recursive /top/dut/IPS_CORE/cdma_introut_0
-add wave -recursive /top/dut/IPS_CORE/*
 add wave -recursive /top/intc_if/*
-<<<<<<< HEAD
-add wave -r /top/*
-=======
 add wave -recursive /top/cdma_reg_intf/*
 add wave -recursive /top/cdma_interrupt_intf/*
 add wave -recursive /top/cdma_data_mov_intf/*
 add wave -recursive /top/cdma_sg_intf/*
->>>>>>> main
 run -all
 
 

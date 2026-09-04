@@ -4,7 +4,7 @@ package intc_package;
     import uvm_pkg::*;
     `include "uvm_macros.svh"
 
-    `include "config_tb.sv"
+    `include "../../common/config_tb.sv"
 // COMMON
     `include "intc_config_obj.sv"
 
