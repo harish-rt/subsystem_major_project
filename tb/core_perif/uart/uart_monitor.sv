@@ -27,12 +27,13 @@ task uart_monitor::main_phase(uvm_phase phase);
     `uvm_info(get_full_name(), "uart_run_phase entered", UVM_LOW)
   
     fork
-      mon_tx_frames();
-      mon_rx_frames();
+        mon_tx_frames();
+        mon_rx_frames();
     join
 endtask : main_phase
 
 task uart_monitor::mon_tx_frames();
+
     forever begin
         uart_seq_item tx_pkt;
 

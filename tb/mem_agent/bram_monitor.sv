@@ -2,7 +2,7 @@ class bram_monitor extends uvm_monitor;
     `uvm_component_utils(bram_monitor)
     `NEW_COMP
     
-    uvm_analysis_port #(bram_seq_item)     mon_ap;
+    uvm_analysis_port #(bram_seq_item)          mon_ap;
 	virtual axi4_intf.MONITOR_MOD               bram_if;
    mailbox #(bram_seq_item)  write_address_mbx ,write_data_mbx;      //to capture transactions on write address channel // Preserve ordering
    mailbox #(bram_seq_item) wresp_array [id_t];    //associative array of mailboxes. Will hold packets waiting for write response.Mailboxes will preserve ordering based on ID.
@@ -39,6 +39,7 @@ task bram_monitor :: main_phase (uvm_phase phase);
   capture_write_response();
   capture_read_address();
   capture_read_data();
+  merge_write_info();
  join
 endtask
 
@@ -188,404 +189,33 @@ task  bram_monitor ::  capture_read_data();
  end
 endtask
 
-task bram_monitor :: merge_write_info();
-bram_seq_item addr_pkt,data_pkt,merged_pkt;
-int x ,no_addr, no_data; //indicates number of completed write transactions waiting for response.
-  `uvm_info("bram_monitor :: merge_write_info","Triggred",UVM_LOW);
-  no_addr = write_address_mbx.num();
-  no_data = write_data_mbx.num();
-  x = (no_addr<no_data)? no_addr :no_data;
-  //`uvm_info("bram_monitor :: merge_write_info",$sformatf("before get pkt comparing no_of_elements  addr= %d, data=%d ,x=%d",no_addr,no_data,x),UVM_LOW);
-  repeat(x)begin
-  merged_pkt = bram_seq_item :: type_id :: create("merged_pkt");
-  write_address_mbx.get(addr_pkt);
-  write_data_mbx.get(data_pkt);
-  //Merging address and data phases
-   //write address_phase
-   merged_pkt.write       = bram_seq_item::WRITE;
-   merged_pkt.AWBURST     = addr_pkt.AWBURST;
-   merged_pkt.AWADDR      = addr_pkt.AWADDR;
-   merged_pkt.AWSIZE      = addr_pkt.AWSIZE;
-   merged_pkt.AWID        = addr_pkt.AWID;
-   merged_pkt.AWLEN       = addr_pkt.AWLEN;
-   merged_pkt.AWLOCK      = addr_pkt.AWLOCK;
-   merged_pkt.AWPROT      = addr_pkt.AWPROT;
-   merged_pkt.AWQOS       = addr_pkt.AWQOS;
-   merged_pkt.AWCACHE     = addr_pkt.AWCACHE;
-   //write data phase
-   merged_pkt.WDATA    = data_pkt.WDATA;
-   merged_pkt.WSTRB  = data_pkt.WSTRB;
-  //adding packets to array waiting for response
-   //`uvm_info("bram_monitor :: merge_write_info",$sformatf("putting merged pkt to wresp_array AWID = %b",merged_pkt.AWID),UVM_LOW);
-    if(!wresp_array.exists(merged_pkt.AWID)) wresp_array[merged_pkt.AWID] = new();
-    wresp_array[merged_pkt.AWID].put(merged_pkt);
-  end
-endtask
-
-/*
-task bram_monitor :: capture_reset();
- bram_seq_item     rst_pkt;
- `uvm_info("bram_monitor :: capture_reset","Triggred",UVM_LOW);
- fork
-  forever begin //reset deasserted
-    @(posedge bram_if.ARESETn) ;
-    rst_pkt = bram_seq_item :: type_id :: create("rst_pkt");
-    rst_pkt.reset_op = RESET_DEASSERTED;
-    rst_pkt.reset_deasserted = $realtime();
-    `uvm_info("bram_monitor :: capture_reset","reset_deasserted_pkt to SB",UVM_LOW);
-    mon_ap.write(rst_pkt);
-  end
-  forever begin //reset asserted
-    @(negedge bram_if.ARESETn) ;
-    rst_pkt = bram_seq_item :: type_id :: create("rst_pkt");
-    rst_pkt.reset_op = RESET_ASSERTED;
-    rst_pkt.reset_deasserted = $realtime();
-    `uvm_info("bram_monitor :: capture_reset","reset_asserted_pkt to SB",UVM_LOW);
-    mon_ap.write(rst_pkt);
-  end
-join
-endtask
-*/
-
-/*
-class bram_monitor extends uvm_monitor;
-    `uvm_component_utils(bram_monitor)
-    `NEW_COMP
+task bram_monitor::merge_write_info();
+    bram_seq_item addr_pkt, data_pkt, merged_pkt;
     
-    uvm_analysis_port #(bram_seq_item)     mon_ap;
-	virtual axi4_intf.MONITOR_MOD               bram_if;
+    forever begin
+        // Block until BOTH an address and data item are available
+        write_address_mbx.get(addr_pkt);
+        write_data_mbx.get(data_pkt);
 
-    bram_seq_item                          aw_pkt,w_pkt,b_pkt,ar_pkt,r_pkt;
+        merged_pkt = bram_seq_item::type_id::create("merged_pkt");
+        merged_pkt.write       = bram_seq_item::WRITE;
+        merged_pkt.AWBURST     = addr_pkt.AWBURST;
+        merged_pkt.AWADDR      = addr_pkt.AWADDR;
+        merged_pkt.AWSIZE      = addr_pkt.AWSIZE;
+        merged_pkt.AWID        = addr_pkt.AWID;
+        merged_pkt.AWLEN       = addr_pkt.AWLEN;
+        merged_pkt.AWLOCK      = addr_pkt.AWLOCK;
+        merged_pkt.AWPROT      = addr_pkt.AWPROT;
+        merged_pkt.AWQOS       = addr_pkt.AWQOS;
+        merged_pkt.AWCACHE     = addr_pkt.AWCACHE;
+        merged_pkt.WDATA       = data_pkt.WDATA;
+        merged_pkt.WSTRB       = data_pkt.WSTRB;
 
-    bram_seq_item  wr_addr_queue[$],rd_addr_queue[$],wr_data_queue[$],rd_data_queue[$],wr_resp_queue[$];
-
-   extern function void build_phase              	(uvm_phase phase);
-   extern function void connect_phase            	(uvm_phase phase);
-   extern function void end_of_elaboration_phase 	(uvm_phase phase);
-   extern function void start_of_simulation_phase	(uvm_phase phase);
-   extern function void extract_phase            	(uvm_phase phase);
-   extern function void check_phase              	(uvm_phase phase);
-   extern function void report_phase             	(uvm_phase phase);
-   extern function void final_phase              	(uvm_phase phase);
-   extern task main_phase                         	(uvm_phase phase);
-   extern task mon_write_address					();
-   extern task mon_write_data						();
-   extern task mon_write_resp						();
-   extern task mon_read_address						();
-   extern task mon_read_data						();
-   extern task merge_write							();
-   extern task merge_read							();
-
-endclass 
-
-  function void bram_monitor :: build_phase (uvm_phase phase);
-     super.build_phase (phase);
-        mon_ap 			= new ("mon_ap",this);
-        `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
-  endfunction : build_phase
-
-  function void bram_monitor :: connect_phase (uvm_phase phase);
-     super.connect_phase (phase);
-     `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
-  endfunction : connect_phase
-
-  function void bram_monitor :: end_of_elaboration_phase (uvm_phase phase);
-     super.end_of_elaboration_phase (phase);
-     `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
-  endfunction : end_of_elaboration_phase
-
-  function void bram_monitor :: start_of_simulation_phase (uvm_phase phase);
-     super.start_of_simulation_phase (phase);
-     `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
-  endfunction : start_of_simulation_phase
-
-  function void bram_monitor :: extract_phase (uvm_phase phase);
-     super.extract_phase (phase);
-     `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
-  endfunction : extract_phase
-
-  function void bram_monitor :: check_phase (uvm_phase phase);
-     super.check_phase (phase);
-     `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
-  endfunction : check_phase
-
-  function void bram_monitor :: report_phase (uvm_phase phase);
-     super.report_phase (phase);
-     `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
-  endfunction : report_phase
-
-  function void bram_monitor :: final_phase (uvm_phase phase);
-     super.final_phase (phase);
-     `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
-  endfunction : final_phase
-
-    task bram_monitor :: main_phase (uvm_phase phase);
-        `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
-
-        fork
-            forever begin
-                @(bram_if.axi4_mon_cb);        
-                fork
-                    mon_write_address();
-                    mon_write_data();
-                    mon_write_resp();
-                join
-                merge_write();
-            end
-            forever begin
-                @(bram_if.axi4_mon_cb);   
-                fork
-                    mon_read_address();
-                    mon_read_data();
-                join
-                merge_read();
-            end
-        join
- 
-    endtask:main_phase
-
-    task bram_monitor :: mon_write_address();
-        wait(bram_if.axi4_mon_cb.AWVALID && bram_if.axi4_mon_cb.AWREADY) begin
-            aw_pkt = bram_seq_item :: type_id :: create ("aw_pkt");
-            aw_pkt.AWADDR   = bram_if.axi4_mon_cb.AWADDR;
-            aw_pkt.AWBURST  = bram_seq_item::burst_t'(bram_if.axi4_mon_cb.AWBURST);
-            aw_pkt.AWCACHE  = bram_if.axi4_mon_cb.AWCACHE;
-            aw_pkt.AWID     = bram_if.axi4_mon_cb.AWID;
-            aw_pkt.AWLEN    = bram_if.axi4_mon_cb.AWLEN;
-            aw_pkt.AWLOCK   = bram_if.axi4_mon_cb.AWLOCK;
-            aw_pkt.AWPROT   = bram_if.axi4_mon_cb.AWPROT;
-            aw_pkt.AWQOS    = bram_if.axi4_mon_cb.AWQOS;
-            aw_pkt.AWSIZE   = bram_if.axi4_mon_cb.AWSIZE;
-            aw_pkt.write    = bram_seq_item::WRITE;
-            `uvm_info("axi4_lite_mon_AW",$sformatf("write_address = %0h,write=%s",aw_pkt.AWADDR,aw_pkt.write.name),UVM_NONE)
-            wr_addr_queue.push_back(aw_pkt);
+        if (!wresp_array.exists(merged_pkt.AWID)) begin
+            wresp_array[merged_pkt.AWID] = new();
         end
-    endtask
-
-    task bram_monitor :: mon_write_data();
-        int i;
-        bit last;
-    i = 0;
-    do begin
-        wait(bram_if.axi4_mon_cb.WVALID && bram_if.axi4_mon_cb.WREADY) begin
-            w_pkt = bram_seq_item :: type_id :: create ("w_pkt");
-            w_pkt.WDATA = new[w_pkt.WDATA.size() + 1](w_pkt.WDATA);
-            w_pkt.WSTRB = new[w_pkt.WSTRB.size() + 1](w_pkt.WSTRB);
-            w_pkt.WDATA[i] = bram_if.axi4_mon_cb.WDATA;
-            w_pkt.WSTRB[i] = bram_if.axi4_mon_cb.WSTRB;
-            last = bram_if.axi4_mon_cb.WLAST;
-      i=i+1;
-      end while(last==0);           //keeps sampling till last indicates end of data phase.
-            `uvm_info("axi4_lite_mon_WD",$sformatf("write_data = %0h",w_pkt.WDATA),UVM_LOW)
-            wr_data_queue.push_back(w_pkt);
-        end
-    endtask
-
-    task bram_monitor :: mon_write_resp();
-        wait(bram_if.axi4_mon_cb.BVALID && bram_if.axi4_mon_cb.BREADY) begin
-            b_pkt = bram_seq_item :: type_id :: create ("b_pkt");
-            b_pkt.BID       = bram_if.axi4_mon_cb.BID;
-            b_pkt.BRESP     = bram_seq_item::response_t'(bram_if.axi4_mon_cb.BRESP);
-            `uvm_info("axi4_lite_mon_bresp",$sformatf("write_bresp = %b",b_pkt.BRESP),UVM_LOW)
-            wr_resp_queue.push_back(b_pkt);
-        end
-    endtask
-
-    task bram_monitor :: mon_read_address();
-        wait(bram_if.axi4_mon_cb.ARVALID && bram_if.axi4_mon_cb.ARREADY) begin
-            ar_pkt = bram_seq_item :: type_id :: create ("ar_pkt");
-            ar_pkt.ARADDR   = bram_if.axi4_mon_cb.ARADDR;
-            ar_pkt.ARBURST  = bram_seq_item::burst_t'(bram_if.axi4_mon_cb.ARBURST);
-            ar_pkt.ARCACHE  = bram_if.axi4_mon_cb.ARCACHE;
-            ar_pkt.ARID     = bram_if.axi4_mon_cb.ARID;
-            ar_pkt.ARLEN    = bram_if.axi4_mon_cb.ARLEN;
-            ar_pkt.ARLOCK   = bram_if.axi4_mon_cb.ARLOCK;
-            ar_pkt.ARPROT   = bram_if.axi4_mon_cb.ARPROT;
-            ar_pkt.ARQOS    = bram_if.axi4_mon_cb.ARQOS;
-            ar_pkt.ARSIZE   = bram_if.axi4_mon_cb.ARSIZE;            
-            ar_pkt.write    = bram_seq_item::READ;
-            `uvm_info("axi4_lite_mon_read_addr",$sformatf("read_address = %0h,write=%s",ar_pkt.ARADDR,ar_pkt.write),UVM_LOW)
-            rd_addr_queue.push_back(ar_pkt); 
-        end
-    endtask
-
-    task bram_monitor :: mon_read_data();
-        int i;
-        bit last;
-        do begin
-        wait(bram_if.axi4_mon_cb.RVALID && bram_if.axi4_mon_cb.RREADY) begin
-            r_pkt = bram_seq_item :: type_id :: create ("r_pkt");
-            r_pkt.RID       = bram_if.axi4_mon_cb.RID;
-            r_pkt.RDATA[i]  = bram_if.axi4_mon_cb.RDATA;
-            r_pkt.RRESP[i]  = bram_seq_item::response_t'(bram_if.axi4_mon_cb.RRESP);            
-            last            = bram_if.axi4_mon_cb.RLAST;
-            i=i+1;
-        end while(last == 0);
-            `uvm_info("axi4_lite_mon_read_data",$sformatf("RDATA = %0h",r_pkt.RDATA),UVM_LOW)
-            rd_data_queue.push_back(r_pkt);
-        end 
-    endtask
-
-    task bram_monitor :: merge_write();
-        bram_seq_item w_merge = bram_seq_item :: type_id :: create("w_merge");
-        if(wr_addr_queue.size() > 0 && wr_data_queue.size() > 0 && wr_resp_queue.size() > 0 )
-            begin
-                w_merge.AWADDR 	= wr_addr_queue[0].AWADDR;
-                w_merge.WDATA 	= wr_data_queue[0].WDATA;
-                w_merge.WSTRB 	= wr_data_queue[0].WSTRB;
-                w_merge.BRESP 	= wr_resp_queue[0].BRESP;
-                w_merge.write 		= wr_addr_queue[0].write;
-                void'(wr_addr_queue.pop_front);
-                void'(wr_data_queue.pop_front);
-                void'(wr_resp_queue.pop_front);
-                `uvm_info("axi4_lite_mon_WRITE",w_merge.sprint(),UVM_LOW)
-                mon_ap.write(w_merge);
-            end
-    endtask
-
-    task bram_monitor :: merge_read();
-        bram_seq_item r_merge = bram_seq_item :: type_id :: create("r_merge");
-        if(rd_addr_queue.size() > 0 && rd_data_queue.size() > 0 )
-            begin
-                r_merge.ARADDR    = rd_addr_queue[0].ARADDR;
-                r_merge.RDATA     = rd_data_queue[0].RDATA;
-		        r_merge.RRESP 	= rd_data_queue[0].RRESP;
-                r_merge.write         = rd_addr_queue[0].write;
-                void'(rd_addr_queue.pop_front);
-                void'(rd_data_queue.pop_front);
-                `uvm_info("axi4_lite_mon_READ",r_merge.sprint(),UVM_LOW)
-                mon_ap.write(r_merge);
-            end
-    endtask
-
-/*
-class bram_monitor extends uvm_monitor;
-    `uvm_component_utils(bram_monitor)
-
-    function new(string name="bram_monitor",uvm_component parent);
-        super.new(name,parent);
-    endfunction
-
-    virtual axi4_lite_intf.MONITOR_MOD   bram_if;
-    uvm_analysis_port#(bram_seq_item) mon_ap;
-    bram_seq_item wr_addr_queue[$],wr_data_queue[$],wr_resp_queue[$],rd_addr_queue[$],rd_data_queue[$];
-    
-    extern function void build_phase(uvm_phase phase);
-    extern task main_phase(uvm_phase phase);
-    extern task write_addr();
-    extern task write_data();
-    extern task write_resp();
-    extern task read_addr();
-    extern task read_data();
-    extern task merge_write();
-    extern task merge_read();
-endclass
-
-function void bram_monitor::build_phase(uvm_phase phase);
-    mon_ap=new("mon_ap",this);
-    if(!uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::get(this,"","MON",bram_if)) begin
-		`uvm_fatal("NO_VIF",{"virtual interface is not set for monitor"})
-	end
-
-endfunction
-
-task bram_monitor::main_phase(uvm_phase phase);
-    fork 
-       write_addr();
-       write_data();
-       write_resp();
-       read_addr();
-       read_data();
-       merge_read();
-       merge_write();
-    join
-endtask
-
-task bram_monitor::write_addr();
-    bram_seq_item pkt;
-   forever begin
-    pkt=bram_seq_item::type_id::create("pkt");
-     wait(bram_if.axil_mon_cb.AWVALID && bram_if.axil_mon_cb.WREADY);
-     pkt.awaddr=bram_if.axil_mon_cb.AWADDR;
-     pkt.write=WRITE;
-     wr_addr_queue.push_back(pkt);
-   end
-endtask
-
-task bram_monitor::write_data();
-    bram_seq_item pkt;
-    forever begin
-        pkt=bram_seq_item::type_id::create("pkt");
-        wait(bram_if.axil_mon_cb.WVALID && bram_if.axil_mon_cb.WREADY);
-        pkt=bram_seq_item::type_id::create("pkt");
-        pkt.wdata=bram_if.axil_mon_cb.WDATA;
-        pkt.wstrb=bram_if.axil_mon_cb.WSTRB;
-        wr_data_queue.push_back(pkt);
-    end
-endtask
-
-task bram_monitor::write_resp();
-    bram_seq_item pkt;
-    forever begin
-        pkt=bram_seq_item::type_id::create("pkt");
-        wait(bram_if.axil_mon_cb.BVALID && bram_if.axil_mon_cb.BREADY);
-        pkt.bresp=RESPONSE_TYPE'(bram_if.axil_mon_cb.BRESP);
-        wr_resp_queue.push_back(pkt);
-    end
-endtask
-
-task bram_monitor::read_addr();
-    bram_seq_item pkt;
-    forever begin
-        pkt=bram_seq_item::type_id::create("pkt");
-        wait(bram_if.axil_mon_cb.ARADDR && bram_if.axil_mon_cb.ARREADY);
-        pkt.araddr=bram_if.axil_mon_cb.ARADDR;
-        pkt.write=READ;
-        rd_addr_queue.push_back(pkt);
-    end
-endtask
-
-task bram_monitor::read_data();
-    bram_seq_item pkt;
-    forever begin
-        pkt=bram_seq_item::type_id::create("pkt");
-        wait(bram_if.axil_mon_cb.RVALID && bram_if.axil_mon_cb.RREADY);
-        pkt.rdata=bram_if.axil_mon_cb.RDATA;
-        pkt.rresp=RESPONSE_TYPE'(bram_if.axil_mon_cb.RRESP);
-        rd_data_queue.push_back(pkt);
-    end
-endtask
-
-task bram_monitor::merge_write();
-    bram_seq_item wr_pkt;
-    forever begin
-     wr_pkt=bram_seq_item::type_id::create("wr_pkt");
-        wait(wr_data_queue.size()>0 && wr_addr_queue.size()>0 && wr_resp_queue.size()>0);//begin
-            wr_pkt.awaddr=wr_addr_queue[0].awaddr;
-            wr_pkt.write=wr_addr_queue[0].write;
-            wr_pkt.wdata=wr_data_queue[0].wdata;
-            wr_pkt.wstrb=wr_data_queue[0].wstrb;
-            wr_pkt.bresp=wr_resp_queue[0].bresp;
-            void'(wr_addr_queue.pop_front());
-            void'(wr_data_queue.pop_front());
-            void'(wr_resp_queue.pop_front());
-            mon_ap.write(wr_pkt);
-       // end
-    end
-endtask
-
-task bram_monitor::merge_read();
-    bram_seq_item rd_pkt;
-    forever begin
-        rd_pkt=bram_seq_item::type_id::create("rd_pkt");
-        wait(rd_addr_queue.size()>0 && rd_data_queue.size()>0);//begin
-        rd_pkt.araddr=rd_addr_queue[0].araddr;
-        rd_pkt.write=rd_addr_queue[0].write;
-        rd_pkt.rdata=rd_data_queue[0].rdata;
-        rd_pkt.rresp=rd_data_queue[0].rresp;
-        void'(rd_addr_queue.pop_front());
-        void'(rd_data_queue.pop_front());
-        mon_ap.write(rd_pkt);
-      // end 
+        wresp_array[merged_pkt.AWID].put(merged_pkt);
+        
+        `uvm_info("bram_monitor::merge", $sformatf("Successfully merged and queued AWID=%0h", merged_pkt.AWID), UVM_HIGH)
     end
 endtask

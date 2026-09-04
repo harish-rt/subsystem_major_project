@@ -1,6 +1,7 @@
 package mem_package;
     `include "uvm_macros.svh"
     import uvm_pkg::*;  
+    `include "../common/config_tb.sv"
     `include "mem_enum.sv"
     `include "mem_seq_item.sv"
     `include "bram_seq_item.sv"

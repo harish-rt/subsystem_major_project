@@ -5,11 +5,47 @@ class soc_base_virtual_sequence extends uvm_sequence;
 
     intc_config_obj     obj;
     uvm_event           irq_event;
+    virtual intc_intf   intc_if;
 
     task body();
         if(!uvm_config_db #(intc_config_obj)::get(null,get_full_name(),"intc_config_obj",obj))
             `uvm_fatal(get_full_name(),"Config_obj get Failure")
         irq_event   = obj.irq_event;
+    endtask
+
+    task isr_clear();
+        intc_if = p_sequencer.cfg.intc_if;
+
+        fork
+            begin
+                fork
+                    begin
+                        if(intc_if.intc_irq !== 1'b1)begin
+                            @(posedge intc_if.intc_irq);
+                            `uvm_info("WAIT_IRQ", "IRQ asserted! Now waiting for ISR to clear...", UVM_LOW)
+                        end
+                    end
+                    begin
+                        #10000ns;
+                        `uvm_fatal("IRQ_ASSERT_TIMEOUT", "CDMA/Peripheral never asserted IRQ!")
+                    end
+                join_any
+                disable fork;
+
+                fork
+                    begin
+                        @(negedge intc_if.intc_irq);
+                        `uvm_info("WAIT_IRQ", "ISR cleared IRQ!", UVM_LOW)
+                    end
+                    begin
+                        #3000ns;
+                        `uvm_fatal("IRQ_CLEAR_TIMEOUT", "ISR failed to clear IRQ! Pin stuck high")
+                    end
+                join_any
+                disable fork;
+                `uvm_info("WAIT_IRQ", "IRQ successfully asserted and cleared.", UVM_LOW)
+            end
+        join
     endtask
 endclass : soc_base_virtual_sequence
 
@@ -27,22 +63,50 @@ class cpu_config_intc_vseq extends soc_base_virtual_sequence;
     endtask
 endclass : cpu_config_intc_vseq
 
+class intc_reg_read_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(intc_reg_read_vseq)
+    `NEW_OBJ
+
+    intc_reg_read_seq intc_vseq;
+
+    task body();
+        intc_vseq    = intc_reg_read_seq::type_id::create("intc_vseq");
+        `uvm_info("intc_vseq", "Starting INTC reg read vsequence...", UVM_LOW)
+        intc_vseq.start(p_sequencer.cpu_sqr);
+        `uvm_info("intc_vseq", "INTC reg read vsequence complete.", UVM_LOW)
+    endtask
+endclass : intc_reg_read_vseq
+
+class cdma_reg_read_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(cdma_reg_read_vseq)
+    `NEW_OBJ
+
+    cdma_reg_read_seq cdma_vseq;
+
+    task body();
+        cdma_vseq    = cdma_reg_read_seq::type_id::create("cdma_vseq");
+        `uvm_info("cdma_vseq", "Starting CDMA reg read vsequence...", UVM_LOW)
+        cdma_vseq.start(p_sequencer.cpu_sqr);
+        `uvm_info("cdma_vseq", "CDMA reg read vsequence complete.", UVM_LOW)
+    endtask
+endclass : cdma_reg_read_vseq
+
 class cpu_isr_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(cpu_isr_vseq)
     `NEW_OBJ
 
     cpu_isr_seq isr_vseq;
+    bit flag;
 
     task body();
         super.body();
         forever begin
-            `uvm_info("isr_vseq", "Hardware IRQ detected", UVM_LOW)
-            irq_event.wait_trigger(); 
-            `uvm_info("isr_vseq", "Hardware IRQ detected wait cleared, launching CPU ISR...", UVM_LOW)
+            `uvm_info("isr_vseq", "Hardware IRQ wait", UVM_LOW)
+            p_sequencer.intc_af.get(flag);
+            `uvm_info("isr_vseq", "Hardware IRQ wait cleared, launching CPU ISR...", UVM_LOW)
             isr_vseq    = cpu_isr_seq::type_id::create("isr_vseq");
             `uvm_info("isr_vseq", "Starting ISR sequence...", UVM_LOW)
             isr_vseq.start(p_sequencer.cpu_sqr);
-            `uvm_info("isr_vseq", "ISR sequence complete.", UVM_LOW)
         end
     endtask
 endclass : cpu_isr_vseq
@@ -99,5 +163,6 @@ class soc_master_vseq extends soc_base_virtual_sequence;
         bram_vseq.start(p_sequencer);
         intc_vseq.start(p_sequencer);
         cdma_vseq.start(p_sequencer);
+        isr_clear();    // waits for irq down before ending soc_master_vseq
     endtask
 endclass : soc_master_vseq
