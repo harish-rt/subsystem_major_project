@@ -7,7 +7,8 @@ class intc_monitor extends uvm_monitor;
     intc_config_obj                     cfg;
 
     virtual intc_intf                   mon_intc_intf;
-    uvm_analysis_port #(intc_seq_item)  mon_intc_ap;
+    uvm_analysis_port #(intc_seq_item)  intc_ap;
+    uvm_analysis_port #(bit)            resp_ap;
 
     bit                          [31:0] prev_intr;
     bit                                 prev_irq;
@@ -21,28 +22,36 @@ function void intc_monitor::build_phase(uvm_phase phase);
     `uvm_info("intc_monitor", "build_phase started", UVM_LOW)
     super.build_phase(phase);
     
-    mon_intc_ap = new("mon_intc_ap",this);
+    intc_ap = new("intc_ap",this);
+    resp_ap = new("resp_ap",this);
 
-    if (!uvm_config_db#(intc_config_obj)::get(this,"","intc_config_obj",cfg)) begin
+    if (!uvm_config_db#(intc_config_obj)::get(this,"","intc_config_obj",cfg))
         `uvm_fatal("INTC_MON", "Failed to get intc_config_obj from config DB")
-    end
 
     `uvm_info("intc_monitor", "build_phase ended", UVM_LOW)
 endfunction 
 
 task intc_monitor::main_phase(uvm_phase phase);       
     // Wait for reset de-assertion
-    wait(mon_intc_intf.intc_procss_rst == 0);
+    if (mon_intc_intf.intc_procss_rst !== 0)
+        @(negedge mon_intc_intf.intc_procss_rst);
     `uvm_info("intc_monitor", "main_phase started after reset", UVM_LOW)
     
-    forever begin
-        @(posedge mon_intc_intf.intc_irq);
-        phase.raise_objection(this, "IRQ asserted, holding simulation");
-        
-        `uvm_info("INTC_MON", "Hardware IRQ Asserted -> Triggering event", UVM_LOW)
-        irq_event.trigger();
+    @(mon_intc_intf.intc_interface_monitor_cb);
+    prev_intr = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
+    prev_irq  = mon_intc_intf.intc_interface_monitor_cb.intc_irq;
 
+    forever begin
         @(mon_intc_intf.intc_interface_monitor_cb);
+        if(mon_intc_intf.intc_interface_monitor_cb.intc_irq === 1'b1 && prev_irq === 1'b0)begin
+            resp_ap.write(1'b1);
+            `uvm_info("INTC_MON","Hardware IRQ Asserted -> Triggering event",UVM_LOW)
+        end
+
+        if(mon_intc_intf.intc_interface_monitor_cb.intc_irq === 1'b0 && prev_irq === 1'b1)begin
+            `uvm_info("INTC_MON","Hardware IRQ De-asserted",UVM_LOW)
+        end
+
         if ((mon_intc_intf.intc_interface_monitor_cb.intc_intr != prev_intr) ||
             (mon_intc_intf.intc_interface_monitor_cb.intc_irq != prev_irq)) begin
             
@@ -50,17 +59,12 @@ task intc_monitor::main_phase(uvm_phase phase);
             pkt.intc_intr = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
             pkt.intc_irq  = mon_intc_intf.intc_interface_monitor_cb.intc_irq;
 
-            mon_intc_ap.write(pkt);
+            intc_ap.write(pkt);
             `uvm_info("intc_monitor_pkt", pkt.sprint(), UVM_MEDIUM)            
 
             prev_intr = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
             prev_irq  = mon_intc_intf.intc_interface_monitor_cb.intc_irq;
         end
-
-        @(negedge mon_intc_intf.intc_irq);
-        `uvm_info("INTC_MON", "Hardware IRQ De-asserted -> Releasing objection", UVM_LOW)
-        
-        phase.drop_objection(this, "IRQ cleared, dropping objection");
     end
 endtask : main_phase
 
@@ -93,7 +97,7 @@ class intc_monitor extends uvm_monitor;
     bit                                 prev_irq;
 
     virtual intc_intf                   mon_intc_intf;
-	uvm_analysis_port #(intc_seq_item) 	mon_intc_ap;
+	uvm_analysis_port #(intc_seq_item) 	intc_ap;
 
     extern function void build_phase	(uvm_phase phase);
     extern task main_phase				(uvm_phase phase);
@@ -104,7 +108,7 @@ function void intc_monitor :: build_phase (uvm_phase phase);
     `uvm_info ("intc_monitor :: build_phase started ", "",UVM_LOW)
     super.build_phase(phase);
     
-    mon_intc_ap = new("mon_intc_ap", this);
+    intc_ap = new("intc_ap", this);
     `uvm_info ("intc_monitor  :: build_phase ended ", "",UVM_LOW)
 endfunction 
 
@@ -127,7 +131,7 @@ task intc_monitor :: main_phase(uvm_phase phase);
             pkt.intc_intr       = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
             pkt.intc_irq        = mon_intc_intf.intc_interface_monitor_cb.intc_irq;
 
-            mon_intc_ap.write(pkt);
+            intc_ap.write(pkt);
             `uvm_info("intc_monitor_pkt",pkt.sprint(),UVM_MEDIUM)            
 
             prev_intr   = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
@@ -148,7 +152,7 @@ class intc_monitor extends uvm_monitor;
     
     virtual intc_intf 			            mon_intc_intf;
   
-	uvm_analysis_port #(intc_seq_item) 	    mon_intc_ap;
+	uvm_analysis_port #(intc_seq_item) 	    intc_ap;
     uvm_analysis_port #(intc_seq_item) 	    mon_seqr_ap;
 
 	intc_seq_item 						    tx_h;
@@ -169,7 +173,7 @@ endclass
         if(!uvm_config_db #(intc_config_obj)::get(this,"","intc_config_obj",cfg))
             `uvm_fatal(get_full_name(),"Config_obj get Failure")
         
-        mon_intc_ap = new("mon_intc_ap", this);
+        intc_ap = new("intc_ap", this);
 		mon_seqr_ap = new("mon_seqr_ap", this);
         `uvm_info ("intc_monitor  :: build_phase ended ", "",UVM_LOW)
     endfunction 
@@ -208,7 +212,7 @@ endclass
         tx_h.intc_intr          = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
         tx_h.intc_irq           = mon_intc_intf.intc_interface_monitor_cb.intc_irq; 
 
-        mon_intc_ap.write(tx_h);
+        intc_ap.write(tx_h);
 
   endtask
 	
