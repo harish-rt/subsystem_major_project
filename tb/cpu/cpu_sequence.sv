@@ -319,7 +319,7 @@ class cpu_isr_seq extends base_cpu_sequence;
     endtask
 
     task handle_core_perif_isr();
-        write_reg(INTC_BASE + 'hc, 'h2000);      // INTC ACK
+        write_reg(INTC_BASE + 'hc, 'h800_0000);      // INTC ACK
     endtask
 
 endclass : cpu_isr_seq
