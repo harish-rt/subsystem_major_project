@@ -45,7 +45,10 @@ class base_cpu_sequence extends uvm_sequence#(cpu_seq_item);
             AWADDR      == reg_addr;
             if(data != 0) {
                 WDATA   == data;
+            }else {
+            WDATA       == 0;
             }
+
             WSTRB       == 'hf;
             operation   == WRITE;
         })begin
@@ -200,7 +203,7 @@ class load_mem_seq extends base_cpu_sequence;
         `uvm_info("load_mem_seq", "start of Memory load Sequence", UVM_MEDIUM)
 
         for (int i = 0; i < 20; i++) begin        
-            addr = LITE_MEM_BASE + (i*4);
+            addr = LITE_MEM_BASE + (i * 4);
             start_item(pkt);
             if(!pkt.randomize() with {
                 AWADDR  == addr;
@@ -561,3 +564,149 @@ class bram_address_range_seq extends base_cpu_sequence;
 
     endtask
 endclass : bram_address_range_seq
+
+class cdma_descriptor_mem_seq extends base_cpu_sequence; 
+
+    `uvm_object_utils(cdma_descriptor_mem_seq)
+
+    int unsigned num_desc = 4;
+    localparam int unsigned DESC_SIZE = 32'h40;
+
+    typedef struct {
+        bit [31:0] nxtdesc_pntr;
+        bit [31:0] nxtdesc_pntr_msb;
+        bit [31:0] sa;
+        bit [31:0] sa_msb;
+        bit [31:0] da;
+        bit [31:0] da_msb;
+        bit [25:0] control;
+        bit [31:0] status;
+    } cdma_desc_t;
+
+    cdma_desc_t desc[];
+
+
+    bit [31:0] curdesc_addr;
+    bit [31:0] taildesc_addr;
+
+    function new(string name = "cdma_descriptor_mem_seq");
+        super.new(name);
+    endfunction
+
+    // MAIN SEQUENCE
+
+    task body();
+
+        bit [31:0] current_desc_addr;
+        bit [31:0] next_desc_addr;
+
+
+        curdesc_addr = BRAM_BASE ; //+ desc_offset;
+
+        taildesc_addr = curdesc_addr + ((num_desc - 1) * DESC_SIZE);
+
+        desc = new[num_desc];
+
+        for (int i = 0; i < num_desc; i++) begin
+
+            current_desc_addr = curdesc_addr + (i * DESC_SIZE);
+
+            if (i < num_desc - 1) begin
+                next_desc_addr = curdesc_addr + ((i + 1) * DESC_SIZE);
+                desc[i].nxtdesc_pntr = next_desc_addr;
+            end
+            else begin
+                desc[i].nxtdesc_pntr = 32'h0000_0000;
+            end
+
+                desc[i].nxtdesc_pntr_msb = 32'h0000_0000;
+                desc[i].sa = LITE_MEM_BASE + (i * 8 );
+                desc[i].sa_msb = 32'h0000_0000;
+                desc[i].da = 32'h9000_0000 + (i * 64);
+                desc[i].da_msb = 32'h0000_0000;
+                desc[i].control = 32'h10 + (i * 1);
+                desc[i].status = 32'h0000_0000;
+
+                `uvm_info("DESC_SEQ",$sformatf("DESC[%0d] @ 0x%08h : NEXT=0x%08h SA=0x%08h DA=0x%08h LEN=%0d",
+                    i,
+                    current_desc_addr,
+                    desc[i].nxtdesc_pntr,
+                    desc[i].sa,
+                    desc[i].da,
+                    desc[i].control
+                ),UVM_LOW)
+        end
+
+        for (int i = 0; i < num_desc; i++) begin
+
+            current_desc_addr = curdesc_addr + (i * DESC_SIZE);
+
+            `uvm_info("DESC_SEQ",$sformatf("Writing Descriptor %0d to BRAM @ 0x%08h",i,current_desc_addr),UVM_LOW)
+           
+            write_reg(current_desc_addr + 32'h00,desc[i].nxtdesc_pntr);
+            write_reg(current_desc_addr + 32'h04,desc[i].nxtdesc_pntr_msb);
+            write_reg(current_desc_addr + 32'h08,desc[i].sa);
+            write_reg(current_desc_addr + 32'h0C,desc[i].sa_msb);
+            write_reg(current_desc_addr + 32'h10,desc[i].da);
+            write_reg(current_desc_addr + 32'h14,desc[i].da_msb);
+            write_reg(current_desc_addr + 32'h18,desc[i].control);
+            write_reg(current_desc_addr + 32'h1C,desc[i].status);
+        end
+
+        `uvm_info("DESC_SEQ","All CDMA descriptors written successfully into BRAM",UVM_LOW)
+    endtask
+endclass:cdma_descriptor_mem_seq
+
+
+class cdma_sg_seq extends base_cpu_sequence;
+    `uvm_object_utils(cdma_sg_seq)
+    `NEW_OBJ
+
+    cdma_descriptor_mem_seq desc_mem;
+
+    bit [31:0] current_desc;
+    bit [31:0] tail_desc;
+    int unsigned num_desc;
+    bit [31:0] addr;
+    
+    task body();
+        super.body();
+
+        current_desc = desc_mem.curdesc_addr;
+        tail_desc    = desc_mem.taildesc_addr;
+        num_desc     = desc_mem.num_desc;
+    
+        do begin
+            start_item(pkt);
+            if (!pkt.randomize() with {
+                ARADDR    == CDMA_BASE + 04;  //status
+                operation == READ;
+            }) begin
+                `uvm_error(get_full_name(), "randomization_failed")
+            end
+            finish_item(pkt);
+            get_response(pkt);
+        end while (pkt.RDATA[1] == 0);
+
+        `uvm_do_with(pkt, {
+            AWADDR    == CDMA_BASE; //cntl reg
+            operation == WRITE;
+            WDATA     == 32'h5008;  //err,ioc,sg
+        })
+
+        `uvm_do_with(pkt, {
+            AWADDR    == CDMA_BASE + 'h08; //curr desc
+            operation == WRITE;
+            WDATA     == current_desc;
+        })
+        
+        `uvm_do_with(pkt, {
+            AWADDR    == CDMA_BASE + 'h10; //Tail desc
+            operation == WRITE;
+            WDATA     == tail_desc;
+        })
+
+     endtask
+endclass:cdma_sg_seq
+
+

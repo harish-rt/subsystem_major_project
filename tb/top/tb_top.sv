@@ -284,6 +284,7 @@ import soc_package ::*;
     assign cdma_sg_intf.awid=0;
     assign cdma_sg_intf.bid=0;
     assign cdma_sg_intf.arid=0;
+    assign cdma_sg_intf.rid=0;
 
     assign cdma_data_mov_intf.arlock=0;
     assign cdma_data_mov_intf.awid=0;
@@ -374,7 +375,7 @@ import soc_package ::*;
  
 
     initial begin
-        run_test("soc_master_test");
+        //run_test("soc_master_test");
         //run_test("sample_test");
         //run_test("bram_address_range_test");
         //run_test("bram_upper_invalid_addr_test");
@@ -387,6 +388,7 @@ import soc_package ::*;
         //run_test("cpu_base_test");
         //run_test("cdma_wr_rd_test");
         //run_test("mem_wr_rd_test");
+          run_test("cdma_sg_test");
     end
 
     initial begin
