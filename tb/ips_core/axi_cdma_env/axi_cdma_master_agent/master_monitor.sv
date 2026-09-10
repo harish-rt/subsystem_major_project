@@ -86,7 +86,7 @@ task  master_monitor :: capture_write_address();
     pkt.awsize   = master_mon_intf.mas_mon_cb.awsize;
     pkt.operation = WRITE;
     write_address_mbx.put(pkt);
-    `uvm_info("capture_write_address::task",pkt.sprint(),UVM_DEBUG)
+    `uvm_info("capture_write_address::task",pkt.sprint(),UVM_LOW)
     @(master_mon_intf.mas_mon_cb); //wait for a clk
   end
 endtask
@@ -148,7 +148,7 @@ task  master_monitor :: capture_read_address();
  forever begin
     `uvm_info("master_monitor :: capture_read_address","Triggred",UVM_LOW);
     pkt = master_seq_item :: type_id :: create("pkt");
-    wait( master_mon_intf.mas_mon_cb.arready==1 && master_mon_intf.mas_mon_cb.arvalid==1 && master_mon_intf.areset_n==1);
+    wait(master_mon_intf.mas_mon_cb.arready==1 && master_mon_intf.mas_mon_cb.arvalid==1 && master_mon_intf.areset_n==1);
     pkt.radd_hndshk = $realtime();  //capturing timestamp for handshake.
     pkt.araddr   = master_mon_intf.mas_mon_cb.araddr;
     pkt.arburst  = burst_type_t'(master_mon_intf.mas_mon_cb.arburst);
@@ -161,13 +161,13 @@ task  master_monitor :: capture_read_address();
     pkt.arregion = master_mon_intf.mas_mon_cb.arregion;
     pkt.arsize   = master_mon_intf.mas_mon_cb.arsize;
     pkt.operation = READ;
-    `uvm_info("master_monitor :: capture_read_address","captured address pkt put to read_address_array",UVM_DEBUG);
+    `uvm_info("master_monitor :: capture_read_address","captured address pkt put to read_address_array",UVM_LOW);
     if(!read_address_array.exists(pkt.arid))begin
-    `uvm_info("monitor_read_address_before_printing",pkt.sprint(),UVM_DEBUG)
+    `uvm_info("monitor_read_address_before_printing",pkt.sprint(),UVM_LOW)
     read_address_array[pkt.arid]=new(); 
     end
     read_address_array[pkt.arid].put(pkt);
-    `uvm_info("master_monitor::capture_readaddress",pkt.sprint(),UVM_DEBUG)
+    `uvm_info("master_monitor::capture_readaddress",pkt.sprint(),UVM_LOW)
     @(master_mon_intf.mas_mon_cb); //wait till next clk posedge
   end
 endtask
@@ -189,21 +189,21 @@ endtask
       pkt.rid       = master_mon_intf.mas_mon_cb.rid;
       pkt.rdata[0]  = master_mon_intf.mas_mon_cb.rdata;
       pkt.rresp[0]  = response_t'(master_mon_intf.mas_mon_cb.rresp);
-      `uvm_info("master_monitor::readdata","before read packet",UVM_DEBUG)
+      `uvm_info("master_monitor::readdata","before read packet",UVM_LOW)
       if(!read_data_array.exists(pkt.rid)) 
       read_data_array[pkt.rid] = new();
       read_data_array[pkt.rid].put(pkt);
-      `uvm_info("master_monitor::readdata",pkt.sprint(),UVM_DEBUG)
+      `uvm_info("master_monitor::readdata",pkt.sprint(),UVM_LOW)
       i=i+1;
       last = master_mon_intf.mas_mon_cb.rlast;
       @(master_mon_intf.mas_mon_cb); //wait till next clk posedge
     end while( last ==0); //keeps sampling till last indicates end of data phase.
       pkt2sb = master_seq_item :: type_id :: create("pkt2sb");
       //get  pkt with address info and add data info.//
-      `uvm_info("read_merge_before_get",pkt.sprint(),UVM_DEBUG)
+      `uvm_info("read_merge_before_get",pkt.sprint(),UVM_LOW)
       read_address_array[pkt.rid].get(pkt2sb);// this has address info for required rid pkt.
       `uvm_info("read_merge_after_get",$sformatf("%d",read_address_array.num()),UVM_LOW)
-      `uvm_info("master_monitor::readdata_copying_sbd",pkt.sprint(),UVM_DEBUG)
+      `uvm_info("master_monitor::readdata_copying_sbd",pkt.sprint(),UVM_LOW)
       no_of_beats = read_data_array[pkt.rid].num();
       pkt2sb.rid = pkt.rid;
       pkt2sb.rdata = new[no_of_beats];
@@ -243,9 +243,11 @@ task master_monitor::capture_read_data();
       pkt.rdata        = new[1];
       pkt.rresp        = new[1];
 
+      `uvm_info("R_MON","cdma_read_mon_waiting",UVM_DEBUG);
       wait(master_mon_intf.mas_mon_cb.rready &&
            master_mon_intf.mas_mon_cb.rvalid &&
            master_mon_intf.areset_n);
+           `uvm_info("R_MON","cdma_read_mon_wait_cleared",UVM_DEBUG);
 
       pkt.rdata_hndshk[0] = $realtime();
       pkt.rid   = master_mon_intf.mas_mon_cb.rid;
@@ -254,6 +256,8 @@ task master_monitor::capture_read_data();
 
       rid_last = pkt.rid;
       last = master_mon_intf.mas_mon_cb.rlast;
+
+      `uvm_info("master_monitor_read_data",pkt.sprint(),UVM_DEBUG)
 
       if(!read_data_array.exists(pkt.rid))
         read_data_array[pkt.rid] = new();
@@ -265,11 +269,16 @@ task master_monitor::capture_read_data();
       @(master_mon_intf.mas_mon_cb);
 
     end while(last == 0);
+    `uvm_info("R_MON","cdma_read_mon_while_cleared",UVM_DEBUG)
     pkt2sb = master_seq_item::type_id::create("pkt2sb");
 
     //if(read_address_array.exists(rid_last))
-      if(read_address_array.exists(rid_last)>0)
-      read_address_array[rid_last].get(pkt2sb);
+    if(read_address_array.exists(rid_last)>0)begin
+        `uvm_info("R_MON","cdma_read_mon_getting...",UVM_DEBUG)
+        read_address_array[rid_last].get(pkt2sb);
+        `uvm_info("R_MON","cdma_read_mon_get_cleared",UVM_DEBUG)
+        `uvm_info("master_monitor_read_data_pkt2sb",pkt2sb.sprint(),UVM_DEBUG)
+    end
     else
       `uvm_error("R_MON","AR entry missing for RID");
 
@@ -287,6 +296,7 @@ task master_monitor::capture_read_data();
       pkt2sb.rdata_hndshk[i] = pkt.rdata_hndshk[0];
     end
 
+    `uvm_info("master_monitor_merge_read",pkt2sb.sprint(),UVM_LOW)
     `uvm_info("R_MON", "Sending packet to scoreboard", UVM_LOW);
     mon_ap.write(pkt2sb);
 
@@ -325,7 +335,7 @@ int x ,no_addr, no_data; //indicates number of completed write transactions wait
    merged_pkt.wstrobe  = data_pkt.wstrobe;
   //adding packets to array waiting for response
   // `uvm_info("master_monitor :: merge_write_info",$sformatf("putting merged pkt to wresp_array awaddr = %b",merged_pkt.awaddr),UVM_LOW);
-    `uvm_info("master_monitor_merge_write_info",merged_pkt.sprint(),UVM_LOW)
+    `uvm_info("master_monitor_merge_write",merged_pkt.sprint(),UVM_LOW)
     if(!wresp_array.exists(merged_pkt.awid)) wresp_array[merged_pkt.awid] = new();
     wresp_array[merged_pkt.awid].put(merged_pkt);
 

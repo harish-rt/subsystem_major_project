@@ -2,7 +2,7 @@
 # Makefile - Riviera-PRO (Aligned with compiletb.do & simulate.do)
 # ==============================================================================
 
-TEST          ?= read_cdma_test
+TEST          ?= soc_master_test
 VERBOSITY     ?= UVM_LOW
 SEED          ?= random
 GUI           ?= 0
@@ -13,7 +13,7 @@ TOP_MODULE    = top
 
 TB_DIR        = ../tb
 LOG_DIR       = ./logs
-WAVE_DIR      = ./waves
+WAVE_DIR      = ./MakeWaves
 
 # Pre-compiled Libraries for vlog (-l)
 LIBS          = -l xpm \
