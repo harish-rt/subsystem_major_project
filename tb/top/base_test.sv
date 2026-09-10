@@ -195,3 +195,33 @@ class mem_wr_rd_test extends cpu_base_test;
         phase.drop_objection(this);
     endtask
 endclass : mem_wr_rd_test
+
+class cdma_sg_test extends cpu_base_test;
+    `uvm_component_utils(cdma_sg_test)
+    `NEW_COMP
+
+    load_mem_seq mem_seq;
+    cdma_descriptor_mem_seq desc_seq;
+    cdma_sg_seq seq;
+
+    task main_phase(uvm_phase phase);
+        mem_seq = load_mem_seq :: type_id :: create("mem_seq");
+        desc_seq = cdma_descriptor_mem_seq :: type_id :: create("desc_seq");
+        seq = cdma_sg_seq :: type_id :: create("seq");
+
+        phase.raise_objection(this);
+
+            mem_seq.start(w_env.c_env.cpu_agt.sqr);
+            desc_seq.start(w_env.c_env.cpu_agt.sqr);
+
+            //seq.current_desc  = desc_seq.curdesc_addr;
+            //seq.tail_desc = desc_seq.taildesc_addr;
+            seq.desc_mem = desc_seq;
+                       
+            seq.start(w_env.c_env.cpu_agt.sqr);
+
+        phase.phase_done.set_drain_time(this, 5000ns);
+        phase.drop_objection(this);
+    endtask
+endclass : cdma_sg_test
+
