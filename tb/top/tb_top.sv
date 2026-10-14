@@ -342,6 +342,7 @@ module top;
     assign cdma_sg_intf.awid=0;
     assign cdma_sg_intf.bid=0;
     assign cdma_sg_intf.arid=0;
+    assign cdma_sg_intf.rid=0;
 
     assign cdma_data_mov_intf.arlock=0;
     assign cdma_data_mov_intf.awid=0;
@@ -439,11 +440,11 @@ module top;
         //run_test("perif_reg_read_test");  //`SET_CPU_FORK_DISABLE(1) in test
         run_test("cdma_boundary_check_test");
         //run_test("load_bram_256_test");   //find the interconnect issue
-        //run_test("soc_master_test");
         //run_test("intc_sw_irq_test");
         //run_test("intc_reg_write_read_test");
         //run_test("cdma_reg_write_read_test");
         //run_test("reg_read_test");
+        //run_test("soc_master_test");
         //run_test("bram_address_range_test");
         //run_test("bram_upper_invalid_addr_test");
         //run_test("bram_lower_invalid_addr_test");
@@ -454,6 +455,7 @@ module top;
         //run_test("cpu_base_test");
         //run_test("cdma_wr_rd_test");
         //run_test("mem_wr_rd_test");
+        //run_test("cdma_sg_test");
     end
 
     initial begin
