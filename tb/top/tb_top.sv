@@ -1,15 +1,16 @@
 `timescale 1ns/1ps
 
-module top;
 `include "uvm_macros.svh"
 import uvm_pkg :: *;
 
-import cpu_package ::*;
-import axi_cdma_env_pkg ::*;
-import mem_package :: *;
-import intc_package ::*;
-
-import soc_package ::*;
+module top;
+    
+    import cpu_package ::*;
+    import axi_cdma_env_pkg ::*;
+    import mem_package :: *;
+    import intc_package ::*;
+    
+    import soc_package ::*;
 
     bit aclk;
     bit areset_n;
@@ -132,12 +133,16 @@ import soc_package ::*;
         .data_bridge2axi_int(lite_data_if)
     );
 
+    //defparam dut.IPS_CORE.axi_cdma_0.U0.C_M_AXI_MAX_BURST_LEN = 64;
+
     // Cpu 
     assign axil_riscv_if.ACLK    = aclk;
     assign axil_riscv_if.ARESETn = areset_n;
     
+    // Open port S04
+    assign slave_if.ACLK    =   aclk;
+    assign slave_if.ARESETn =   areset_n;
 
-    
     // Interuppt controller
     // --- Write Channels (AW) ---
     assign lite_intc_if.axi_awaddr  = dut.IPS_CORE.axi_intc_0.s_axi_awaddr;
@@ -163,11 +168,9 @@ import soc_package ::*;
     assign lite_intc_if.axi_rvalid  = dut.IPS_CORE.axi_intc_0.s_axi_rvalid;
     assign lite_intc_if.axi_rready  = dut.IPS_CORE.axi_intc_0.s_axi_rready;
 
-
     // Interrupt Wires
     assign intc_if.intc_intr        = dut.IPS_CORE.intr_0;   //CDMA is 26 | Core Peri is 27
     assign intc_if.intc_irq         = dut.IPS_CORE.irq_0;
-
 
     //cdma connect
 
@@ -374,7 +377,9 @@ import soc_package ::*;
  
 
     initial begin
-        run_test("soc_master_test");
+        run_test("cdma_boundary_check_test");
+        //run_test("load_bram_256_test");   //find the interconnect issue
+        //run_test("soc_master_test");
         //run_test("sample_test");
         //run_test("bram_address_range_test");
         //run_test("bram_upper_invalid_addr_test");
@@ -407,6 +412,7 @@ import soc_package ::*;
     initial begin
     	uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
     	uvm_config_db#(virtual axi4_intf.MONITOR_MOD)::set(null,"*","BRAM_MON",axi4_bram_if);
+    	uvm_config_db#(virtual axi4_intf.DRIVER_MOD)::set(null,"*","S04",slave_if);
     end
    
     
@@ -426,7 +432,7 @@ import soc_package ::*;
         soc_config_obj.cpu_obj = cpu_config_obj :: type_id :: create ("obj");
         soc_config_obj.cpu_obj.cpu_i  = axil_riscv_if;
         soc_config_obj.cpu_obj.mas_is_active = 1;        // agent active
-        uvm_config_db #(cpu_config_obj) :: set (null , "*" , "cpu_config_obj" ,soc_config_obj.cpu_obj);
+        uvm_config_db #(cpu_config_obj)::set(null,"*","cpu_config_obj",soc_config_obj.cpu_obj);
 
         //CDMA
         soc_config_obj.cdma_config_obj=axi_cdma_config_obj::type_id::create("cdma_config_obj");
@@ -451,6 +457,74 @@ import soc_package ::*;
 
         uvm_config_db#(axi_cdma_config_obj)::set(null,"*","axi_cdma_config_obj",soc_config_obj.cdma_config_obj);
 
-        //Lite MEMORY
     end
+    //BRAM MEMORY
+    /*
+    initial begin
+        // 1. Wait for system reset to clear completely
+        @(posedge aclk);
+        while (dut.IPS_CORE.axi_bram_ctrl_0.s_axi_aresetn == 0) @(posedge aclk);
+        
+        $display("[TB_BURST_WRITE] Forcefully driving 256-Byte Burst Write to BRAM...");
+    
+        // 2. FORCE Drive the Address Channel 
+        @(posedge aclk);
+        force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awaddr   = 'h7100_0000;
+        force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awvalid  = 1'b1;
+        force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awlen    = 8'h3F;   // 64 beats
+        force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awsize   = 3'b010;  // 32-bit bus
+        force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awburst  = 2'b01;   // INCR
+    
+        // 3. Wait for the Slave to accept the command address, then RELEASE valid
+        fork
+            begin
+                do
+                    @(posedge aclk);
+                while (dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awready === 0);
+                force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awvalid = 1'b0;
+            end
+        join_none
+    
+        // 4. Drive the 64 Write Data Beats sequentially using force
+        for (int beat = 0; beat < 64; beat++) begin
+            force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wdata   = $urandom;
+            force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wstrb   = 4'b1111;
+            force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wvalid  = 1'b1;
+            
+            if (beat == 63) begin
+                force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wlast = 1'b1;
+            end else begin
+                force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wlast = 1'b0;
+            end
+    
+            // Wait for handshake
+            do
+                @(posedge aclk);
+            while (dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wready === 0);
+        end
+    
+        // 5. Clear the Data Channel signals after the final beat completes
+        force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wvalid = 1'b0;
+        force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_wlast  = 1'b0;
+    
+        // 6. Catch the Write Response acknowledgment (B Channel)
+        $display("[TB_BURST_WRITE] Data stream finished. Waiting for Write Response...");
+        do
+            @(posedge aclk);
+        while (dut.IPS_CORE.axi_bram_ctrl_0.s_axi_bvalid === 0);
+        
+        force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_bready = 1'b1;
+        @(posedge aclk);
+        force dut.IPS_CORE.axi_bram_ctrl_0.s_axi_bready = 1'b0;
+        
+        // Release all driven nets to prevent bus locking
+        release dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awaddr;
+        release dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awlen;
+        release dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awburst;
+        release dut.IPS_CORE.axi_bram_ctrl_0.s_axi_awsize;
+        
+        $display("[TB_BURST_WRITE] SUCCESS: 256 Bytes processed cleanly!");
+        $finish();
+    end
+*/
 endmodule

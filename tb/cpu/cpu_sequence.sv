@@ -142,23 +142,13 @@ class load_bram_seq extends base_cpu_sequence;
 
     task body();
         super.body();
-        for(int i=0;i<8;i=i+4)begin
-            write_reg('h7100_0000 + i);
-            //start_item(pkt);
-            //if(!pkt.randomize() with {
-            //    AWADDR  == 'h7100_0000 + i;
-            //    WSTRB   == 'hf;
-            //    operation   == WRITE;
-            //    })begin
-            //    `uvm_error(get_full_name(), "randomization_failed")
-            //end
-            //finish_item(pkt);
-            //get_response(pkt);             
+        for(int i=0;i<256;i=i+4)begin
+            write_reg('h7100_1000 + i);
         end
     endtask
 endclass : load_bram_seq
 
-
+/*
 class read_bram_seq extends base_cpu_sequence;
     `uvm_object_utils(read_bram_seq)
     `NEW_OBJ
@@ -182,7 +172,7 @@ class read_bram_seq extends base_cpu_sequence;
     endtask
 
 endclass : read_bram_seq
-
+*/
 
 class config_intc_seq extends base_cpu_sequence;
     `uvm_object_utils(config_intc_seq)
@@ -256,19 +246,19 @@ class cdma_read_write_seq extends base_cpu_sequence;
         `uvm_do_with(pkt, {
             AWADDR    == CDMA_BASE + 'h18; //sa
             operation == WRITE;
-            WDATA     == 32'h7100_0000;
+            WDATA     == 32'h7100_0000;     //bram
         })
         
         `uvm_do_with(pkt, {
             AWADDR    == CDMA_BASE + 'h20; //da
             operation == WRITE;
-            WDATA     == 32'h8000_0000;
+            WDATA     == 32'h7100_1000;     //bram
         })
-              
+
        `uvm_do_with(pkt, {
             AWADDR    == CDMA_BASE + 'h28;//btt
             operation == WRITE;
-            WDATA     == 32'h8;
+            WDATA     == 32'd128;
         })
         
         for(int i=0;i<8;i=i+4)begin
@@ -537,3 +527,27 @@ class bram_address_range_seq extends base_cpu_sequence;
 
     endtask
 endclass
+
+class cdma_boundary_check_seq extends base_cpu_sequence;
+    `uvm_object_utils(cdma_boundary_check_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        //'h7000_0000 to 'h7000_0fff
+        write_reg('h7000_0000 - 'd1, 'h1);
+        write_reg('h7000_0fff + 'd1, 'h1);
+    endtask
+endclass
+
+class read_bram_seq extends base_cpu_sequence;
+    `uvm_object_utils(read_bram_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        for(int i=0;i<32;i=i+4)begin
+            read_reg('h7100_0120 + i,reg_data);
+        end
+    endtask
+endclass : read_bram_seq

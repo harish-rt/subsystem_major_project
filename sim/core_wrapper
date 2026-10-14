@@ -1,0 +1,4 @@
+QuestaSim-64 vlog 2024.1 Compiler 2024.02 Feb  1 2024
+** Error (suppressible): (vlog-1902) Option "-uvmver" is not a valid option for this tool.
+Use the -help option for complete vlog usage.
+Errors: 1, Warnings: 1

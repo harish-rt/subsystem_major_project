@@ -8,17 +8,16 @@ set INCDIR        "+incdir+$PROJECT_SRC/ipshared/ec67/hdl"
 # ==============================================================================
 # Xilinx Primitive Libraries (UNISIM)
 # ==============================================================================
+vlib work
+vlib riviera
+vlib riviera/xpm
 vlib riviera/unisim
-vmap unisim riviera/unisim
 
 vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_VPKG.vhd"
 vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_retarget_VCOMP.vhd"
 # ==============================================================================
 # Create Libraries
 # ==============================================================================
-vlib work
-vlib riviera
-vlib riviera/xpm
 vlib riviera/generic_baseblocks_v2_1_0
 vlib riviera/axi_infrastructure_v1_1_0
 vlib riviera/axi_register_slice_v2_1_20
@@ -45,6 +44,7 @@ vlib riviera/xil_defaultlib
 # Map Libraries
 # ==============================================================================
 vmap xpm riviera/xpm
+vmap unisim riviera/unisim
 vmap generic_baseblocks_v2_1_0 riviera/generic_baseblocks_v2_1_0
 vmap axi_infrastructure_v1_1_0 riviera/axi_infrastructure_v1_1_0
 vmap axi_register_slice_v2_1_20 riviera/axi_register_slice_v2_1_20
