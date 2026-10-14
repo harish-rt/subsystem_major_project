@@ -178,7 +178,7 @@ class load_bram_seq extends base_cpu_sequence;
     endtask
 endclass : load_bram_seq
 
-
+/*
 class read_bram_seq extends base_cpu_sequence;
     `uvm_object_utils(read_bram_seq)
     `NEW_OBJ
@@ -202,7 +202,7 @@ class read_bram_seq extends base_cpu_sequence;
     endtask
 
 endclass : read_bram_seq
-
+*/
 
 class intc_sw_irq_seq extends base_cpu_sequence;
     `uvm_object_utils(intc_sw_irq_seq)
@@ -311,15 +311,15 @@ class cdma_read_write_seq extends base_cpu_sequence;
         `uvm_do_with(pkt, {
             AWADDR    == CDMA_BASE + 'h18; //sa
             operation == WRITE;
-            WDATA     == 32'h7100_0000;
+            WDATA     == 32'h7100_0000;     //bram
         })
         
         `uvm_do_with(pkt, {
             AWADDR    == CDMA_BASE + 'h20; //da
             operation == WRITE;
-            WDATA     == 32'h8000_0000;
+            WDATA     == 32'h7100_1000;     //bram
         })
-              
+
        `uvm_do_with(pkt, {
             AWADDR    == CDMA_BASE + 'h28; //btt
             operation == WRITE;
@@ -624,6 +624,19 @@ class perif_reg_read_seq extends base_cpu_sequence;
     endtask
 endclass : perif_reg_read_seq
 
+class cdma_boundary_check_seq extends base_cpu_sequence;
+    `uvm_object_utils(cdma_boundary_check_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        //'h7000_0000 to 'h7000_0fff
+        write_reg('h7000_0000 - 'd1, 'h1);
+        write_reg('h7000_0fff + 'd1, 'h1);
+    endtask
+endclass
+
+
 class gap_pre_system_seq extends base_cpu_sequence;
     `uvm_object_utils(gap_pre_system_seq)
     `NEW_OBJ
@@ -784,3 +797,15 @@ class spi_write_data_seq extends base_cpu_sequence;
         end
     endtask
 endclass : spi_write_data_seq
+
+class read_bram_seq extends base_cpu_sequence;
+    `uvm_object_utils(read_bram_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        for(int i=0;i<32;i=i+4)begin
+            read_reg('h7100_0120 + i,reg_data);
+        end
+    endtask
+endclass : read_bram_seq

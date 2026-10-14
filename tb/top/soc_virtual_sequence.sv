@@ -127,6 +127,21 @@ class soc_master_vseq extends soc_base_virtual_sequence;
     endtask
 endclass : soc_master_vseq
 
+class read_bram_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(read_bram_vseq)
+    `NEW_OBJ
+
+    read_bram_seq bram_vseq;
+
+    task body();
+        bram_vseq    = read_bram_seq::type_id::create("bram_vseq");
+        `uvm_info("bram_vseq", "Starting BRAM configuration sequence...", UVM_LOW)
+        bram_vseq.start(p_sequencer.cpu_sqr);
+        `uvm_info("bram_vseq", "BRAM configuration sequence complete.", UVM_LOW)
+    endtask
+endclass : read_bram_vseq
+
+
 class reg_read_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(reg_read_vseq)
     `NEW_OBJ

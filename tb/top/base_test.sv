@@ -124,6 +124,52 @@ class soc_master_test extends cpu_base_test;
     endtask
 endclass : soc_master_test
 
+class load_bram_256_test extends cpu_base_test;
+    `uvm_component_utils(load_bram_256_test)
+    `NEW_COMP
+
+    load_bram_256_seq   load_seq;
+    read_bram_256_seq   read_seq;   //axi4
+    read_bram_vseq      lite_seq;   //axi4 lite
+
+    task main_phase(uvm_phase phase);
+        load_seq = load_bram_256_seq::type_id::create("load_seq");  //axi4
+
+        read_seq = read_bram_256_seq::type_id::create("read_seq");  //axi4
+        lite_seq = read_bram_vseq::type_id::create("lite_seq");     //axi4 lite
+
+        phase.raise_objection(this);
+            load_seq.start(w_env.c_env.s04_agt.sqr);
+            `uvm_info("UVM_TEST","loading bram completed",UVM_LOW)
+            //#1000ns;
+        fork
+            `uvm_info("UVM_TEST","entered fork",UVM_LOW)
+            read_seq.start(w_env.c_env.s04_agt.sqr);
+            lite_seq.start(w_env.vsqr);
+        join
+        `uvm_info("UVM_TEST","came out of fork",UVM_LOW)
+        phase.phase_done.set_drain_time(this, 2000ns);
+        phase.drop_objection(this);
+    endtask
+endclass : load_bram_256_test
+
+class cdma_boundary_check_test extends cpu_base_test;
+    `uvm_component_utils(cdma_boundary_check_test)
+    `NEW_COMP
+
+    cdma_boundary_check_seq cdma_seq;
+
+    task main_phase(uvm_phase phase);
+        cdma_seq = cdma_boundary_check_seq::type_id::create("cdma_seq");
+
+        phase.raise_objection(this);
+            cdma_seq.start(w_env.c_env.cpu_agt.sqr);
+            //cdma_seq.start(w_env.c_env.s04_agt.sqr);
+        phase.drop_objection(this);
+    endtask
+endclass : cdma_boundary_check_test
+
+
 class cdma_wr_rd_test extends cpu_base_test;
     `uvm_component_utils(cdma_wr_rd_test)
     `NEW_COMP
