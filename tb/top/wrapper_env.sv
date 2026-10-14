@@ -5,6 +5,7 @@ class wrapper_env extends uvm_env;
     cpu_env                 c_env;
     ips_core_env            ips_env;
     mem_env                 m_env;
+    core_perif_env          cp_env;
     intc_config_obj         cfg;
     soc_virtual_sequencer   vsqr;
 
@@ -12,11 +13,12 @@ class wrapper_env extends uvm_env;
         super.build_phase(phase);
         if (!uvm_config_db#(intc_config_obj)::get(this,"","intc_config_obj",cfg))
             `uvm_fatal("w_env", "Failed to get intc_config_obj into wrapper env from config DB")
-        c_env   = cpu_env::type_id::create("c_env",this);
-        m_env   = mem_env::type_id::create("mem_env",this);
-        ips_env = ips_core_env::type_id::create("ips_env",this);
-        vsqr    = soc_virtual_sequencer::type_id::create("vsqr",this);
-        vsqr.cfg    =   cfg;
+        c_env       = cpu_env::type_id::create("c_env",this);
+        m_env       = mem_env::type_id::create("m_env",this);
+        cp_env      = core_perif_env::type_id::create("cp_env",this);
+        ips_env     = ips_core_env::type_id::create("ips_env",this);
+        vsqr        = soc_virtual_sequencer::type_id::create("vsqr",this);
+        vsqr.cfg    = cfg;
     endfunction
 
     function void connect_phase(uvm_phase phase);

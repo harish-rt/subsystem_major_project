@@ -13,6 +13,7 @@ package cpu_package;
     `include "../cpu/cpu_monitor.sv"
     `include "../cpu/cpu_sequencer.sv"
     `include "../cpu/cpu_agent.sv"
+    `include "../cpu/s04_agent.sv"
     `include "../cpu/cpu_env.sv"  
 
 endpackage

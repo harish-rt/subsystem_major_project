@@ -17,3 +17,15 @@ do ./waves/cdma_sg.do
 do ./waves/cdma_intr.do
 #view wave -title intc
 do ./waves/intc.do
+#view wave -title s04_intf
+do ./waves/s04_intf.do
+#view wave -title uart_intf
+do ./waves/uart_intf.do
+#view wave -title gpio_intf
+do ./waves/gpio_intf.do
+#view wave -title spi_intf
+do ./waves/spi_intf.do
+#view wave -title core_perif_lite_intf
+do ./waves/core_perif_intf.do
+#view wave -title core_perif_waves
+do ./waves/core_perif_waves.do

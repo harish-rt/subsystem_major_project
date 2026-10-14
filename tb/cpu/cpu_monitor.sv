@@ -1,12 +1,10 @@
 class cpu_monitor extends uvm_monitor;
    `uvm_component_utils(cpu_monitor)
 
-   uvm_analysis_port #(cpu_seq_item)   mon_ap;
-   virtual axi4_lite_intf.MONITOR_MOD        cpu_mon_intf;
+   uvm_analysis_port #(cpu_seq_item)        mon_ap;
+   virtual axi4_lite_intf.MONITOR_MOD       cpu_mon_intf;
 
-   // Mailboxes for write/read phases
-   mailbox #(cpu_seq_item)  write_address_mbx, write_data_mbx;
-   mailbox #(cpu_seq_item)  read_address_mbx, read_data_mbx;
+   mailbox #(cpu_seq_item) write_address_mbx, write_data_mbx, read_address_mbx, read_data_mbx;
 
    function new(string name="cpu_monitor", uvm_component parent);
       super.new(name, parent);
@@ -155,13 +153,3 @@ class cpu_monitor extends uvm_monitor;
       end
    endtask
 endclass:cpu_monitor
-
-
-
-
-
-
-
-
-
-

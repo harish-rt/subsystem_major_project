@@ -166,6 +166,19 @@ class mem_wr_rd_test extends cpu_base_test;
     endtask
 endclass : mem_wr_rd_test
 
+class cdma_reg_read_test extends cpu_base_test;
+    `uvm_component_utils(cdma_reg_read_test)
+    `NEW_COMP
+
+    cdma_reg_read_vseq   reg_vseq;
+    task main_phase(uvm_phase phase);
+        reg_vseq = cdma_reg_read_vseq::type_id::create("reg_vseq");
+        phase.raise_objection(this);
+            reg_vseq.start(w_env.vsqr);
+        phase.drop_objection(this);
+    endtask
+endclass : cdma_reg_read_test
+
 class reg_read_test extends cpu_base_test;
     `uvm_component_utils(reg_read_test)
     `NEW_COMP
@@ -206,3 +219,95 @@ class intc_reg_write_read_test extends cpu_base_test;
         phase.drop_objection(this);
     endtask
 endclass : intc_reg_write_read_test
+
+class perif_reg_read_test extends cpu_base_test;
+    `uvm_component_utils(perif_reg_read_test)
+    `NEW_COMP
+
+    perif_reg_read_vseq   reg_vseq;
+    task main_phase(uvm_phase phase);
+        //w_env.c_env.cpu_agt.drv.disable_cpu_fork = 1;
+        `SET_CPU_FORK_DISABLE(1);
+        reg_vseq = perif_reg_read_vseq::type_id::create("reg_vseq");
+        phase.raise_objection(this);
+            reg_vseq.start(w_env.vsqr);
+        phase.drop_objection(this);
+    endtask
+endclass : perif_reg_read_test
+
+class uart_write_data_test extends cpu_base_test;
+    `uvm_component_utils(uart_write_data_test)
+    `NEW_COMP
+
+    uart_write_data_vseq   reg_vseq;
+    task main_phase(uvm_phase phase);
+        `SET_CPU_FORK_DISABLE(1);
+        reg_vseq = uart_write_data_vseq::type_id::create("reg_vseq");
+        phase.raise_objection(this);
+            reg_vseq.start(w_env.vsqr);
+        phase.phase_done.set_drain_time(this, 6000ns);
+        phase.drop_objection(this);
+    endtask
+endclass : uart_write_data_test
+
+`define GAPS_TEST(TESTNAME,VSEQ_NAME,CFD)\
+class TESTNAME extends cpu_base_test;\
+    `uvm_component_utils(TESTNAME)\
+    `NEW_COMP\
+    VSEQ_NAME   vseq;\
+    task main_phase(uvm_phase phase);\
+        `SET_CPU_FORK_DISABLE(CFD);\
+        vseq = VSEQ_NAME::type_id::create("vseq");\
+        phase.raise_objection(this);\
+            vseq.start(w_env.vsqr);\
+        phase.phase_done.set_drain_time(this, 1000ns);\
+        phase.drop_objection(this);\
+    endtask\
+endclass : TESTNAME
+
+`GAPS_TEST(interconnect_gaps_test, interconnect_gaps_vseq,0)
+`GAPS_TEST(perif_gap_interconnect_test, perif_gap_interconnect_vseq,1)
+
+//`GAPS_TEST(core_perif_master_test, core_perif_master_vseq,1)
+//`GAPS_TEST(spi_write_data_test, spi_write_data_vseq,1)
+
+class spi_write_data_test extends cpu_base_test;
+    `uvm_component_utils(spi_write_data_test)
+    `NEW_COMP
+
+    spi_write_data_vseq     reg_vseq;
+    spi_slave_sequence      slv_seq;
+
+    task main_phase(uvm_phase phase);
+        `SET_CPU_FORK_DISABLE(1);
+        reg_vseq = spi_write_data_vseq::type_id::create("reg_vseq");
+        slv_seq = spi_slave_sequence::type_id::create("slv_seq");
+        phase.raise_objection(this);
+        fork
+            reg_vseq.start(w_env.vsqr);
+            slv_seq.start(w_env.cp_env.spi_agt.sequencer);
+        join
+        phase.phase_done.set_drain_time(this, 8000ns);
+        phase.drop_objection(this);
+    endtask
+endclass : spi_write_data_test
+
+class core_perif_master_test extends cpu_base_test;
+    `uvm_component_utils(core_perif_master_test)
+    `NEW_COMP
+
+    core_perif_master_vseq   reg_vseq;
+    uart_slave_sequence      slv_seq;
+    task main_phase(uvm_phase phase);
+        `SET_CPU_FORK_DISABLE(1);
+        reg_vseq = core_perif_master_vseq::type_id::create("reg_vseq");
+        slv_seq  = uart_slave_sequence  ::type_id::create("slv_seq");
+        phase.raise_objection(this);
+        fork
+            reg_vseq.start(w_env.vsqr);
+            slv_seq.start(w_env.cp_env.uart_agt.sequencer);
+        join
+        phase.phase_done.set_drain_time(this, 1000ns);
+        phase.drop_objection(this);
+    endtask
+endclass : core_perif_master_test

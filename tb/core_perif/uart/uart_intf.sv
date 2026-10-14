@@ -1,3 +1,16 @@
+interface uart_slave_if(input clk, input rst_n);
+    logic        rx_valid;
+    logic        rx_ready;
+    logic        tx_valid;
+    logic        tx_ready;
+    logic        ack;
+    logic        tx_o;
+    logic        rx_i;
+    logic [7:0]  rx_data;
+    logic [7:0]  tx_data;
+endinterface
+
+/*
 interface uart_if (input logic clk_i, input logic rst_n_i);
 
     logic rx;      // Serial data input (to DUT)
@@ -19,3 +32,4 @@ interface uart_if (input logic clk_i, input logic rst_n_i);
     modport MON (clocking mon_cb, input clk_i, input rst_n_i);
 
 endinterface : uart_if
+*/

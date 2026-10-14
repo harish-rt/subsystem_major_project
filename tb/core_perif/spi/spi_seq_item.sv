@@ -1,9 +1,11 @@
 class spi_seq_item extends uvm_sequence_item;
 
-    rand bit [7:0] data;
+    rand bit [7:0]  data;
+         bit        cs_n;
 
     `uvm_object_utils_begin(spi_seq_item)
         `uvm_field_int(data, UVM_ALL_ON)
+        `uvm_field_int(cs_n, UVM_ALL_ON)
     `uvm_object_utils_end
     `NEW_OBJ
 

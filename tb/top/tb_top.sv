@@ -8,11 +8,16 @@ import cpu_package ::*;
 import axi_cdma_env_pkg ::*;
 import mem_package :: *;
 import intc_package ::*;
-
+//import uart_pkg ::*;
+//import gpio_pkg ::*;
+//import spi_pkg ::*;
+import core_perif_pkg ::*;
 import soc_package ::*;
 
     bit aclk;
     bit areset_n;
+
+    bit disable_cpu_fork;
 
     wire intc_proc_rst;
 
@@ -44,23 +49,38 @@ import soc_package ::*;
     axi_cdma_axi_slave_intf     cdma_data_mov_intf  (.aclk(aclk),.areset_n(areset_n));
     axi_cdma_interrupt_intf     cdma_interrupt_intf (.aclk(aclk));
 
+// core peripherals monitor
+    axi4_lite_intf              core_perif_if();
+
+// UART interface
+    uart_slave_if   uart_if(.clk(aclk),.rst_n(intc_proc_rst));
+// GPIO interface
+    gpio_slave_if   gpio_if(.clk(aclk),.rst_n(intc_proc_rst));
+// SPI interface
+    spi_slave_if    spi_if(.clk(aclk),.rst_n(intc_proc_rst));
+
+    initial begin
+        uvm_config_db#(virtual uart_slave_if)   ::set(null, "", "vif", uart_if);
+        uvm_config_db#(virtual spi_slave_if)    ::set(null, "", "vif", spi_if);
+        uvm_config_db#(virtual gpio_slave_if)   ::set(null, "", "vif", gpio_if);
+    end
     
     core_wrapper dut(
         .clk_i(aclk),
         .rst_n_i(areset_n),
 
         //peripherals
-        .spi_clk_o(),
-        .spi_cs_o(),
-        .spi_miso_i(),
-        .spi_mosi_o(),
+        .spi_clk_o(spi_if.sclk),
+        .spi_cs_o(spi_if.cs_n),
+        .spi_miso_i(spi_if.miso),
+        .spi_mosi_o(spi_if.mosi),
 
-        .uart_rx_i(),
-        .uart_tx_o(),
+        .uart_rx_i(uart_if.tx_o),
+        .uart_tx_o(uart_if.rx_i),
 
-        .gpio_input_i(),
-        .gpio_output_o(),
-        .gpio_output_enable_o(),
+        .gpio_input_i(gpio_if.gpio_out),
+        .gpio_output_o(gpio_if.gpio_in),
+        .gpio_output_enable_o(gpio_if.gpio_oe),
 
         .ext1_cfg_araddr_o(),
         .ext1_cfg_arready_i(),
@@ -122,7 +142,9 @@ import soc_package ::*;
         .rsta_busy_0(),
         .rstb_busy_0(),
 
+        //M05
         .ext_axi4_master(master_if),
+        //S04
         .ext_axi4_slave(slave_if),
 
     //instructions and data interfaces
@@ -132,10 +154,36 @@ import soc_package ::*;
         .data_bridge2axi_int(lite_data_if)
     );
 
-    // Cpu 
-    assign axil_riscv_if.ACLK    = aclk;
-    assign axil_riscv_if.ARESETn = areset_n;
+    // S04
+    assign slave_if.ACLK            = aclk;
+    assign slave_if.ARESETn         = areset_n;
     
+    // Cpu 
+    assign axil_riscv_if.ACLK       = aclk;
+    assign axil_riscv_if.ARESETn    = areset_n;
+
+    // Core Peripherals
+    assign core_perif_if.ACLK       = aclk;
+    assign core_perif_if.ARESETn    = areset_n;
+
+    assign core_perif_if.AWADDR  = dut.axi_int2core_peri.AWADDR;
+    assign core_perif_if.AWVALID = dut.axi_int2core_peri.AWVALID;
+    assign core_perif_if.AWREADY = dut.axi_int2core_peri.AWREADY;
+    assign core_perif_if.WDATA   = dut.axi_int2core_peri.WDATA;
+    assign core_perif_if.WSTRB   = dut.axi_int2core_peri.WSTRB;
+    assign core_perif_if.WVALID  = dut.axi_int2core_peri.WVALID;
+    assign core_perif_if.WREADY  = dut.axi_int2core_peri.WREADY;
+    assign core_perif_if.BRESP   = dut.axi_int2core_peri.BRESP;
+    assign core_perif_if.BVALID  = dut.axi_int2core_peri.BVALID;
+    assign core_perif_if.BREADY  = dut.axi_int2core_peri.BREADY;
+
+    assign core_perif_if.ARADDR  = dut.axi_int2core_peri.ARADDR;
+    assign core_perif_if.ARVALID = dut.axi_int2core_peri.ARVALID;
+    assign core_perif_if.ARREADY = dut.axi_int2core_peri.ARREADY;
+    assign core_perif_if.RDATA   = dut.axi_int2core_peri.RDATA;
+    assign core_perif_if.RRESP   = dut.axi_int2core_peri.RRESP;
+    assign core_perif_if.RVALID  = dut.axi_int2core_peri.RVALID;
+    assign core_perif_if.RREADY  = dut.axi_int2core_peri.RREADY;
 
     // Interuppt controller
     // --- Write Channels (AW) ---
@@ -371,14 +419,19 @@ import soc_package ::*;
     assign mem_intf.WREADY  = dut.AXI_SLAVE_MEM.s_axi_intf.WREADY;   
     assign mem_intf.WSTRB   = dut.AXI_SLAVE_MEM.s_axi_intf.WSTRB;    
     assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
- 
+
 
     initial begin
+        run_test("perif_gap_interconnect_test");
+        //run_test("interconnect_gaps_test");
+        //run_test("gap_pre_system_test");
+        //run_test("uart_write_data_test");   //`SET_CPU_FORK_DISABLE(1) in test
+        //run_test("perif_reg_read_test");  //`SET_CPU_FORK_DISABLE(1) in test
         //run_test("intc_sw_irq_test");
         //run_test("intc_reg_write_read_test");
         //run_test("cdma_reg_write_read_test");
         //run_test("reg_read_test");
-        run_test("soc_master_test");
+        //run_test("soc_master_test");
         //run_test("bram_address_range_test");
         //run_test("bram_upper_invalid_addr_test");
         //run_test("bram_lower_invalid_addr_test");
@@ -406,27 +459,47 @@ import soc_package ::*;
     soc_config     soc_config_obj;
 
     initial begin
+    	uvm_config_db#(virtual axi4_lite_intf)::set(null,"*","CP_MON",core_perif_if);
     	uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
     	uvm_config_db#(virtual axi4_intf.MONITOR_MOD)::set(null,"*","BRAM_MON",axi4_bram_if);
+    	uvm_config_db#(virtual axi4_intf.MONITOR_MOD)::set(null,"*","S04",slave_if);
     end
+
+    //initial begin
+    //	uvm_config_db#(virtual spi_intf.SPI_MON)::set(null,"*","SPI_MON",spi_if);
+    //end
    
+    initial begin
+        //$value$plusargs("DISABLE_CPU_FORK=%b", disable_cpu_fork);
+    	//uvm_config_db#(bit)::set(null,"*","DCF",disable_cpu_fork);
+
+    `ifdef SBD_COMPONENTS
+        sb_config sb_cfg;
+        sb_cfg = sb_config::type_id::create("sb_cfg");
+        sb_cfg.perif_addr = new[2];
+        sb_cfg.perif_addr[0] = '{BRAM, 32'h7100_0000, 32'h713F_FFFF};
+        sb_cfg.perif_addr[1] = '{LITE_MEM, 32'h8000_0000, 32'h9FFF_FFFF};
+	    uvm_config_db #(sb_config)::set(null,"*","SB_CFG",sb_cfg);
+    `endif
+    end
     
     initial begin
         //soc_config
-          soc_config_obj=soc_config::type_id::create("soc_config_obj");
+        soc_config_obj=soc_config::type_id::create("soc_config_obj");
+
         //INTC
         soc_config_obj.intc_obj = intc_config_obj::type_id::create("intc_obj");
         soc_config_obj.intc_obj.axi_lite_is_active  =   UVM_PASSIVE;
         soc_config_obj.intc_obj.lite_intc_intf      =   lite_intc_if;
         soc_config_obj.intc_obj.intc_is_active      =   UVM_PASSIVE;
         soc_config_obj.intc_obj.intc_if             =   intc_if;
-        uvm_config_db #(intc_config_obj)::  set(null,"*","intc_config_obj",soc_config_obj.intc_obj);
+        uvm_config_db #(intc_config_obj)::set(null,"*","intc_config_obj",soc_config_obj.intc_obj);
 
         //CPU
         soc_config_obj.cpu_obj = cpu_config_obj :: type_id :: create ("obj");
         soc_config_obj.cpu_obj.cpu_i  = axil_riscv_if;
         soc_config_obj.cpu_obj.mas_is_active = 1;        // active agent
-        uvm_config_db #(cpu_config_obj) :: set (null , "*" , "cpu_config_obj" ,soc_config_obj.cpu_obj);
+        uvm_config_db #(cpu_config_obj)::set(null,"*","cpu_config_obj",soc_config_obj.cpu_obj);
 
         //CDMA
         soc_config_obj.cdma_config_obj=axi_cdma_config_obj::type_id::create("cdma_config_obj");
@@ -450,7 +523,5 @@ import soc_package ::*;
         soc_config_obj.cdma_config_obj.slv_is_active='{2{UVM_PASSIVE}};
 
         uvm_config_db#(axi_cdma_config_obj)::set(null,"*","axi_cdma_config_obj",soc_config_obj.cdma_config_obj);
-
-        //Lite MEMORY
     end
 endmodule

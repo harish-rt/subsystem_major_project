@@ -1,5 +1,6 @@
 class cpu_agent extends uvm_agent;
    `uvm_component_utils(cpu_agent)
+
    cpu_monitor    mon;
    cpu_driver     drv;
    cpu_sequencer  sqr;

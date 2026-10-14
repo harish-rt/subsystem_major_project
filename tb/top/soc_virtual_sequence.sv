@@ -113,6 +113,8 @@ class soc_master_vseq extends soc_base_virtual_sequence;
         bram_seq = load_bram_seq       ::type_id::create("bram_seq");
         intc_seq = cpu_config_intc_seq ::type_id::create("intc_seq");
         cdma_seq = cdma_read_write_seq ::type_id::create("cdma_seq");
+        
+        intc_seq.cdma_en = 1;
 
         fork
             isr_vseq.start(p_sequencer);
@@ -191,3 +193,128 @@ class intc_reg_write_read_vseq extends soc_base_virtual_sequence;
         intc_rseq.start(p_sequencer.cpu_sqr);
     endtask
 endclass : intc_reg_write_read_vseq
+
+class perif_reg_read_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(perif_reg_read_vseq)
+    `NEW_OBJ
+
+    perif_reg_read_seq perif_vseq;
+
+    task body();
+        perif_vseq    = perif_reg_read_seq::type_id::create("perif_vseq");
+        `uvm_info("perif_vseq", "Starting PERIF reg read vsequence...", UVM_LOW)
+        perif_vseq.start(p_sequencer.cpu_sqr);
+        `uvm_info("perif_vseq", "PERIF reg read vsequence complete.", UVM_LOW)
+    endtask
+endclass : perif_reg_read_vseq
+
+class uart_write_data_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(uart_write_data_vseq)
+    `NEW_OBJ
+
+    uart_write_data_seq uart_seq;
+
+    task body();
+        uart_seq    = uart_write_data_seq::type_id::create("uart_seq");
+        `uvm_info("uart_seq", "Starting uart PERIF vsequence...", UVM_LOW)
+        uart_seq.start(p_sequencer.cpu_sqr);
+        `uvm_info("uart_seq", "uart PERIF vsequence complete.", UVM_LOW)
+    endtask
+endclass
+
+`define GAPS_SEQ(VSEQ_NAME,SEQ_NAME)\
+class VSEQ_NAME extends soc_base_virtual_sequence;\
+    `uvm_object_utils(VSEQ_NAME)\
+    `NEW_OBJ\
+    SEQ_NAME seq;\
+    task body();\
+        seq    = SEQ_NAME::type_id::create("seq");\
+        `uvm_info("seq", "Starting PERIF vsequence...", UVM_LOW)\
+        seq.start(p_sequencer.cpu_sqr);\
+        `uvm_info("seq", "PERIF vsequence complete.", UVM_LOW)\
+    endtask\
+endclass:VSEQ_NAME
+
+`GAPS_SEQ(gap_pre_system_vseq, gap_pre_system_seq)
+`GAPS_SEQ(gap_mid_periph_vseq, gap_mid_periph_seq)
+`GAPS_SEQ(gap_post_cdma_bram_vseq, gap_post_cdma_bram_seq)
+`GAPS_SEQ(perif_gap_interconnect_vseq, perif_gap_interconnect_seq)
+
+class interconnect_gaps_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(interconnect_gaps_vseq)
+    `NEW_OBJ
+
+    gap_pre_system_vseq      pre_vseq;
+    gap_mid_periph_vseq      mid_vseq;
+    gap_post_cdma_bram_vseq  post_vseq;
+    //perif_gap_interconnect_vseq    intc_vseq;
+
+    task body();
+        pre_vseq     = gap_pre_system_vseq    ::type_id::create("pre_vseq");
+        mid_vseq     = gap_mid_periph_vseq    ::type_id::create("mid_vseq");
+        post_vseq    = gap_post_cdma_bram_vseq::type_id::create("post_vseq");
+        //intc_vseq    = perif_gap_interconnect_vseq  ::type_id::create("intc_vseq");
+        `uvm_info("gap_seq", "Starting gaps vsequence...", UVM_LOW)
+        pre_vseq.start(p_sequencer);
+        mid_vseq.start(p_sequencer);
+        post_vseq.start(p_sequencer);
+        //intc_vseq.start(p_sequencer);
+        `uvm_info("gap_seq", "gaps vsequence complete.", UVM_LOW)
+    endtask
+endclass:interconnect_gaps_vseq
+
+class core_perif_master_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(core_perif_master_vseq)
+    `NEW_OBJ
+
+    cpu_config_intc_seq     intc_seq;
+    uart_write_data_seq     uart_seq;
+    cpu_isr_vseq            isr_vseq;
+
+    task body();
+        super.body();
+
+        isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
+        uart_seq = uart_write_data_seq  ::type_id::create("uart_seq");
+        intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
+        
+        intc_seq.core_en = 1;
+
+        fork
+            //isr_vseq.start(p_sequencer);
+        join_none
+
+        uart_seq.start(p_sequencer.cpu_sqr);
+        intc_seq.start(p_sequencer.cpu_sqr);
+        //isr_clear();    // waits for irq down before ending core_perif_master_vseq
+    endtask
+endclass : core_perif_master_vseq
+
+//`GAPS_SEQ(spi_write_data_vseq, spi_write_data_seq)
+
+class spi_write_data_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(spi_write_data_vseq)
+    `NEW_OBJ
+
+    cpu_config_intc_seq     intc_seq;
+    spi_write_data_seq      spi_seq;
+    cpu_isr_vseq            isr_vseq;
+
+    task body();
+        super.body();
+
+        isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
+        spi_seq  = spi_write_data_seq   ::type_id::create("spi_seq");
+        intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
+        
+        intc_seq.core_en = 1;
+
+        fork
+            //isr_vseq.start(p_sequencer);
+        join_none
+
+        spi_seq.start(p_sequencer.cpu_sqr);
+        intc_seq.start(p_sequencer.cpu_sqr);
+        //isr_clear();    // waits for irq down before ending spi_write_data_vseq
+    endtask
+endclass : spi_write_data_vseq

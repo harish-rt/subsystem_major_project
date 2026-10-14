@@ -1,0 +1,626 @@
+ALIB: Library "work" already exists.
+work = ./work/work.lib
+ALIB: Library "riviera" already exists.
+riviera = ./riviera/riviera.lib
+ALIB: Library "xpm" already exists.
+xpm = ./riviera/xpm/xpm.lib
+ALIB: Library "generic_baseblocks_v2_1_0" already exists.
+generic_baseblocks_v2_1_0 = ./riviera/generic_baseblocks_v2_1_0/generic_baseblocks_v2_1_0.lib
+ALIB: Library "axi_infrastructure_v1_1_0" already exists.
+axi_infrastructure_v1_1_0 = ./riviera/axi_infrastructure_v1_1_0/axi_infrastructure_v1_1_0.lib
+ALIB: Library "axi_register_slice_v2_1_20" already exists.
+axi_register_slice_v2_1_20 = ./riviera/axi_register_slice_v2_1_20/axi_register_slice_v2_1_20.lib
+ALIB: Library "fifo_generator_v13_2_5" already exists.
+fifo_generator_v13_2_5 = ./riviera/fifo_generator_v13_2_5/fifo_generator_v13_2_5.lib
+ALIB: Library "axi_data_fifo_v2_1_19" already exists.
+axi_data_fifo_v2_1_19 = ./riviera/axi_data_fifo_v2_1_19/axi_data_fifo_v2_1_19.lib
+ALIB: Library "axi_crossbar_v2_1_21" already exists.
+axi_crossbar_v2_1_21 = ./riviera/axi_crossbar_v2_1_21/axi_crossbar_v2_1_21.lib
+ALIB: Library "core_ip_wraps" already exists.
+core_ip_wraps = ./riviera/core_ip_wraps/core_ip_wraps.lib
+ALIB: Library "axi_lite_ipif_v3_0_4" already exists.
+axi_lite_ipif_v3_0_4 = ./riviera/axi_lite_ipif_v3_0_4/axi_lite_ipif_v3_0_4.lib
+ALIB: Library "axi_intc_v4_1_14" already exists.
+axi_intc_v4_1_14 = ./riviera/axi_intc_v4_1_14/axi_intc_v4_1_14.lib
+ALIB: Library "blk_mem_gen_v8_4_4" already exists.
+blk_mem_gen_v8_4_4 = ./riviera/blk_mem_gen_v8_4_4/blk_mem_gen_v8_4_4.lib
+ALIB: Library "axi_bram_ctrl_v4_1_2" already exists.
+axi_bram_ctrl_v4_1_2 = ./riviera/axi_bram_ctrl_v4_1_2/axi_bram_ctrl_v4_1_2.lib
+ALIB: Library "lib_pkg_v1_0_2" already exists.
+lib_pkg_v1_0_2 = ./riviera/lib_pkg_v1_0_2/lib_pkg_v1_0_2.lib
+ALIB: Library "lib_srl_fifo_v1_0_2" already exists.
+lib_srl_fifo_v1_0_2 = ./riviera/lib_srl_fifo_v1_0_2/lib_srl_fifo_v1_0_2.lib
+ALIB: Library "lib_fifo_v1_0_14" already exists.
+lib_fifo_v1_0_14 = ./riviera/lib_fifo_v1_0_14/lib_fifo_v1_0_14.lib
+ALIB: Library "lib_cdc_v1_0_2" already exists.
+lib_cdc_v1_0_2 = ./riviera/lib_cdc_v1_0_2/lib_cdc_v1_0_2.lib
+ALIB: Library "axi_datamover_v5_1_22" already exists.
+axi_datamover_v5_1_22 = ./riviera/axi_datamover_v5_1_22/axi_datamover_v5_1_22.lib
+ALIB: Library "axi_sg_v4_1_13" already exists.
+axi_sg_v4_1_13 = ./riviera/axi_sg_v4_1_13/axi_sg_v4_1_13.lib
+ALIB: Library "axi_cdma_v4_1_20" already exists.
+axi_cdma_v4_1_20 = ./riviera/axi_cdma_v4_1_20/axi_cdma_v4_1_20.lib
+ALIB: Library "axi_clock_converter_v2_1_19" already exists.
+axi_clock_converter_v2_1_19 = ./riviera/axi_clock_converter_v2_1_19/axi_clock_converter_v2_1_19.lib
+ALIB: Library "axi_protocol_converter_v2_1_20" already exists.
+axi_protocol_converter_v2_1_20 = ./riviera/axi_protocol_converter_v2_1_20/axi_protocol_converter_v2_1_20.lib
+ALIB: Library "xil_defaultlib" already exists.
+xil_defaultlib = ./riviera/xil_defaultlib/xil_defaultlib.lib
+AMAP: Library mapping "xpm" to "./riviera/xpm/xpm.lib" already exists.
+AMAP: Library mapping "generic_baseblocks_v2_1_0" to "./riviera/generic_baseblocks_v2_1_0/generic_baseblocks_v2_1_0.lib" already exists.
+AMAP: Library mapping "axi_infrastructure_v1_1_0" to "./riviera/axi_infrastructure_v1_1_0/axi_infrastructure_v1_1_0.lib" already exists.
+AMAP: Library mapping "axi_register_slice_v2_1_20" to "./riviera/axi_register_slice_v2_1_20/axi_register_slice_v2_1_20.lib" already exists.
+AMAP: Library mapping "fifo_generator_v13_2_5" to "./riviera/fifo_generator_v13_2_5/fifo_generator_v13_2_5.lib" already exists.
+AMAP: Library mapping "axi_data_fifo_v2_1_19" to "./riviera/axi_data_fifo_v2_1_19/axi_data_fifo_v2_1_19.lib" already exists.
+AMAP: Library mapping "axi_crossbar_v2_1_21" to "./riviera/axi_crossbar_v2_1_21/axi_crossbar_v2_1_21.lib" already exists.
+AMAP: Library mapping "core_ip_wraps" to "./riviera/core_ip_wraps/core_ip_wraps.lib" already exists.
+AMAP: Library mapping "axi_lite_ipif_v3_0_4" to "./riviera/axi_lite_ipif_v3_0_4/axi_lite_ipif_v3_0_4.lib" already exists.
+AMAP: Library mapping "axi_intc_v4_1_14" to "./riviera/axi_intc_v4_1_14/axi_intc_v4_1_14.lib" already exists.
+AMAP: Library mapping "blk_mem_gen_v8_4_4" to "./riviera/blk_mem_gen_v8_4_4/blk_mem_gen_v8_4_4.lib" already exists.
+AMAP: Library mapping "axi_bram_ctrl_v4_1_2" to "./riviera/axi_bram_ctrl_v4_1_2/axi_bram_ctrl_v4_1_2.lib" already exists.
+AMAP: Library mapping "lib_pkg_v1_0_2" to "./riviera/lib_pkg_v1_0_2/lib_pkg_v1_0_2.lib" already exists.
+AMAP: Library mapping "lib_srl_fifo_v1_0_2" to "./riviera/lib_srl_fifo_v1_0_2/lib_srl_fifo_v1_0_2.lib" already exists.
+AMAP: Library mapping "lib_fifo_v1_0_14" to "./riviera/lib_fifo_v1_0_14/lib_fifo_v1_0_14.lib" already exists.
+AMAP: Library mapping "lib_cdc_v1_0_2" to "./riviera/lib_cdc_v1_0_2/lib_cdc_v1_0_2.lib" already exists.
+AMAP: Library mapping "axi_datamover_v5_1_22" to "./riviera/axi_datamover_v5_1_22/axi_datamover_v5_1_22.lib" already exists.
+AMAP: Library mapping "axi_sg_v4_1_13" to "./riviera/axi_sg_v4_1_13/axi_sg_v4_1_13.lib" already exists.
+AMAP: Library mapping "axi_cdma_v4_1_20" to "./riviera/axi_cdma_v4_1_20/axi_cdma_v4_1_20.lib" already exists.
+AMAP: Library mapping "axi_clock_converter_v2_1_19" to "./riviera/axi_clock_converter_v2_1_19/axi_clock_converter_v2_1_19.lib" already exists.
+AMAP: Library mapping "axi_protocol_converter_v2_1_20" to "./riviera/axi_protocol_converter_v2_1_20/axi_protocol_converter_v2_1_20.lib" already exists.
+AMAP: Library mapping "xil_defaultlib" to "./riviera/xil_defaultlib/xil_defaultlib.lib" already exists.
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 237  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 238  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 240  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 241  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 409  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 410  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 412  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 413  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 628  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 629  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 630  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 631  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 632  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 634  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 635  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 636  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 637  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 638  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1011  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1013  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1132  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1134  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1400  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1401  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1403  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1404  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1406  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1407  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1412  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1413  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1415  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1416  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1418  1
+WARNING VCP2900 "Conditional expression 1'b0==1'b1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" 1419  1
+WARNING VCP7079 "The $fatal system task requires exit code as the first argument. Assuming 0 exit code here." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv" 1626  143
+WARNING VCP7079 "The $fatal system task requires exit code as the first argument. Assuming 0 exit code here." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv" 1627  148
+WARNING VCP2900 "Conditional expression 1 at 'if' statement is constant." "/opt/xilinx/2025.1/Vivado/data/ip/xpm/xpm_memory/hdl/xpm_memory.sv" 316  1
+MESSAGE "ASRT_7002: Due to optimizations some assertions from source code will be evaluated in non LRM complaint mode. Use switch -ao_off to turn off this optimization."
+MESSAGE "Unit top modules: xpm_cdc_handshake xpm_cdc_pulse xpm_cdc_array_single xpm_cdc_async_rst xpm_cdc_low_latency_handshake xpm_fifo_sync xpm_fifo_async xpm_fifo_axis xpm_fifo_axif xpm_fifo_axil xpm_memory_dpdistram xpm_memory_dprom xpm_memory_sdpram xpm_memory_spram xpm_memory_sprom xpm_memory_tdpram."
+SUCCESS "Compile success 0 Errors 37 Warnings  Analysis time: 3[s]."
+done
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Package "VCOMPONENTS"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  60.0 [ms]
+WARNING VCP2515 "Undefined module: MUXCY was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/b752/hdl/generic_baseblocks_v2_1_vl_rfs.v" 109  9
+WARNING VCP2515 "Undefined module: AND2B1L was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/b752/hdl/generic_baseblocks_v2_1_vl_rfs.v" 229  11
+WARNING VCP2515 "Undefined module: OR2L was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/b752/hdl/generic_baseblocks_v2_1_vl_rfs.v" 345  11
+WARNING VCP2515 "Undefined module: FDRE was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/b752/hdl/generic_baseblocks_v2_1_vl_rfs.v" 849  10
+WARNING VCP2515 "Undefined module: XORCY was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/b752/hdl/generic_baseblocks_v2_1_vl_rfs.v" 905  12
+WARNING VCP2515 "Undefined module: SRLC32E was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/b752/hdl/generic_baseblocks_v2_1_vl_rfs.v" 954  15
+WARNING VCP2515 "Undefined module: SRLC16E was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/b752/hdl/generic_baseblocks_v2_1_vl_rfs.v" 968  15
+WARNING VCP2515 "Undefined module: MUXF7 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/b752/hdl/generic_baseblocks_v2_1_vl_rfs.v" 2568  15
+WARNING VCP2515 "Undefined module: MUXF8 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/b752/hdl/generic_baseblocks_v2_1_vl_rfs.v" 2589  15
+WARNING VCP2507 "Potentially recursive instantiation of module generic_baseblocks_v2_1_0_mux detected." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/b752/hdl/generic_baseblocks_v2_1_vl_rfs.v" 2721  37
+WARNING VCP2507 "Potentially recursive instantiation of module generic_baseblocks_v2_1_0_mux detected." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/b752/hdl/generic_baseblocks_v2_1_vl_rfs.v" 2721  37
+WARNING VCP2507 "Potentially recursive instantiation of module generic_baseblocks_v2_1_0_mux detected." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/b752/hdl/generic_baseblocks_v2_1_vl_rfs.v" 2721  37
+MESSAGE "Unit top modules: generic_baseblocks_v2_1_0_carry_latch_and generic_baseblocks_v2_1_0_carry_or generic_baseblocks_v2_1_0_carry generic_baseblocks_v2_1_0_command_fifo generic_baseblocks_v2_1_0_comparator_mask_static generic_baseblocks_v2_1_0_comparator_mask generic_baseblocks_v2_1_0_comparator_sel_mask_static generic_baseblocks_v2_1_0_comparator_sel_mask generic_baseblocks_v2_1_0_comparator_sel_static generic_baseblocks_v2_1_0_comparator_sel generic_baseblocks_v2_1_0_comparator_static generic_baseblocks_v2_1_0_comparator generic_baseblocks_v2_1_0_mux_enc generic_baseblocks_v2_1_0_nto1_mux."
+SUCCESS "Compile success 0 Errors 12 Warnings  Analysis time: 0[s]."
+done
+WARNING VCP2515 "Undefined module: SRL16E was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/ec67/hdl/axi_infrastructure_v1_1_vl_rfs.v" 406  7
+MESSAGE "Unit top modules: axi_infrastructure_v1_1_0_axi2vector axi_infrastructure_v1_1_0_axic_srl_fifo axi_infrastructure_v1_1_0_vector2axi."
+SUCCESS "Compile success 0 Errors 1 Warnings  Analysis time: 0[s]."
+done
+WARNING VCP2515 "Undefined module: FDCE was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/72d4/hdl/axi_register_slice_v2_1_vl_rfs.v" 1272  8
+WARNING VCP2515 "Undefined module: axi_infrastructure_v1_1_0_axi2vector was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/72d4/hdl/axi_register_slice_v2_1_vl_rfs.v" 4123  7
+WARNING VCP2515 "Undefined module: axi_infrastructure_v1_1_0_vector2axi was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/72d4/hdl/axi_register_slice_v2_1_vl_rfs.v" 4184  7
+MESSAGE "Unit top modules: axi_register_slice_v2_1_20_axi_register_slice."
+SUCCESS "Compile success 0 Errors 3 Warnings  Analysis time: 1[s]."
+done
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol srst_wrst_busy has not been declared in module fifo_generator_v13_2_5_bhv_ver_ss." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 7793  28
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol wr_rst_busy_i has not been declared in module fifo_generator_vlog_beh in generate block conv_fifo." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 1249  49
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol rd_rst_busy_axis has not been declared in module fifo_generator_vlog_beh in generate block axi_streaming." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 1574  52
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol rd_rst_busy_wach has not been declared in module fifo_generator_vlog_beh in generate block axi_write_address_channel." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 2099  52
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol rd_rst_busy_wdch has not been declared in module fifo_generator_vlog_beh in generate block axi_write_data_channel." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 2319  52
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol rd_rst_busy_wrch has not been declared in module fifo_generator_vlog_beh in generate block axi_write_resp_channel." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 2486  52
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol rd_rst_busy_rach has not been declared in module fifo_generator_vlog_beh in generate block axi_read_addr_channel." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 2866  52
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol rd_rst_busy_rdch has not been declared in module fifo_generator_vlog_beh in generate block axi_read_data_channel." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 3099  52
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol safety_ckt_rd_rst has not been declared in module fifo_generator_v13_2_5_CONV_VER in generate block block2_fwft." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 4153  53
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol safety_ckt_rd_rst has not been declared in module fifo_generator_v13_2_5_CONV_VER in generate block gpkt_fifo_fwft." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 4361  53
+WARNING VCP2597 "Some unconnected ports remain at instance: ""fifo_generator_v13_2_5_axis_dut"". Module ""fifo_generator_v13_2_5_CONV_VER"" has unconnected port(s) : ""wr_rst_busy_o""." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 1463  1
+WARNING VCP2597 "Some unconnected ports remain at instance: ""fifo_generator_v13_2_5_wach_dut"". Module ""fifo_generator_v13_2_5_CONV_VER"" has unconnected port(s) : ""wr_rst_busy_o""." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 1988  1
+WARNING VCP2597 "Some unconnected ports remain at instance: ""fifo_generator_v13_2_5_wdch_dut"". Module ""fifo_generator_v13_2_5_CONV_VER"" has unconnected port(s) : ""wr_rst_busy_o""." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 2207  1
+WARNING VCP2597 "Some unconnected ports remain at instance: ""fifo_generator_v13_2_5_wrch_dut"". Module ""fifo_generator_v13_2_5_CONV_VER"" has unconnected port(s) : ""wr_rst_busy_o""." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 2374  1
+WARNING VCP2597 "Some unconnected ports remain at instance: ""fifo_generator_v13_2_5_rach_dut"". Module ""fifo_generator_v13_2_5_CONV_VER"" has unconnected port(s) : ""wr_rst_busy_o""." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 2754  1
+WARNING VCP2597 "Some unconnected ports remain at instance: ""fifo_generator_v13_2_5_rdch_dut"". Module ""fifo_generator_v13_2_5_CONV_VER"" has unconnected port(s) : ""wr_rst_busy_o""." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 2987  1
+WARNING VCP2597 "Some unconnected ports remain at instance: ""gen_as"". Module ""fifo_generator_v13_2_5_bhv_ver_as"" has unconnected port(s) : ""fab_read_data_valid_i"", ""read_data_valid_i"", ""ram_valid_i""." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 4007  1
+WARNING VCP2597 "Some unconnected ports remain at instance: ""pkt_fifo_fwft"". Module ""fifo_generator_v13_2_5_bhv_ver_preload0"" has unconnected port(s) : ""fab_read_data_valid_i_o"", ""read_data_valid_i_o"", ""ram_valid_i_o""." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 4344  1
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol wr_eop_ad has not been declared in module fifo_generator_vlog_beh in generate block fifo_ic_adapter." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 1331  22
+MESSAGE_SP VCP2876 "Implicit net declaration, symbol rd_eop_ad has not been declared in module fifo_generator_vlog_beh in generate block fifo_ic_adapter." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 1332  22
+WARNING VCP3005 "The implicit event expression list (@*) is empty; the process will never be executed." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 4859  17
+WARNING VCP3005 "The implicit event expression list (@*) is empty; the process will never be executed." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 4886  17
+WARNING VCP3005 "The implicit event expression list (@*) is empty; the process will never be executed." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 4928  15
+WARNING VCP3005 "The implicit event expression list (@*) is empty; the process will never be executed." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/276e/simulation/fifo_generator_vlog_beh.v" 4931  15
+MESSAGE "Unit top modules: fifo_generator_vlog_beh."
+SUCCESS "Compile success 0 Errors 12 Warnings  Analysis time: 2[s]."
+done
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile encrypted unit
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  3.0 [s]
+WARNING VCP1251 "The warning message cannot be shown because a protected code block was seen in the current compilation session. Any further warnings will be disregarded." "./fifo_generator_v13_2_rfs.v" 3146  1
+SUCCESS "Compile success 0 Errors 1 Warnings (2 protected)  Analysis time: 0[s]."
+done
+WARNING VCP2515 "Undefined module: fifo_generator_v13_2_5 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/60de/hdl/axi_data_fifo_v2_1_vl_rfs.v" 632  5
+WARNING VCP2515 "Undefined module: SRLC32E was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/60de/hdl/axi_data_fifo_v2_1_vl_rfs.v" 1190  16
+WARNING VCP2515 "Undefined module: generic_baseblocks_v2_1_0_nto1_mux was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/60de/hdl/axi_data_fifo_v2_1_vl_rfs.v" 1207  11
+MESSAGE "Unit top modules: axi_data_fifo_v2_1_19_axic_fifo axi_data_fifo_v2_1_19_axic_srl_fifo axi_data_fifo_v2_1_19_axic_reg_srl_fifo axi_data_fifo_v2_1_19_axi_data_fifo."
+SUCCESS "Compile success 0 Errors 3 Warnings  Analysis time: 1[s]."
+done
+WARNING VCP2515 "Undefined module: generic_baseblocks_v2_1_0_mux_enc was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/6b0d/hdl/axi_crossbar_v2_1_vl_rfs.v" 306  11
+WARNING VCP2515 "Undefined module: generic_baseblocks_v2_1_0_comparator_static was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/6b0d/hdl/axi_crossbar_v2_1_vl_rfs.v" 899  15
+WARNING VCP2515 "Undefined module: axi_register_slice_v2_1_20_axic_register_slice was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/6b0d/hdl/axi_crossbar_v2_1_vl_rfs.v" 1984  10
+WARNING VCP2515 "Undefined module: axi_data_fifo_v2_1_19_axic_srl_fifo was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/6b0d/hdl/axi_crossbar_v2_1_vl_rfs.v" 3027  17
+WARNING VCP2515 "Undefined module: axi_register_slice_v2_1_20_axi_register_slice was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/6b0d/hdl/axi_crossbar_v2_1_vl_rfs.v" 3216  11
+WARNING VCP2515 "Undefined module: axi_data_fifo_v2_1_19_axic_reg_srl_fifo was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/6b0d/hdl/axi_crossbar_v2_1_vl_rfs.v" 4630  14
+MESSAGE "Unit top modules: axi_crossbar_v2_1_21_axi_crossbar."
+SUCCESS "Compile success 0 Errors 6 Warnings  Analysis time: 1[s]."
+done
+WARNING VCP2515 "Undefined module: axi_crossbar_v2_1_21_axi_crossbar was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ip/core_ip_wraps_xbar_0/sim/core_ip_wraps_xbar_0.v" 430  5
+MESSAGE "Unit top modules: core_ip_wraps_xbar_0."
+SUCCESS "Compile success 0 Errors 1 Warnings  Analysis time: 0[s]."
+done
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Package "ipif_pkg"
+COMP96 Compile Package Body "ipif_pkg"
+COMP96 Compile Entity "pselect_f"
+COMP96 Compile Architecture "imp" of Entity "pselect_f"
+COMP96 Compile Entity "address_decoder"
+COMP96 Compile Architecture "IMP" of Entity "address_decoder"
+COMP96 Compile Entity "slave_attachment"
+COMP96 Compile Architecture "imp" of Entity "slave_attachment"
+COMP96 Compile Entity "axi_lite_ipif"
+COMP96 Compile Architecture "imp" of Entity "axi_lite_ipif"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  0.1 [s]
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Entity "double_synchronizer"
+COMP96 Compile Architecture "RTL" of Entity "double_synchronizer"
+COMP96 Compile Entity "shared_ram_ivar"
+COMP96 Compile Architecture "byte_data_ram_a" of Entity "shared_ram_ivar"
+COMP96 Compile Entity "pulse_synchronizer"
+COMP96 Compile Architecture "RTL" of Entity "pulse_synchronizer"
+COMP96 Compile Entity "intc_core"
+COMP96 Compile Architecture "imp" of Entity "intc_core"
+COMP96 Compile Entity "axi_intc"
+COMP96 Compile Architecture "imp" of Entity "axi_intc"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  1.0 [s]
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Entity "core_ip_wraps_axi_intc_0_0"
+COMP96 Compile Architecture "core_ip_wraps_axi_intc_0_0_arch" of Entity "core_ip_wraps_axi_intc_0_0"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  30.0 [ms]
+WARNING VCP2515 "Undefined module: core_ip_wraps_axi_bram_ctrl_0_1 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 923  59
+WARNING VCP2515 "Undefined module: core_ip_wraps_axi_cdma_0_0 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 1002  64
+WARNING VCP2515 "Undefined module: core_ip_wraps_blk_mem_gen_0_0 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 1346  46
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_cc_0 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 4152  56
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_pc_0 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 4210  51
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_cc_1 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 4585  56
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_pc_1 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 4646  51
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_cc_2 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 5013  56
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_pc_2 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 5072  51
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_cc_3 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 5468  56
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_cc_4 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 5843  56
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_pc_3 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 5904  51
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_cc_5 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 6320  56
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_cc_6 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 6611  56
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_pc_4 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 6666  51
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_cc_7 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 7008  56
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_cc_8 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 7299  56
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_pc_5 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 7354  51
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_cc_9 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 7696  56
+WARNING VCP2515 "Undefined module: core_ip_wraps_auto_cc_10 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v" 8102  56
+MESSAGE "Unit top modules: core_ip_wraps."
+SUCCESS "Compile success 0 Errors 20 Warnings  Analysis time: 1[s]."
+done
+WARNING VCP7060 "Argument ADDRFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 2375  37
+WARNING VCP7060 "Argument ADDRFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 2503  37
+WARNING VCP7060 "Argument ADDRFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 2576  37
+WARNING VCP7060 "Argument ADDRFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 2618  37
+WARNING VCP7060 "Argument ERRFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 2708  78
+WARNING VCP7060 "Argument ERRFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 2715  49
+WARNING VCP7060 "Argument ERRFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 2734  31
+WARNING VCP7060 "Argument ERRFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 2741  48
+WARNING VCP7060 "Argument ERRFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 2762  37
+WARNING VCP7060 "Argument ERRFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 2769  58
+WARNING VCP7060 "Argument COLLFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 3301  34
+WARNING VCP7060 "Argument COLLFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 3304  48
+WARNING VCP7060 "Argument COLLFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 3348  34
+WARNING VCP7060 "Argument COLLFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 3350  55
+WARNING VCP7060 "Argument COLLFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 3354  34
+WARNING VCP7060 "Argument COLLFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 3356  61
+WARNING VCP7060 "Argument COLLFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 3390  34
+WARNING VCP7060 "Argument COLLFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 3392  55
+WARNING VCP7060 "Argument COLLFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 3396  34
+WARNING VCP7060 "Argument COLLFILE should be a 32-bit multi_channel_descriptor." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 3398  61
+WARNING VCP3005 "The implicit event expression list (@*) is empty; the process will never be executed." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/2985/simulation/blk_mem_gen_v8_4.v" 4026  17
+MESSAGE "Unit top modules: blk_mem_gen_v8_4_4."
+SUCCESS "Compile success 0 Errors 21 Warnings  Analysis time: 1[s]."
+done
+WARNING VCP2515 "Undefined module: blk_mem_gen_v8_4_4 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ip/core_ip_wraps_blk_mem_gen_0_0/sim/core_ip_wraps_blk_mem_gen_0_0.v" 248  5
+SUCCESS "Compile success 0 Errors 1 Warnings  Analysis time: 0[s]."
+done
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Entity "SRL_FIFO"
+COMP96 Compile Architecture "IMP" of Entity "SRL_FIFO"
+COMP96 Compile Package "axi_bram_ctrl_funcs"
+COMP96 Compile Package Body "axi_bram_ctrl_funcs"
+COMP96 Compile Entity "axi_lite_if"
+COMP96 Compile Architecture "IMP" of Entity "axi_lite_if"
+COMP96 Compile Entity "checkbit_handler_64"
+COMP96 Compile Architecture "IMP" of Entity "checkbit_handler_64"
+ELAB1 WARNING ELAB1_0026: "There is no default binding for component "Parity". (No entity named "Parity" was found)." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/a002/hdl/axi_bram_ctrl_v4_1_rfs.vhd" 1980 0
+COMP96 Compile Entity "checkbit_handler"
+COMP96 Compile Architecture "IMP" of Entity "checkbit_handler"
+ELAB1 WARNING ELAB1_0026: "There is no default binding for component "XOR18". (No entity named "XOR18" was found)." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/a002/hdl/axi_bram_ctrl_v4_1_rfs.vhd" 3314 0
+ELAB1 WARNING ELAB1_0026: "There is no default binding for component "Parity". (No entity named "Parity" was found)." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/a002/hdl/axi_bram_ctrl_v4_1_rfs.vhd" 3368 0
+COMP96 Compile Entity "Correct_One_Bit_64"
+COMP96 Compile Architecture "IMP" of Entity "Correct_One_Bit_64"
+COMP96 Compile Entity "Correct_One_Bit"
+COMP96 Compile Architecture "IMP" of Entity "Correct_One_Bit"
+COMP96 Compile Entity "XOR18"
+COMP96 Compile Architecture "IMP" of Entity "XOR18"
+COMP96 Compile Entity "Parity"
+COMP96 Compile Architecture "IMP" of Entity "Parity"
+COMP96 Compile Entity "ecc_gen"
+COMP96 Compile Architecture "trans" of Entity "ecc_gen"
+COMP96 Compile Entity "lite_ecc_reg"
+COMP96 Compile Architecture "implementation" of Entity "lite_ecc_reg"
+COMP96 Compile Entity "axi_lite"
+COMP96 Compile Architecture "implementation" of Entity "axi_lite"
+COMP96 Compile Entity "sng_port_arb"
+COMP96 Compile Architecture "implementation" of Entity "sng_port_arb"
+COMP96 Compile Entity "ua_narrow"
+COMP96 Compile Architecture "implementation" of Entity "ua_narrow"
+COMP96 Compile Entity "wrap_brst"
+COMP96 Compile Architecture "implementation" of Entity "wrap_brst"
+COMP96 Compile Entity "wrap_brst_rd"
+COMP96 Compile Architecture "implementation" of Entity "wrap_brst_rd"
+COMP96 Compile Entity "rd_chnl"
+COMP96 Compile Architecture "implementation" of Entity "rd_chnl"
+COMP96 Compile Entity "wr_chnl"
+COMP96 Compile Architecture "implementation" of Entity "wr_chnl"
+COMP96 Compile Entity "full_axi"
+COMP96 Compile Architecture "implementation" of Entity "full_axi"
+COMP96 Compile Entity "axi_bram_ctrl_top"
+COMP96 Compile Architecture "implementation" of Entity "axi_bram_ctrl_top"
+COMP96 Compile Entity "axi_bram_ctrl"
+COMP96 Compile Architecture "implementation" of Entity "axi_bram_ctrl"
+COMP96 Compile success 0 Errors 3 Warnings  Analysis time :  2.0 [s]
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Entity "core_ip_wraps_axi_bram_ctrl_0_1"
+COMP96 Compile Architecture "core_ip_wraps_axi_bram_ctrl_0_1_arch" of Entity "core_ip_wraps_axi_bram_ctrl_0_1"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  50.0 [ms]
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Package "lib_pkg"
+COMP96 Compile Package Body "lib_pkg"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  40.0 [ms]
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Entity "cntr_incr_decr_addn_f"
+COMP96 Compile Architecture "imp" of Entity "cntr_incr_decr_addn_f"
+COMP96 Compile Entity "dynshreg_f"
+COMP96 Compile Architecture "behavioral" of Entity "dynshreg_f"
+COMP96 Compile Entity "srl_fifo_rbu_f"
+COMP96 Compile Architecture "imp" of Entity "srl_fifo_rbu_f"
+COMP96 Compile Entity "srl_fifo_f"
+COMP96 Compile Architecture "imp" of Entity "srl_fifo_f"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  90.0 [ms]
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Entity "async_fifo_fg"
+COMP96 Compile Architecture "implementation" of Entity "async_fifo_fg"
+COMP96 Compile Entity "sync_fifo_fg"
+COMP96 Compile Architecture "implementation" of Entity "sync_fifo_fg"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  0.1 [s]
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Entity "cdc_sync"
+COMP96 Compile Architecture "implementation" of Entity "cdc_sync"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  0.9 [s]
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Entity "axi_datamover_reset"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_reset"
+COMP96 Compile Entity "axi_datamover_afifo_autord"
+COMP96 Compile Architecture "imp" of Entity "axi_datamover_afifo_autord"
+COMP96 Compile Entity "axi_datamover_sfifo_autord"
+COMP96 Compile Architecture "imp" of Entity "axi_datamover_sfifo_autord"
+COMP96 Compile Entity "axi_datamover_fifo"
+COMP96 Compile Architecture "imp" of Entity "axi_datamover_fifo"
+COMP96 Compile Entity "axi_datamover_cmd_status"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_cmd_status"
+COMP96 Compile Entity "axi_datamover_scc"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_scc"
+COMP96 Compile Entity "axi_datamover_strb_gen2"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_strb_gen2"
+COMP96 Compile Entity "axi_datamover_pcc"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_pcc"
+COMP96 Compile Entity "axi_datamover_addr_cntl"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_addr_cntl"
+COMP96 Compile Entity "axi_datamover_rdmux"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_rdmux"
+COMP96 Compile Entity "axi_datamover_rddata_cntl"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_rddata_cntl"
+COMP96 Compile Entity "axi_datamover_rd_status_cntl"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_rd_status_cntl"
+COMP96 Compile Entity "axi_datamover_wr_demux"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_wr_demux"
+COMP96 Compile Entity "axi_datamover_wrdata_cntl"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_wrdata_cntl"
+COMP96 Compile Entity "axi_datamover_wr_status_cntl"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_wr_status_cntl"
+COMP96 Compile Entity "axi_datamover_skid2mm_buf"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_skid2mm_buf"
+COMP96 Compile Entity "axi_datamover_skid_buf"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_skid_buf"
+COMP96 Compile Entity "axi_datamover_rd_sf"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_rd_sf"
+COMP96 Compile Entity "axi_datamover_wr_sf"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_wr_sf"
+COMP96 Compile Entity "axi_datamover_stbs_set"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_stbs_set"
+COMP96 Compile Entity "axi_datamover_stbs_set_nodre"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_stbs_set_nodre"
+COMP96 Compile Entity "axi_datamover_ibttcc"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_ibttcc"
+COMP96 Compile Entity "axi_datamover_indet_btt"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_indet_btt"
+COMP96 Compile Entity "axi_datamover_dre_mux2_1_x_n"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_dre_mux2_1_x_n"
+COMP96 Compile Entity "axi_datamover_dre_mux4_1_x_n"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_dre_mux4_1_x_n"
+COMP96 Compile Entity "axi_datamover_dre_mux8_1_x_n"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_dre_mux8_1_x_n"
+COMP96 Compile Entity "axi_datamover_mm2s_dre"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_mm2s_dre"
+COMP96 Compile Entity "axi_datamover_s2mm_dre"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_s2mm_dre"
+COMP96 Compile Entity "axi_datamover_ms_strb_set"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_ms_strb_set"
+COMP96 Compile Entity "axi_datamover_mssai_skid_buf"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_mssai_skid_buf"
+COMP96 Compile Entity "axi_datamover_slice"
+COMP96 Compile Architecture "working" of Entity "axi_datamover_slice"
+COMP96 Compile Entity "axi_datamover_s2mm_scatter"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_s2mm_scatter"
+COMP96 Compile Entity "axi_datamover_s2mm_realign"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_s2mm_realign"
+COMP96 Compile Entity "axi_datamover_s2mm_basic_wrap"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_s2mm_basic_wrap"
+COMP96 Compile Entity "axi_datamover_s2mm_omit_wrap"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_s2mm_omit_wrap"
+COMP96 Compile Entity "axi_datamover_s2mm_full_wrap"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_s2mm_full_wrap"
+COMP96 Compile Entity "axi_datamover_mm2s_basic_wrap"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_mm2s_basic_wrap"
+COMP96 Compile Entity "axi_datamover_mm2s_omit_wrap"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_mm2s_omit_wrap"
+COMP96 Compile Entity "axi_datamover_mm2s_full_wrap"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover_mm2s_full_wrap"
+COMP96 Compile Entity "axi_datamover"
+COMP96 Compile Architecture "implementation" of Entity "axi_datamover"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  3.0 [s]
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Package "axi_sg_pkg"
+COMP96 Compile Package Body "axi_sg_pkg"
+COMP96 Compile Entity "axi_sg_reset"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_reset"
+COMP96 Compile Entity "axi_sg_sfifo_autord"
+COMP96 Compile Architecture "imp" of Entity "axi_sg_sfifo_autord"
+COMP96 Compile Entity "axi_sg_afifo_autord"
+COMP96 Compile Architecture "imp" of Entity "axi_sg_afifo_autord"
+COMP96 Compile Entity "axi_sg_fifo"
+COMP96 Compile Architecture "imp" of Entity "axi_sg_fifo"
+COMP96 Compile Entity "axi_sg_cmd_status"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_cmd_status"
+COMP96 Compile Entity "axi_sg_rdmux"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_rdmux"
+COMP96 Compile Entity "axi_sg_addr_cntl"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_addr_cntl"
+COMP96 Compile Entity "axi_sg_rddata_cntl"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_rddata_cntl"
+COMP96 Compile Entity "axi_sg_rd_status_cntl"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_rd_status_cntl"
+COMP96 Compile Entity "axi_sg_scc"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_scc"
+COMP96 Compile Entity "axi_sg_wr_demux"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_wr_demux"
+COMP96 Compile Entity "axi_sg_scc_wr"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_scc_wr"
+COMP96 Compile Entity "axi_sg_skid2mm_buf"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_skid2mm_buf"
+COMP96 Compile Entity "axi_sg_wrdata_cntl"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_wrdata_cntl"
+COMP96 Compile Entity "axi_sg_wr_status_cntl"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_wr_status_cntl"
+COMP96 Compile Entity "axi_sg_skid_buf"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_skid_buf"
+COMP96 Compile Entity "axi_sg_mm2s_basic_wrap"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_mm2s_basic_wrap"
+COMP96 Compile Entity "axi_sg_s2mm_basic_wrap"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_s2mm_basic_wrap"
+COMP96 Compile Entity "axi_sg_datamover"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_datamover"
+COMP96 Compile Entity "axi_sg_ftch_sm"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_ftch_sm"
+COMP96 Compile Entity "axi_sg_ftch_pntr"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_ftch_pntr"
+COMP96 Compile Entity "axi_sg_ftch_cmdsts_if"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_ftch_cmdsts_if"
+COMP96 Compile Entity "axi_sg_ftch_mngr"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_ftch_mngr"
+COMP96 Compile Entity "axi_sg_cntrl_strm"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_cntrl_strm"
+COMP96 Compile Entity "axi_sg_ftch_queue"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_ftch_queue"
+COMP96 Compile Entity "axi_sg_ftch_noqueue"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_ftch_noqueue"
+COMP96 Compile Entity "axi_sg_ftch_q_mngr"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_ftch_q_mngr"
+COMP96 Compile Entity "axi_sg_updt_cmdsts_if"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_updt_cmdsts_if"
+COMP96 Compile Entity "axi_sg_updt_sm"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_updt_sm"
+COMP96 Compile Entity "axi_sg_updt_mngr"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_updt_mngr"
+COMP96 Compile Entity "axi_sg_updt_queue"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_updt_queue"
+COMP96 Compile Entity "axi_sg_updt_noqueue"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_updt_noqueue"
+COMP96 Compile Entity "axi_sg_updt_q_mngr"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_updt_q_mngr"
+COMP96 Compile Entity "axi_sg_intrpt"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg_intrpt"
+COMP96 Compile Entity "axi_sg"
+COMP96 Compile Architecture "implementation" of Entity "axi_sg"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  2.0 [s]
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Package "axi_cdma_pkg"
+COMP96 Compile Package Body "axi_cdma_pkg"
+COMP96 Compile Entity "axi_cdma_pulse_gen"
+COMP96 Compile Architecture "implementation" of Entity "axi_cdma_pulse_gen"
+COMP96 Compile Entity "axi_cdma_reset"
+COMP96 Compile Architecture "implementation" of Entity "axi_cdma_reset"
+COMP96 Compile Entity "axi_cdma_lite_if"
+COMP96 Compile Architecture "implementation" of Entity "axi_cdma_lite_if"
+COMP96 Compile Entity "axi_cdma_register"
+COMP96 Compile Architecture "implementation" of Entity "axi_cdma_register"
+COMP96 Compile Entity "axi_cdma_reg_module"
+COMP96 Compile Architecture "implementation" of Entity "axi_cdma_reg_module"
+COMP96 Compile Entity "axi_cdma_sfifo_autord"
+COMP96 Compile Architecture "imp" of Entity "axi_cdma_sfifo_autord"
+COMP96 Compile Entity "axi_cdma_sf"
+COMP96 Compile Architecture "implementation" of Entity "axi_cdma_sf"
+COMP96 Compile Entity "axi_cdma_simple_cntlr"
+COMP96 Compile Architecture "implementation" of Entity "axi_cdma_simple_cntlr"
+COMP96 Compile Entity "axi_cdma_simple_wrap"
+COMP96 Compile Architecture "implementation" of Entity "axi_cdma_simple_wrap"
+COMP96 Compile Entity "axi_cdma_sg_cntlr"
+COMP96 Compile Architecture "implementation" of Entity "axi_cdma_sg_cntlr"
+COMP96 Compile Entity "axi_cdma_sg_wrap"
+COMP96 Compile Architecture "implementation" of Entity "axi_cdma_sg_wrap"
+COMP96 Compile Entity "axi_cdma"
+COMP96 Compile Architecture "implementation" of Entity "axi_cdma"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  1.0 [s]
+Aldec, Inc. VHDL Compiler, build 2025.04.139
+VLM Initialized with path: "/home/harish/projects/SS/sim/pre_libs/xilinx_lib/sim_scripts/core_ip_wraps/riviera/library.cfg".
+COMP96 Compile Entity "core_ip_wraps_axi_cdma_0_0"
+COMP96 Compile Architecture "core_ip_wraps_axi_cdma_0_0_arch" of Entity "core_ip_wraps_axi_cdma_0_0"
+COMP96 Compile success 0 Errors 0 Warnings  Analysis time :  40.0 [ms]
+WARNING VCP2515 "Undefined module: xpm_cdc_handshake was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/9e81/hdl/axi_clock_converter_v2_1_vl_rfs.v" 647  3
+WARNING VCP2515 "Undefined module: fifo_generator_v13_2_5 was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/9e81/hdl/axi_clock_converter_v2_1_vl_rfs.v" 1616  11
+WARNING VCP2515 "Undefined module: axi_infrastructure_v1_1_0_axi2vector was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/9e81/hdl/axi_clock_converter_v2_1_vl_rfs.v" 1691  11
+WARNING VCP2515 "Undefined module: axi_infrastructure_v1_1_0_vector2axi was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/9e81/hdl/axi_clock_converter_v2_1_vl_rfs.v" 1837  11
+MESSAGE "Unit top modules: axi_clock_converter_v2_1_19_axi_clock_converter."
+SUCCESS "Compile success 0 Errors 4 Warnings  Analysis time: 0[s]."
+done
+WARNING VCP2515 "Undefined module: axi_clock_converter_v2_1_19_axi_clock_converter was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ip/core_ip_wraps_auto_cc_6/sim/core_ip_wraps_auto_cc_6.v" 307  5
+SUCCESS "Compile success 0 Errors 1 Warnings  Analysis time: 0[s]."
+done
+WARNING VCP2515 "Undefined module: axi_data_fifo_v2_1_19_axic_fifo was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/c4a6/hdl/axi_protocol_converter_v2_1_vl_rfs.v" 701  10
+WARNING VCP2515 "Undefined module: axi_register_slice_v2_1_20_axi_register_slice was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ipshared/c4a6/hdl/axi_protocol_converter_v2_1_vl_rfs.v" 4485  3
+MESSAGE "Unit top modules: axi_protocol_converter_v2_1_20_axi_protocol_converter."
+SUCCESS "Compile success 0 Errors 2 Warnings  Analysis time: 0[s]."
+done
+WARNING VCP2515 "Undefined module: axi_protocol_converter_v2_1_20_axi_protocol_converter was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ip/core_ip_wraps_auto_pc_4/sim/core_ip_wraps_auto_pc_4.v" 344  5
+WARNING VCP2515 "Undefined module: axi_clock_converter_v2_1_19_axi_clock_converter was used. Port connection rules will not be checked at such instantiations." "/home/riscv/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/ip/core_ip_wraps_auto_cc_7/sim/core_ip_wraps_auto_cc_7.v" 403  5
+SUCCESS "Compile success 0 Errors 2 Warnings  Analysis time: 0[s]."
+done
+MESSAGE "Unit top modules: glbl."
+SUCCESS "Compile success 0 Errors 0 Warnings  Analysis time: 0[s]."
+done
