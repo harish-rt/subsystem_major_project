@@ -1,7 +1,6 @@
 class cpu_env extends uvm_env;
    `uvm_component_utils(cpu_env)
 
-   s04_agent        s04_agt;
    cpu_agent        cpu_agt;
    s04_agent        s04_agt;
    cpu_config_obj   obj;

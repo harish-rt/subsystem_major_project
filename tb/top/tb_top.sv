@@ -193,10 +193,6 @@ module top;
     assign core_perif_if.RREADY  = dut.axi_int2core_peri.RREADY;
     //defparam dut.IPS_CORE.axi_cdma_0.U0.C_M_AXI_MAX_BURST_LEN = 64;
 
-    // Cpu 
-    assign axil_riscv_if.ACLK    = aclk;
-    assign axil_riscv_if.ARESETn = areset_n;
-    
     // Open port S04
     assign slave_if.ACLK    =   aclk;
     assign slave_if.ARESETn =   areset_n;

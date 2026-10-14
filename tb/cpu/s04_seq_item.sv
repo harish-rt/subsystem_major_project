@@ -1,7 +1,7 @@
 class s04_seq_item extends uvm_sequence_item;
 
     typedef enum bit { WRITE, READ } write_t;
-    typedef enum { OKAY, EXOKAY, SLVERR, DECERR } response_t;
+    //typedef enum { OKAY, EXOKAY, SLVERR, DECERR } response_t;
     typedef enum bit [1:0] { FIXED=2'b00, INCR=2'b01, WRAP=2'b10, RESERVED=2'b11 } burst_t;
 
     rand write_t        write;
