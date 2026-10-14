@@ -14,6 +14,13 @@ msim/
 compile/
 sim/xil_defaultlib/
 
+sim/acdb_report.html
+sim/acdb_report_files/
+sim/tcov_html_report
+sim/tcov_html_report_files/
+sim/tcov_report.txt
+sim/xtrace/
+
 *.mgf
 *.qpb
 *.qpg

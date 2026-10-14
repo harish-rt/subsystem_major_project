@@ -16,8 +16,6 @@ class s04_driver extends uvm_driver #(s04_seq_item, s04_seq_item);
     `uvm_component_utils(s04_driver)
     `uvm_register_cb(s04_driver, master_driver_callback)
 
-    // Base virtual interface handle to prevent config_db SIGSEGV
-    virtual axi4_intf            vif;
     virtual axi4_intf.DRIVER_MOD master_drv_intf;
 
     int                          drv_burst_count;
@@ -27,10 +25,9 @@ class s04_driver extends uvm_driver #(s04_seq_item, s04_seq_item);
 
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-        if (!uvm_config_db#(virtual axi4_intf.DRIVER_MOD)::get(this, "", "S04", master_drv_intf)) begin
+        if (!uvm_config_db#(virtual axi4_intf.DRIVER_MOD)::get(this,"","S04",master_drv_intf)) begin
             `uvm_fatal(get_full_name(), "virtual axi4_intf get failed from config_db!")
         end
-        //master_drv_intf = vif.DRIVER_MOD;
     endfunction
 
     extern task reset_phase      (uvm_phase phase);
@@ -168,7 +165,7 @@ task s04_driver::drive_write_resp(s04_seq_item pkt);
         @(master_drv_intf.axi4_drv_cb);
     end while (master_drv_intf.axi4_drv_cb.BVALID !== 1'b1);
 
-    pkt.BRESP = master_drv_intf.axi4_drv_cb.BRESP;
+    pkt.BRESP = response_t'(master_drv_intf.axi4_drv_cb.BRESP);
     master_drv_intf.axi4_drv_cb.BREADY <= 1'b0;
     drv_burst_count++;
 endtask : drive_write_resp
@@ -201,7 +198,7 @@ task s04_driver::drive_read_data(s04_seq_item pkt);
         @(master_drv_intf.axi4_drv_cb);
         if (master_drv_intf.axi4_drv_cb.RVALID === 1'b1) begin
             pkt.RDATA[beat] = master_drv_intf.axi4_drv_cb.RDATA;
-            pkt.RRESP       = master_drv_intf.axi4_drv_cb.RRESP;
+            pkt.RRESP       = response_t'(master_drv_intf.axi4_drv_cb.RRESP);
             beat++;
             if (master_drv_intf.axi4_drv_cb.RLAST === 1'b1) begin
                 rlast = 1'b1;

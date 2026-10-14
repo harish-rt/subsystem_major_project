@@ -130,7 +130,7 @@ wire read_en_w  = cfg_arvalid_i & cfg_arready_o;
 wire write_en_w = wr_cmd_accepted_w && wr_data_accepted_w;
 
 //-----------------------------------------------------------------
-// Accept Logic
+// Acsim:/top/dut/CORE_PERIF_CTRL/u_intc/write_en_wcept Logic
 //-----------------------------------------------------------------
 assign cfg_arready_o = ~cfg_rvalid_o;
 assign cfg_awready_o = ~cfg_bvalid_o && ~cfg_arvalid_i && ~awvalid_q;
