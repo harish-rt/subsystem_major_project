@@ -349,7 +349,6 @@ module top;
     assign cdma_data_mov_intf.bid=0;
     assign cdma_data_mov_intf.arid=0;
     assign cdma_data_mov_intf.rid=0;
-    assign cdma_sg_intf.rid=0;
     assign cdma_sg_intf.awlock=0;
     assign cdma_sg_intf.awqos=0;
     assign cdma_sg_intf.awregion=0;
