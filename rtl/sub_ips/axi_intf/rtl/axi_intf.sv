@@ -6,63 +6,76 @@ interface axi4_intf();
    parameter USER_SIGNAL_WIDTH 	= 8	;
 
    //Global signals
-   logic			ACLK	;
-   logic 			ARESETn	;
+   wire			ACLK	;
+   wire 			ARESETn	;
 
    //Read address channel signals
-   logic [ID_WIDTH-1:0]		ARID	;
-   logic [ADDR_WIDTH-1:0]	ARADDR	;
-   logic [7:0]			    ARLEN	;
-   logic [2:0]			    ARSIZE	;
-   logic [1:0]  		    ARBURST	;
-   logic			        ARVALID	;
-   logic 			        ARREADY	;
-   logic [3:0] 			    ARCACHE	;
-   logic 			        ARLOCK	;
-   logic [2:0] 			    ARPROT	;
-   logic [3:0] 			    ARQOS	;
-   logic [3:0] 			    ARREGION;
-   logic [USER_SIGNAL_WIDTH-1:0]ARUSER	;
+   wire [ID_WIDTH-1:0]		ARID	;
+   wire [ADDR_WIDTH-1:0]	ARADDR	;
+   wire [7:0]			    ARLEN	;
+   wire [2:0]			    ARSIZE	;
+   wire [1:0]  		    ARBURST	;
+   wire			        ARVALID	;
+   wire 			        ARREADY	;
+   wire [3:0] 			    ARCACHE	;
+   wire 			        ARLOCK	;
+   wire [2:0] 			    ARPROT	;
+   wire [3:0] 			    ARQOS	;
+   wire [3:0] 			    ARREGION;
+   wire [USER_SIGNAL_WIDTH-1:0]ARUSER	;
    
    //Write address channel signals
-   logic [ID_WIDTH-1:0]		AWID	;
-   logic [ADDR_WIDTH-1:0]	AWADDR	;
-   logic [7:0]			    AWLEN	;
-   logic [2:0]			    AWSIZE	;
-   logic [1:0]  		    AWBURST	;
-   logic  			        AWVALID	;
-   logic  			        AWREADY	;
-   logic [3:0] 			    AWCACHE	;
-   logic 			        AWLOCK	;
-   logic [2:0] 			    AWPROT	;
-   logic [3:0] 			    AWQOS	;
-   logic [3:0] 			    AWREGION;
-   logic [USER_SIGNAL_WIDTH-1:0]AWUSER	;
+   wire [ID_WIDTH-1:0]		AWID	;
+   wire [ADDR_WIDTH-1:0]	AWADDR	;
+   wire [7:0]			    AWLEN	;
+   wire [2:0]			    AWSIZE	;
+   wire [1:0]  		    AWBURST	;
+   wire  			        AWVALID	;
+   wire  			        AWREADY	;
+   wire [3:0] 			    AWCACHE	;
+   wire 			        AWLOCK	;
+   wire [2:0] 			    AWPROT	;
+   wire [3:0] 			    AWQOS	;
+   wire [3:0] 			    AWREGION;
+   wire [USER_SIGNAL_WIDTH-1:0]AWUSER	;
 
    //Write response channel signals
-   logic [ID_WIDTH-1:0]		BID	;
-   logic [1:0]			    BRESP	;
-   logic 			        BVALID	;
-   logic			        BREADY	;
-   logic [USER_SIGNAL_WIDTH-1:0]BUSER	;
+   wire [ID_WIDTH-1:0]		BID	;
+   wire [1:0]			    BRESP	;
+   wire 			        BVALID	;
+   wire			        BREADY	;
+   wire [USER_SIGNAL_WIDTH-1:0]BUSER	;
    
    //Read data channel signals
-   logic [ID_WIDTH-1:0]		RID	;
-   logic [DATA_WIDTH-1:0]	RDATA	;
-   logic 			        RLAST	;
-   logic [1:0]			    RRESP	;
-   logic 			        RVALID	;
-   logic 			        RREADY	;
-   logic [USER_SIGNAL_WIDTH-1:0]RUSER	;
+   wire [ID_WIDTH-1:0]		RID	;
+   wire [DATA_WIDTH-1:0]	RDATA	;
+   wire 			        RLAST	;
+   wire [1:0]			    RRESP	;
+   wire 			        RVALID	;
+   wire 			        RREADY	;
+   wire [USER_SIGNAL_WIDTH-1:0]RUSER	;
 
    //Write data channel signals
-   logic [DATA_WIDTH-1:0]	WDATA	;
-   logic [DATA_WIDTH>>3-1:0]WSTRB	;
-   logic 			        WLAST	;
-   logic  			        WVALID	;
-   logic  			        WREADY	;
-   logic [USER_SIGNAL_WIDTH-1:0]WUSER	;
+   wire [DATA_WIDTH-1:0]	WDATA	;
+   wire [DATA_WIDTH>>3-1:0]WSTRB	;
+   wire 			        WLAST	;
+   wire  			        WVALID	;
+   wire  			        WREADY	;
+   wire [USER_SIGNAL_WIDTH-1:0]WUSER	;
 
+    clocking axi4_drv_cb @(posedge ACLK);
+        default input #1ns output #1ns;
+        output ARADDR, ARBURST, ARCACHE, ARID, ARLEN, ARLOCK, ARPROT, ARQOS, ARREGION, ARSIZE, ARVALID, ARUSER;
+        input  ARREADY;
+        output AWADDR, AWBURST, AWCACHE, AWID, AWLEN, AWLOCK, AWPROT, AWQOS, AWREGION, AWSIZE, AWVALID, AWUSER;
+        input  AWREADY;
+        output WDATA, WSTRB, WLAST, WVALID, WUSER;
+        input  WREADY;
+        input  BID, BRESP, BVALID, BUSER;
+        output BREADY;
+        input  RID, RDATA, RRESP, RLAST, RVALID, RUSER;
+        output RREADY;
+    endclocking
 
     clocking axi4_mon_cb @(posedge ACLK);
         default input #1ns output #1ns;
@@ -79,6 +92,7 @@ interface axi4_intf();
     endclocking
 
     modport MONITOR_MOD (clocking axi4_mon_cb, input ACLK, input ARESETn);
+    modport DRIVER_MOD (clocking axi4_drv_cb, input ACLK, input ARESETn);
 
 endinterface
 /*interface axi_intf();
@@ -90,63 +104,63 @@ endinterface
    parameter USER_SIGNAL_WIDTH 	= 8	;
 
    //Global signals
-   logic			ACLK	;
-   logic			ARESETn	;
+   wire			ACLK	;
+   wire			ARESETn	;
 
    //Read address channel signals
-   logic [ADDR_WIDTH-1:0]	ARADDR	;
-   logic [1:0]  		ARBURST	;
-   logic [3:0] 			ARCACHE	;
-   logic [ID_WIDTH-1:0]		ARID	;
-   logic [LENGTH_WIDTH-1:0]	ARLEN	;
-   logic [LOCK_WIDTH-1:0]	ARLOCK	;
-   logic [2:0] 			ARPROT	;
-   logic [3:0] 			ARQOS	;
-   logic 			ARREADY	;
-   logic [3:0] 			ARREGION;
-   logic [2:0]			ARSIZE	;
-   logic			ARVALID	;
-   logic [USER_SIGNAL_WIDTH-1:0]ARUSER	;
+   wire [ADDR_WIDTH-1:0]	ARADDR	;
+   wire [1:0]  		ARBURST	;
+   wire [3:0] 			ARCACHE	;
+   wire [ID_WIDTH-1:0]		ARID	;
+   wire [LENGTH_WIDTH-1:0]	ARLEN	;
+   wire [LOCK_WIDTH-1:0]	ARLOCK	;
+   wire [2:0] 			ARPROT	;
+   wire [3:0] 			ARQOS	;
+   wire 			ARREADY	;
+   wire [3:0] 			ARREGION;
+   wire [2:0]			ARSIZE	;
+   wire			ARVALID	;
+   wire [USER_SIGNAL_WIDTH-1:0]ARUSER	;
    
    //Write address channel signals
-   logic [ADDR_WIDTH-1:0]	AWADDR	;
-   logic [1:0]  		AWBURST	;
-   logic [3:0] 			AWCACHE	;
-   logic [ID_WIDTH-1:0]		AWID	;
-   logic [LENGTH_WIDTH-1:0]	AWLEN	;
-   logic [LOCK_WIDTH-1:0]	AWLOCK	;
-   logic [2:0] 			AWPROT	;
-   logic [3:0] 			AWQOS	;
-   logic  			AWREADY	;
-   logic [3:0] 			AWREGION;
-   logic [2:0]			AWSIZE	;
-   logic  			AWVALID	;
-   logic [USER_SIGNAL_WIDTH-1:0]AWUSER	;
+   wire [ADDR_WIDTH-1:0]	AWADDR	;
+   wire [1:0]  		AWBURST	;
+   wire [3:0] 			AWCACHE	;
+   wire [ID_WIDTH-1:0]		AWID	;
+   wire [LENGTH_WIDTH-1:0]	AWLEN	;
+   wire [LOCK_WIDTH-1:0]	AWLOCK	;
+   wire [2:0] 			AWPROT	;
+   wire [3:0] 			AWQOS	;
+   wire  			AWREADY	;
+   wire [3:0] 			AWREGION;
+   wire [2:0]			AWSIZE	;
+   wire  			AWVALID	;
+   wire [USER_SIGNAL_WIDTH-1:0]AWUSER	;
   
    //Write response channel signals
-   logic [ID_WIDTH-1:0]		BID	;
-   logic			BREADY	;
-   logic [1:0]			BRESP	;
-   logic 			BVALID	;
-   logic [USER_SIGNAL_WIDTH-1:0]BUSER	;
+   wire [ID_WIDTH-1:0]		BID	;
+   wire			BREADY	;
+   wire [1:0]			BRESP	;
+   wire 			BVALID	;
+   wire [USER_SIGNAL_WIDTH-1:0]BUSER	;
    
    //Read data channel signals
-   logic [DATA_WIDTH-1:0]	RDATA	;
-   logic [ID_WIDTH-1:0]		RID	;
-   logic 			RLAST	;
-   logic 			RREADY	;
-   logic [1:0]			RRESP	;
-   logic 			RVALID	;
-   logic [USER_SIGNAL_WIDTH-1:0]RUSER	;
+   wire [DATA_WIDTH-1:0]	RDATA	;
+   wire [ID_WIDTH-1:0]		RID	;
+   wire 			RLAST	;
+   wire 			RREADY	;
+   wire [1:0]			RRESP	;
+   wire 			RVALID	;
+   wire [USER_SIGNAL_WIDTH-1:0]RUSER	;
 
    //Write data channel signals
-   logic [DATA_WIDTH-1:0]	WDATA	;
-   logic [ID_WIDTH-1:0]		WID	;
-   logic 			WLAST	;
-   logic  			WREADY	;
-   logic [DATA_WIDTH>>3-1:0] 	WSTRB	;
-   logic  			WVALID	;
-   logic [USER_SIGNAL_WIDTH-1:0]WUSER	;
+   wire [DATA_WIDTH-1:0]	WDATA	;
+   wire [ID_WIDTH-1:0]		WID	;
+   wire 			WLAST	;
+   wire  			WREADY	;
+   wire [DATA_WIDTH>>3-1:0] 	WSTRB	;
+   wire  			WVALID	;
+   wire [USER_SIGNAL_WIDTH-1:0]WUSER	;
 endinterface
 
 //default param config to AXI3
@@ -156,54 +170,54 @@ interface axi3_intf();
    parameter ID_WIDTH 		= 4	;
 
    //Global signals
-   logic 			ACLK	;
-   logic 			ARESETn	;
+   wire 			ACLK	;
+   wire 			ARESETn	;
 
    //Read address channel signals
-   logic [ADDR_WIDTH-1:0]	ARADDR	;
-   logic [1:0]  		ARBURST	;
-   logic [3:0] 			ARCACHE	;
-   logic [ID_WIDTH-1:0]		ARID	;
-   logic [3:0]			ARLEN	;
-   logic [1:0]			ARLOCK	;
-   logic [2:0] 			ARPROT	;
-   logic 			ARREADY	;
-   logic [2:0]			ARSIZE	;
-   logic			ARVALID	;
+   wire [ADDR_WIDTH-1:0]	ARADDR	;
+   wire [1:0]  		ARBURST	;
+   wire [3:0] 			ARCACHE	;
+   wire [ID_WIDTH-1:0]		ARID	;
+   wire [3:0]			ARLEN	;
+   wire [1:0]			ARLOCK	;
+   wire [2:0] 			ARPROT	;
+   wire 			ARREADY	;
+   wire [2:0]			ARSIZE	;
+   wire			ARVALID	;
    
    //Write address channel signals
-   logic [ADDR_WIDTH-1:0]	AWADDR	;
-   logic [1:0]  		AWBURST	;
-   logic [3:0] 			AWCACHE	;
-   logic [ID_WIDTH-1:0]		AWID	;
-   logic [3:0]			AWLEN	;
-   logic [1:0]			AWLOCK	;
-   logic [2:0] 			AWPROT	;
-   logic  			AWREADY	;
-   logic [2:0]			AWSIZE	;
-   logic  			AWVALID	;
+   wire [ADDR_WIDTH-1:0]	AWADDR	;
+   wire [1:0]  		AWBURST	;
+   wire [3:0] 			AWCACHE	;
+   wire [ID_WIDTH-1:0]		AWID	;
+   wire [3:0]			AWLEN	;
+   wire [1:0]			AWLOCK	;
+   wire [2:0] 			AWPROT	;
+   wire  			AWREADY	;
+   wire [2:0]			AWSIZE	;
+   wire  			AWVALID	;
 
    //Write response channel signals
-   logic [ID_WIDTH-1:0]		BID	;
-   logic			BREADY	;
-   logic [1:0]			BRESP	;
-   logic 			BVALID	;
+   wire [ID_WIDTH-1:0]		BID	;
+   wire			BREADY	;
+   wire [1:0]			BRESP	;
+   wire 			BVALID	;
    
    //Read data channel signals
-   logic [DATA_WIDTH-1:0]	RDATA	;
-   logic [ID_WIDTH-1:0]		RID	;
-   logic 			RLAST	;
-   logic 			RREADY	;
-   logic [1:0]			RRESP	;
-   logic 			RVALID	;
+   wire [DATA_WIDTH-1:0]	RDATA	;
+   wire [ID_WIDTH-1:0]		RID	;
+   wire 			RLAST	;
+   wire 			RREADY	;
+   wire [1:0]			RRESP	;
+   wire 			RVALID	;
 
    //Write data channel signals
-   logic [DATA_WIDTH-1:0]	WDATA	;
-   logic [ID_WIDTH-1:0]		WID	;
-   logic 			WLAST	;
-   logic  			WREADY	;
-   logic [DATA_WIDTH>>3-1:0] 	WSTRB	;
-   logic  			WVALID	;
+   wire [DATA_WIDTH-1:0]	WDATA	;
+   wire [ID_WIDTH-1:0]		WID	;
+   wire 			WLAST	;
+   wire  			WREADY	;
+   wire [DATA_WIDTH>>3-1:0] 	WSTRB	;
+   wire  			WVALID	;
 endinterface
 */
 //default param config to AXI
@@ -214,36 +228,36 @@ interface axi4_lite_intf();
    parameter DATA_WIDTH 	= 32	;
 
    //Global signals
-   logic 			ACLK	;
-   logic 			ARESETn	;
+   wire 			ACLK	;
+   wire 			ARESETn	;
 
    //Read address channel signals
-   logic [ADDR_WIDTH-1:0]	ARADDR	;
-   logic [2:0] 			ARPROT	;
-   logic 			ARREADY	;
-   logic			ARVALID	;
+   wire [ADDR_WIDTH-1:0]	ARADDR	;
+   wire [2:0] 			ARPROT	;
+   wire 			ARREADY	;
+   wire			ARVALID	;
  
    //Write address channel signals
-   logic [ADDR_WIDTH-1:0]	AWADDR	;
-   logic [2:0] 			AWPROT	;
-   logic  			AWREADY	;
-   logic  			AWVALID	;
+   wire [ADDR_WIDTH-1:0]	AWADDR	;
+   wire [2:0] 			AWPROT	;
+   wire  			AWREADY	;
+   wire  			AWVALID	;
 
    //Write response channel signals
-   logic			BREADY	;
-   logic [1:0]			BRESP	;
-   logic 			BVALID	;
+   wire			BREADY	;
+   wire [1:0]			BRESP	;
+   wire 			BVALID	;
 
    //Read data channel signals
-   logic [DATA_WIDTH-1:0]	RDATA	;
-   logic 			RREADY	;
-   logic [1:0]			RRESP	;
-   logic 			RVALID	;
+   wire [DATA_WIDTH-1:0]	RDATA	;
+   wire 			RREADY	;
+   wire [1:0]			RRESP	;
+   wire 			RVALID	;
 
    //Write data channel signals
-   logic [DATA_WIDTH-1:0]	WDATA	;
-   logic  			WREADY	;
-   logic [DATA_WIDTH>>3-1:0] 	WSTRB	;
-   logic  			WVALID	;
+   wire [DATA_WIDTH-1:0]	WDATA	;
+   wire  			WREADY	;
+   wire [DATA_WIDTH>>3-1:0] 	WSTRB	;
+   wire  			WVALID	;
 endinterface
 */

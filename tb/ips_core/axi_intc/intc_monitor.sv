@@ -60,7 +60,7 @@ task intc_monitor::main_phase(uvm_phase phase);
             pkt.intc_irq  = mon_intc_intf.intc_interface_monitor_cb.intc_irq;
 
             intc_ap.write(pkt);
-            `uvm_info("intc_monitor_pkt", pkt.sprint(), UVM_MEDIUM)            
+            `uvm_info("intc_monitor_pkt", pkt.sprint(), UVM_LOW)            
 
             prev_intr = mon_intc_intf.intc_interface_monitor_cb.intc_intr;
             prev_irq  = mon_intc_intf.intc_interface_monitor_cb.intc_irq;

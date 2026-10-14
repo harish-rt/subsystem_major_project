@@ -2,18 +2,20 @@
 # Makefile - Riviera-PRO (Aligned with compiletb.do & simulate.do)
 # ==============================================================================
 
-TEST          ?= read_cdma_test
+TEST          ?= soc_master_test
 VERBOSITY     ?= UVM_LOW
 SEED          ?= random
 GUI           ?= 0
 WAVE          ?= 1
+#DCF           ?= 0
 
 WORK_LIB      = xil_defaultlib
 TOP_MODULE    = top
 
 TB_DIR        = ../tb
 LOG_DIR       = ./logs
-WAVE_DIR      = ./waves
+LOG_FILE 	  = $(LOG_DIR)/$(TEST)_seed_$(SEED).log
+WAVE_DIR      = ./MakeWaves
 
 # Pre-compiled Libraries for vlog (-l)
 LIBS          = -l xpm \
@@ -75,26 +77,54 @@ RTL_LIBS      = -L unisims_ver -L unimacro_ver -L secureip \
                 -L xil_defaultlib
 
 TB_SRCS       = $(TB_DIR)/common/soc_addr_pkg.sv \
-                $(TB_DIR)/common/config_tb.sv \
                 $(TB_DIR)/common/axi_parameters.sv \
                 $(TB_DIR)/mem_agent/mem_pkg.sv \
                 $(TB_DIR)/ips_core/axi_intc/intc_package.sv \
                 $(TB_DIR)/ips_core/axi_cdma_env/top/axi_cdma_env_pkg.sv \
                 $(TB_DIR)/top/cpu_package.sv \
+                $(TB_DIR)/core_perif/uart/uart_intf.sv \
+                $(TB_DIR)/core_perif/spi/spi_intf.sv \
+                $(TB_DIR)/core_perif/gpio/gpio_intf.sv \
+                $(TB_DIR)/core_perif/uart/uart_pkg.sv \
+                $(TB_DIR)/core_perif/spi/spi_pkg.sv \
+                $(TB_DIR)/core_perif/gpio/gpio_pkg.sv \
+                $(TB_DIR)/core_perif/core_perif_pkg.sv \
                 $(TB_DIR)/top/soc_package.sv \
                 $(TB_DIR)/top/tb_top.sv
 
-VLOG_FLAGS    = -work $(WORK_LIB) -uvmver 1.2 \
+VLOG_FLAGS    = -sv -coverage a -dbg \
+				-work $(WORK_LIB) -uvmver 1.2 \
+				+define+UART_SLAVE_RESPONDER_AGENT_SV \
+				+define+SPI_SLAVE_RESPONDER_AGENT_SV \
+				+define+GPIO_SLAVE_RESPONDER_AGENT_SV \
                 -err VCP7803 W1 -err VCP2980 W1 \
                 $(LIBS)
 
 VSIM_FLAGS    = -sv_seed $(SEED) +access +rwc +m+top \
+				-coverage \
+                -cc_all \
+                -acdb -acdb_cov t -acdb_file cc_test.acdb \
                 +UVM_TESTNAME=$(TEST) \
                 +UVM_VERBOSITY=$(VERBOSITY) \
                 $(RTL_LIBS) \
                 -O0 xil_defaultlib.top core_ip_wraps.glbl
 
-GUI_WAVE_CMDS  = wave -rec /top/axi4_bram_if/*; wave -rec /top/mem_intf/*; wave -rec /top/axil_riscv_if/*; wave -rec /top/lite_intc_if/*; wave -rec /top/dut/IPS_CORE/cdma_introut_0; wave -rec /top/intc_if/*; run -all;
+GUI_WAVE_CMDS  = toggle -rec /top/*;\
+				 run -all;
+#				 wave -rec /top/core_perif_if/*;\
+#GUI_WAVE_CMDS  = wave -rec /top/dut/CORE_PERIF_CTRL/u_intc/*;\
+#				 wave -rec /top/dut/CORE_PERIF_CTRL/u_spi/*;\
+#				 wave -rec /top/dut/CORE_PERIF_CTRL/u_gpio/*;\
+#				 wave -rec /top/dut/CORE_PERIF_CTRL/u_uart/*;\
+#GUI_WAVE_CMDS  = wave -rec /top/uart_if/*;\
+#				 wave -rec /top/gpio_if/*;\
+#				 wave -rec /top/spi_if/*;
+#wave -rec /top/axi4_bram_if/*; \
+#wave -rec /top/mem_intf/*; \
+#wave -rec /top/axil_riscv_if/*; \
+#wave -rec /top/lite_intc_if/*; \
+#wave -rec /top/dut/IPS_CORE/cdma_introut_0; \
+#wave -rec /top/intc_if/*;
 BATCH_LOG_CMDS = log -rec /top/axi4_bram_if/*; log -rec /top/mem_intf/*; log -rec /top/axil_riscv_if/*; log -rec /top/lite_intc_if/*; log -rec /top/dut/IPS_CORE/cdma_introut_0; log -rec /top/intc_if/*; run -all;
 
 .PHONY: all setup build run clean run_do view_wave
@@ -110,7 +140,8 @@ build: setup
 run: setup
 ifeq ($(GUI), 1)
 	@echo "--- Launching Interactive GUI Simulation ---"
-	vsim $(VSIM_FLAGS) -do "$(GUI_WAVE_CMDS)"
+	vsim $(VSIM_FLAGS) -l $(LOG_FILE) -do "do waves.tcl; $(GUI_WAVE_CMDS)"
+	#vsim $(VSIM_FLAGS) -do "do waves.tcl; $(GUI_WAVE_CMDS)"
 else
 ifeq ($(WAVE), 1)
 	@echo "--- Running Batch Simulation with Targeted ASDB Waveforms ---"

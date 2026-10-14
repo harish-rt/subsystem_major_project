@@ -16,6 +16,7 @@ class base_cpu_sequence extends uvm_sequence#(cpu_seq_item);
     bit [31:0]          sa_data;
     bit [31:0]          da_data;
     bit [31:0]          btt_data;
+    bit [31:0]          sr_data;
 
     task pre_body();
         phase   =   get_starting_phase();
@@ -38,19 +39,16 @@ class base_cpu_sequence extends uvm_sequence#(cpu_seq_item);
         pkt = cpu_seq_item::type_id::create("pkt");
     endtask
 
-    task write_reg(input bit [31:0]reg_addr, input bit [31:0]data = 0);
-        w_pkt   = cpu_seq_item::type_id::create("w_pkt");
+    task write_reg(input bit [31:0] reg_addr, input bit [32:0] data = 33'h1_0000_0000);
+        w_pkt = cpu_seq_item::type_id::create("w_pkt");
         start_item(w_pkt);
         if(!w_pkt.randomize() with {
-            AWADDR      == reg_addr;
-            if(data != 0) {
-                WDATA   == data;
-            }else {
-            WDATA       == 0;
+            AWADDR    == reg_addr;
+            WSTRB     == 4'hf;
+            operation == WRITE;
+            if(!data[32]){
+                WDATA == data[31:0];
             }
-
-            WSTRB       == 'hf;
-            operation   == WRITE;
         })begin
             `uvm_fatal("REG_ACCESS", "write_reg randomization failed!")        
         end
@@ -99,7 +97,7 @@ class cdma_reg_read_seq extends base_cpu_sequence;
         super.body();
         `uvm_info("cdma_reg_read_seq", "Start of CDMA Read Reg Sequence", UVM_LOW)
 
-        for (int i = 0; i < 11; i++) begin        
+        for(int i = 0; i < 11; i++)begin        
             read_reg(CDMA_BASE + (i*4),reg_data);
         end
         `uvm_info("cdma_reg_read_seq", "End of CDMA Read Reg Sequence", UVM_LOW)
@@ -107,21 +105,62 @@ class cdma_reg_read_seq extends base_cpu_sequence;
 
 endclass : cdma_reg_read_seq
 
+
 // WRITE READ REGISTERS
+class cdma_reg_write_seq extends base_cpu_sequence;
+    `uvm_object_utils(cdma_reg_write_seq)
+    `NEW_OBJ
+    
+    task body();
+        super.body();
+        `uvm_info("cdma_reg_write_seq", "Start of CDMA Write Reg Sequence", UVM_LOW)
+
+        write_reg(CDMA_BASE + 'h0,'h8);
+        //write_reg(CDMA_BASE + 'h4,'h0);
+        for(int i = 2; i < 10; i++)begin        
+            write_reg(CDMA_BASE + (i*4),'hffff_ffff);
+        end
+        //write_reg(CDMA_BASE + 'h28,'h0);
+        `uvm_info("cdma_reg_write_seq", "End of CDMA Write Reg Sequence", UVM_LOW)
+    endtask
+endclass : cdma_reg_write_seq
+
+
+class intc_reg_write_seq extends base_cpu_sequence;
+    `uvm_object_utils(intc_reg_write_seq)
+    `NEW_OBJ
+    
+    task body();
+        super.body();
+        `uvm_info("intc_reg_write_seq", "Start of INTC Write Reg Sequence", UVM_LOW)
+
+        for(int i = 0; i < 10; i++)begin        
+            if(i == 6)begin
+                write_reg(INTC_BASE + (i*4));
+            end else begin
+                write_reg(INTC_BASE + (i*4),'hffff_ffff);
+            end
+        end
+        `uvm_info("intc_reg_write_seq", "End of INTC Write Reg Sequence", UVM_LOW)
+    endtask
+endclass : intc_reg_write_seq
+
 
 class load_bram_seq extends base_cpu_sequence;
     `uvm_object_utils(load_bram_seq)
     `NEW_OBJ
+    
+    int bytes = 16;
 
     task body();
         super.body();
-        for(int i=0;i<8;i=i+4)begin
+        for(int i=0;i<bytes;i=i+4)begin
             write_reg('h7100_0000 + i);
         end
     endtask
 endclass : load_bram_seq
 
-
+/*
 class read_bram_seq extends base_cpu_sequence;
     `uvm_object_utils(read_bram_seq)
     `NEW_OBJ
@@ -145,50 +184,24 @@ class read_bram_seq extends base_cpu_sequence;
     endtask
 
 endclass : read_bram_seq
+*/
 
-
-class config_intc_seq extends base_cpu_sequence;
-    `uvm_object_utils(config_intc_seq)
+class intc_sw_irq_seq extends base_cpu_sequence;
+    `uvm_object_utils(intc_sw_irq_seq)
     `NEW_OBJ
-
-    bit [31:0]intc_d;
 
     task body();
         super.body();
-        
-        intc_d      = 0;
-        intc_d[26]  = 1; //CDMA
-        intc_d[27]  = 0; //Peripherals
-
-        start_item(pkt);
-        if(!pkt.randomize() with {
-            AWADDR  == 'h7000_1008; //Interrupt Enable Register
-            WDATA   == intc_d;
-            WSTRB   == 'hf;
-            operation   == WRITE;
-            })begin
-            `uvm_error(get_full_name(), "randomization_failed")
-        end
-        finish_item(pkt);
-        get_response(pkt);
-
-        intc_d      = 0;
-        intc_d[0]   = 1;  //Master Irq en
-        intc_d[1]   = 1;  //Hardware Interrupt en
-
-        start_item(pkt);
-        if(!pkt.randomize() with {
-            AWADDR  == 'h7000_101c; //Master Enable Register
-            WDATA   == intc_d;
-            WSTRB   == 'hf;
-            operation   == WRITE;
-            })begin
-            `uvm_error(get_full_name(), "randomization_failed")
-        end
-        finish_item(pkt);
-        get_response(pkt);
+        //enable sw irq in mer
+        write_reg(INTC_BASE + 'h1c,'h1);
+        //enable intr in ier
+        write_reg(INTC_BASE + 'h8,'h400_0000);
+        //pass intr in isr
+        write_reg(INTC_BASE + 'h0,'h400_0000);
+        //check irq
+        //make it clear
     endtask
-endclass : config_intc_seq
+endclass : intc_sw_irq_seq
 
 
 class load_mem_seq extends base_cpu_sequence;
@@ -280,41 +293,35 @@ class cdma_read_write_seq extends base_cpu_sequence;
         `uvm_do_with(pkt, {
             AWADDR    == CDMA_BASE + 'h18; //sa
             operation == WRITE;
-            WDATA     == 32'h7100_0000;
+            WDATA     == 32'h7100_0000;     //bram
         })
         
         `uvm_do_with(pkt, {
             AWADDR    == CDMA_BASE + 'h20; //da
             operation == WRITE;
-            WDATA     == 32'h8000_0000;
+            WDATA     == 32'h7100_1000;     //bram
         })
-              
-       `uvm_do_with(pkt, {
-            AWADDR    == CDMA_BASE + 'h28;//btt
-            operation == WRITE;
-            WDATA     == 32'h8;
-        })
-        
-        for(int i=0;i<8;i=i+4)begin
-            `uvm_do_with(pkt, {
-                ARADDR    == LITE_MEM_BASE + i;
-                operation == READ;
-            })
-        end
-    endtask
 
+       `uvm_do_with(pkt, {
+            AWADDR    == CDMA_BASE + 'h28; //btt
+            operation == WRITE;
+            WDATA     == 32'h4;
+        })
+    endtask
 endclass:cdma_read_write_seq
 
 
 class cpu_config_intc_seq extends base_cpu_sequence;
     `uvm_object_utils(cpu_config_intc_seq)
     `NEW_OBJ
+    
+    bit cdma_en,core_en;
 
     task body();
         super.body();
         reg_data        = 0;
-        reg_data[26]    = 1;                    //CDMA
-        reg_data[27]    = 0;                    //Core Peripheral
+        reg_data[26]    = cdma_en;                    //CDMA
+        reg_data[27]    = core_en;                    //Core Peripheral
         write_reg(INTC_BASE + 'h8, reg_data);   //IER
         reg_data        = 0;
         reg_data[0]     = 1;                    //Master En
@@ -372,6 +379,22 @@ class cpu_isr_seq extends base_cpu_sequence;
     endtask
 
     task handle_core_perif_isr();
+        read_reg(IRQ_BASE + 'h4, ipr_data);
+        `uvm_info("CPF_ISR_SEQ",$sformatf("ipr data: %b",ipr_data),UVM_LOW)
+        if(ipr_data[0]) begin   //timer
+        end
+        if(ipr_data[1]) begin   //uart
+            read_reg(UART_BASE + 'h8, sr_data);
+            `uvm_info("CPF_ISR_SEQ",$sformatf("uart sr data: %b",sr_data),UVM_LOW)
+        end
+        if(ipr_data[2]) begin   //spi
+            read_reg(SPI_BASE + 'h20, sr_data);
+            `uvm_info("CPF_ISR_SEQ",$sformatf("spi ipisr data: %b",sr_data),UVM_LOW)
+            read_reg(SPI_BASE + 'h64, sr_data);
+            `uvm_info("CPF_ISR_SEQ",$sformatf("spi sr data: %b",sr_data),UVM_LOW)
+        end
+        if(ipr_data[3]) begin   //gpio
+        end
         write_reg(INTC_BASE + 'hc, 'h800_0000);      // INTC ACK
     endtask
 
@@ -565,6 +588,210 @@ class bram_address_range_seq extends base_cpu_sequence;
     endtask
 endclass : bram_address_range_seq
 
+class perif_reg_read_seq extends base_cpu_sequence;
+    `uvm_object_utils(perif_reg_read_seq)
+    `NEW_OBJ
+    
+    task body();
+        super.body();
+        `uvm_info("perif_reg_read_seq", "Start of PERIF Read Reg Sequence", UVM_LOW)
+
+        //for(int i = 0; i < 10; i++)begin        
+        //    read_reg(32'ha000_0000 + (i*4),reg_data);
+        //end
+        #300;
+        write_reg(GPIO_BASE + 'h14,'h12);
+        read_reg(GPIO_BASE + 'h14,reg_data);
+        `uvm_info("perif_reg_read_seq", "End of PERIF Read Reg Sequence", UVM_LOW)
+    endtask
+endclass : perif_reg_read_seq
+
+class cdma_boundary_check_seq extends base_cpu_sequence;
+    `uvm_object_utils(cdma_boundary_check_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        //'h7000_0000 to 'h7000_0fff
+        write_reg('h7000_0000 - 'd1, 'h1);
+        write_reg('h7000_0fff + 'd1, 'h1);
+    endtask
+endclass
+
+
+class gap_pre_system_seq extends base_cpu_sequence;
+    `uvm_object_utils(gap_pre_system_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        // Lower boundary
+        write_reg(32'h0000_0000);
+        read_reg(32'h0000_0000,reg_data);
+
+        // Mid region
+        write_reg(32'h3800_0000);
+        read_reg(32'h3800_0000,reg_data);
+
+        // Upper boundary
+        write_reg(32'h6fff_fffc);
+        read_reg(32'h6fff_fffc,reg_data);
+    endtask
+endclass : gap_pre_system_seq
+
+class gap_mid_periph_seq extends base_cpu_sequence;
+    `uvm_object_utils(gap_mid_periph_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        // Lower boundary
+        write_reg(32'h7000_2000);
+        read_reg(32'h7000_2000,reg_data);
+
+        // Mid region
+        write_reg(32'h7080_0000);
+        read_reg(32'h7080_0000,reg_data);
+
+        // Upper boundary
+        write_reg(32'h70ff_fffc);
+        read_reg(32'h70ff_fffc,reg_data);
+    endtask
+endclass : gap_mid_periph_seq
+
+class gap_post_cdma_bram_seq extends base_cpu_sequence;
+    `uvm_object_utils(gap_post_cdma_bram_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        // Lower boundary
+        write_reg(32'h7140_0000);
+        read_reg(32'h7140_0000,reg_data);
+
+        // Mid region
+        write_reg(32'h7800_0000);
+        read_reg(32'h7800_0000,reg_data);
+
+        // Upper boundary
+        write_reg(32'h7fff_fffc);
+        read_reg(32'h7fff_fffc,reg_data);
+    endtask
+endclass : gap_post_cdma_bram_seq
+
+class perif_gap_interconnect_seq extends base_cpu_sequence;
+    `uvm_object_utils(perif_gap_interconnect_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        // Lower boundary (right above 0xa7ff_ffff)
+        write_reg(32'ha400_0000);       //'hx4 - gpio
+        write_reg(32'hb400_0000,'habcd_efab);
+        read_reg(32'ha400_0000,reg_data);
+
+        // Mid region
+        //write_reg(32'ha800_0000);       //'hx0 - irq
+        write_reg(32'hb800_0000,'habcd_efab);
+        read_reg(32'ha800_0000,reg_data);
+
+        // Unmapped & no DECERR
+        fork
+            begin
+                write_reg(32'hbfff_fffc);       //'hx7 - ext perif
+                read_reg(32'hbfff_fffc,reg_data);
+            end
+            begin
+                #4000ns;
+                `uvm_info("core_perif_seq","test ended since no resp",UVM_LOW)
+                $finish();
+            end
+        join_any
+    endtask
+endclass : perif_gap_interconnect_seq
+
+class uart_write_data_seq extends base_cpu_sequence;
+    `uvm_object_utils(uart_write_data_seq)
+    `NEW_OBJ
+
+    bit [7:0] tx_data = $urandom();
+
+    task body();
+        super.body();
+        write_reg(IRQ_BASE + 'h8,'h2);
+        write_reg(IRQ_BASE + 'h1c,'h3);
+        write_reg(UART_BASE + 'hc,'h10);
+        write_reg(UART_BASE + 'h4,'haa);
+        do begin
+            read_reg(UART_BASE + 'h8, reg_data);
+        end while ((reg_data & 32'h1) == 0);
+
+        read_reg(UART_BASE + 'h0, reg_data);
+    
+        `uvm_info("UART_TEST", $sformatf("Read back from UART RX FIFO: 0x%02h", reg_data[7:0]), UVM_LOW)
+        if (reg_data[7:0] == 8'hba) begin
+            `uvm_info("UART_TEST", "SUCCESS: Data loopback matched 0xBA!", UVM_LOW)
+        end else begin
+            `uvm_error("UART_TEST", $sformatf("MISMATCH: Expected 0xBA, got 0x%02h", reg_data[7:0]))
+        end
+    endtask
+    //monitor and compare
+    //using top level sbd
+endclass:uart_write_data_seq
+
+class spi_write_data_seq extends base_cpu_sequence;
+    `uvm_object_utils(spi_write_data_seq)
+    `NEW_OBJ
+    
+    bit [7:0] tx_data = $urandom();
+
+    task body();
+        super.body();
+        write_reg(IRQ_BASE + 'h8,'h4);          //irq en
+        write_reg(IRQ_BASE + 'h1c,'h3);         //irq mer
+        write_reg(SPI_BASE + 'h1c,'h8000_0000); //diger
+        write_reg(SPI_BASE + 'h70,'h0);         //ssr
+        write_reg(SPI_BASE + 'h28,'h1ff);       //ier
+        write_reg(SPI_BASE + 'h60,'h086);       //cr
+        //tx random data
+        write_reg(SPI_BASE + 'h68,tx_data);     //dtr
+        do begin
+            read_reg(SPI_BASE + 'h64, reg_data);
+        end while ((reg_data & 32'h1) != 0);    //rx not empty
+        read_reg(SPI_BASE + 'h6c, reg_data);    //drr
+        `uvm_info("SPI_TEST", $sformatf("Read back from SPI RX FIFO: 0x%02h", reg_data[7:0]), UVM_LOW)
+        write_reg(SPI_BASE + 'h70,'h1);         //ssr
+
+        //rx same data
+        write_reg(SPI_BASE + 'h70,'h0);         //ssr
+        write_reg(SPI_BASE + 'h68,'h00);        //dtr
+        do begin
+            read_reg(SPI_BASE + 'h64, reg_data);
+        end while ((reg_data & 32'h1) != 0);    //rx not empty
+        read_reg(SPI_BASE + 'h6c, reg_data);
+        `uvm_info("SPI_TEST", $sformatf("Read back from SPI RX FIFO: 0x%02h", reg_data[7:0]), UVM_LOW)
+        write_reg(SPI_BASE + 'h70,'h1);         //ssr
+
+        if(reg_data == tx_data) begin
+            `uvm_info("SPI_TEST", $sformatf("SUCCESS: Expected : %0h, got : %02h", tx_data, reg_data[7:0]), UVM_LOW)
+        end else begin
+            `uvm_error("SPI_TEST", $sformatf("MISMATCH: Expected : %0h, got : %02h", tx_data, reg_data[7:0]))
+        end
+    endtask
+endclass : spi_write_data_seq
+
+class read_bram_seq extends base_cpu_sequence;
+    `uvm_object_utils(read_bram_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        for(int i=0;i<32;i=i+4)begin
+            read_reg('h7100_0120 + i,reg_data);
+        end
+    endtask
+endclass : read_bram_seq
+
 class cdma_descriptor_mem_seq extends base_cpu_sequence; 
 
     `uvm_object_utils(cdma_descriptor_mem_seq)
@@ -708,5 +935,3 @@ class cdma_sg_seq extends base_cpu_sequence;
 
      endtask
 endclass:cdma_sg_seq
-
-
