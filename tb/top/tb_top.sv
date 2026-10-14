@@ -23,15 +23,15 @@ module top;
     axi4_intf       master_if();
     axi4_intf       slave_if();
 
-    //S00
+// S00
     axi4_lite_intf  axil_riscv_if();
-    //S02
+// S02
     axi4_lite_intf  lite_data_if();
 
-    //memory interface
+// memory interface
     axi4_lite_intf  mem_intf();
 
-    //BRAM interface
+// BRAM interface
     axi4_intf       axi4_bram_if();
 
 // AXI Interrupt Controller
@@ -283,7 +283,8 @@ module top;
     assign cdma_reg_intf.arqos=0;
     assign cdma_reg_intf.arburst=0;
     assign cdma_reg_intf.wstrobe=0;
-    assign cdma_reg_intf.wlast=0;
+    assign cdma_reg_intf.wlast=1;
+    assign cdma_reg_intf.rlast=1;
     assign cdma_sg_intf.awid=0;
     assign cdma_sg_intf.bid=0;
     assign cdma_sg_intf.arid=0;
@@ -293,6 +294,7 @@ module top;
     assign cdma_data_mov_intf.bid=0;
     assign cdma_data_mov_intf.arid=0;
     assign cdma_data_mov_intf.rid=0;
+    assign cdma_sg_intf.rid=0;
     assign cdma_sg_intf.awlock=0;
     assign cdma_sg_intf.awqos=0;
     assign cdma_sg_intf.awregion=0;
@@ -305,7 +307,6 @@ module top;
     assign cdma_data_mov_intf.awregion=0;
     assign cdma_data_mov_intf.awlock=0;
 
-    //BRAM
     // BRAM MEMORY
     // CLK RESET
     assign axi4_bram_if.ACLK        = aclk;
@@ -356,7 +357,7 @@ module top;
     assign mem_intf.ACLK    = aclk;
     assign mem_intf.ARESETn = areset_n;
 
-    //Lite Memory assignment
+    // Lite Memory assignment
     assign mem_intf.ARADDR  = dut.AXI_SLAVE_MEM.s_axi_intf.ARADDR;   
     assign mem_intf.ARREADY = dut.AXI_SLAVE_MEM.s_axi_intf.ARREADY;  
     assign mem_intf.ARVALID = dut.AXI_SLAVE_MEM.s_axi_intf.ARVALID;
@@ -380,16 +381,17 @@ module top;
         run_test("cdma_boundary_check_test");
         //run_test("load_bram_256_test");   //find the interconnect issue
         //run_test("soc_master_test");
-        //run_test("sample_test");
+        //run_test("intc_sw_irq_test");
+        //run_test("intc_reg_write_read_test");
+        //run_test("cdma_reg_write_read_test");
+        //run_test("reg_read_test");
         //run_test("bram_address_range_test");
         //run_test("bram_upper_invalid_addr_test");
         //run_test("bram_lower_invalid_addr_test");
         //run_test("bram_multiple_write_read_test");
-        //run_test("config_intc_test");
         //run_test("load_bram_test");
         //run_test("read_bram_test");
         //run_test("config_cdma_ral_test");
-        //run_test("read_cdma_test");
         //run_test("cpu_base_test");
         //run_test("cdma_wr_rd_test");
         //run_test("mem_wr_rd_test");
@@ -407,7 +409,7 @@ module top;
         //$finish();
     end
      
-     soc_config     soc_config_obj;
+    soc_config     soc_config_obj;
 
     initial begin
     	uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
@@ -420,7 +422,6 @@ module top;
         //soc_config
           soc_config_obj=soc_config::type_id::create("soc_config_obj");
         //INTC
-        //soc_config_obj.intc_obj                     =   new("intc_obj");
         soc_config_obj.intc_obj = intc_config_obj::type_id::create("intc_obj");
         soc_config_obj.intc_obj.axi_lite_is_active  =   UVM_PASSIVE;
         soc_config_obj.intc_obj.lite_intc_intf      =   lite_intc_if;

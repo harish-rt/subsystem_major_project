@@ -179,6 +179,76 @@ endinterface
 interface axi4_lite_intf();
    parameter ADDR_WIDTH 	= 32	;
    parameter DATA_WIDTH 	= 32	;
+    
+   logic ACLK;
+   logic ARESETn;
+   //Write address channel signals
+   logic [ADDR_WIDTH-1:0]	AWADDR	;
+   logic  			AWREADY	;
+   logic  			AWVALID	;
+   logic [2:0] 		AWPROT	;
+
+   //Write data channel signals
+   logic [DATA_WIDTH-1:0]	WDATA	;
+   logic [(DATA_WIDTH/8)-1:0] 	WSTRB	;
+   logic  			WREADY	;
+   logic  			WVALID	;
+
+   //Write response channel signals
+   logic [1:0]		BRESP	;
+   logic			BREADY	;
+   logic 			BVALID	;
+
+   //Read address channel signals
+   logic [ADDR_WIDTH-1:0]	ARADDR	;
+   logic 			ARREADY	;
+   logic			ARVALID	;
+   logic [2:0] 		ARPROT	;
+ 
+   //Read data channel signals
+   logic [DATA_WIDTH-1:0]	RDATA	;
+   logic [1:0]		RRESP	;
+   logic 			RREADY  ;
+   logic 			RVALID	;
+
+   clocking axil_drv_cb @(posedge ACLK);
+      default input #1ns output #1ns;
+
+      output ARADDR, ARPROT, ARVALID;
+      output AWADDR, AWPROT, AWVALID;
+      output WDATA,  WSTRB,  WVALID;
+      output BREADY, RREADY;
+
+      input ARESETn;
+      input  ARREADY;
+      input  AWREADY;
+      input  WREADY;
+      input  BRESP,  BVALID;
+      input  RDATA,  RRESP,  RVALID;
+   endclocking
+
+
+   clocking axil_mon_cb @(posedge ACLK);
+      default input #1ns output #1ns;
+
+      input ARESETn;
+      input ARADDR, ARPROT, ARVALID, ARREADY;
+      input AWADDR, AWPROT, AWVALID, AWREADY;
+      input WDATA,  WSTRB,  WVALID,  WREADY;
+      input BRESP,  BVALID, BREADY;
+      input RDATA,  RRESP,  RVALID,  RREADY;
+   endclocking
+
+   
+   modport DRIVER_MOD  (clocking axil_drv_cb, input ACLK, input ARESETn);
+   modport MONITOR_MOD (clocking axil_mon_cb, input ACLK, input ARESETn);
+
+endinterface
+/*
+//default param config to AXI4_lite
+interface axi4_lite_intf();
+   parameter ADDR_WIDTH 	= 32	;
+   parameter DATA_WIDTH 	= 32	;
 
    //Global signals
    logic 			ACLK	;
