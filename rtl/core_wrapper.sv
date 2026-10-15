@@ -108,6 +108,8 @@ module core_wrapper
   assign axi_int2main_mem.ACLK    = clk_i;
 
   //RESETn
+  wire   core_perif_rst;                                            // core peripheral reset
+  assign core_perif_rst             = ~axi_int2core_peri.ARESETn;   // to core peripheral
   assign axi_int2core_peri.ARESETn  = internal_rst_n;               // to core peripheral
   assign axi_int2main_mem.ARESETn   = internal_rst_n_2;             // Main Memory Unit
   
@@ -354,7 +356,8 @@ module core_wrapper
            ) 
            CORE_PERIF_CTRL  (
               .clk_i		        (axi_int2core_peri.ACLK	    ),
-              .rst_i		        (axi_int2core_peri.ARESETn  ),
+              //.rst_i		        (axi_int2core_peri.ARESETn  ),
+              .rst_i		        (core_perif_rst  ),
               .inport_awvalid_i	    (axi_int2core_peri.AWVALID  ),
               .inport_awaddr_i	    (axi_int2core_peri.AWADDR	),
               .inport_wvalid_i	    (axi_int2core_peri.WVALID 	),

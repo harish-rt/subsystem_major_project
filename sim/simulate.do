@@ -1,6 +1,8 @@
+close [open "sim_txt.log" w]
+
 echo "--- Starting UVM Simulation ---"
 
-vsim -sv_seed random +access +rwc +m+top +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJECTION_TRACE \
+vsim -sv_seed random +access +rwc +dbg +m+top +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJECTION_TRACE \
 -L unisims_ver -L unimacro_ver -L secureip \
 -L xpm \
 -L generic_baseblocks_v2_1_0 \
@@ -33,7 +35,12 @@ vsim -sv_seed random +access +rwc +m+top +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJECTION
 -l sim_txt.log
 do waves.tcl
 run -all
+#transcript to
 
+#add wave -recursive /top/dut/CORE_PERIF_CTRL/u_intc/*
+#add wave -recursive /top/dut/CORE_PERIF_CTRL/u_spi/*
+#add wave -recursive /top/dut/CORE_PERIF_CTRL/u_gpio/*
+#add wave -recursive /top/dut/CORE_PERIF_CTRL/u_uart/*
 
 #add wave -recursive /top/axi4_bram_if/*
 #add wave -recursive /top/mem_intf/*

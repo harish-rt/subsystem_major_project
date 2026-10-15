@@ -1,4 +1,17 @@
-interface spi_if (input logic clk_i, input logic rst_n_i);
+interface spi_slave_if(input logic clk, rst_n);
+    logic        req_valid;
+    logic        req_ready;
+    logic        ack;
+    logic        cs_n;
+    logic        sclk;
+    logic        mosi;
+    logic        miso;
+    logic [7:0]  req_data;
+    logic [7:0]  rsp_data;
+endinterface
+
+/*
+interface spi_intf ();
 
     logic spi_clk_o;
     logic spi_cs_o;
@@ -30,3 +43,4 @@ interface spi_if (input logic clk_i, input logic rst_n_i);
     modport SPI_MON (clocking spi_mon_cb, input clk_i, input rst_n_i);
 
 endinterface : spi_if
+*/

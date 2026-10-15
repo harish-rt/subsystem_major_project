@@ -37,17 +37,13 @@ task spi_monitor::mon_tx_frames();
     forever begin
         spi_seq_item tx_pkt;
 
-        @(negedge spi_if.tx);
+        @(negedge spi_if.clk_i);
         
         tx_pkt = spi_seq_item::type_id::create("tx_pkt");
 
         for (int i = 0; i < 8; i++) begin
-            tx_pkt.data[i] = spi_if.tx;
-            #(baud_period);
-        end
-
-        if (spi_if.tx !== 1'b1) begin
-            `uvm_error("UART_MON_TX", "Framing error: Stop bit not 1")
+            @(negedge spi_if.clk_i);
+            tx_pkt.data[i] = spi_if.spi_mosi_o;
         end
 
         tx_mon_ap.write(tx_pkt);
@@ -58,17 +54,13 @@ task spi_monitor::mon_rx_frames();
   forever begin
     spi_seq_item rx_pkt;
 
-    @(negedge spi_if.rx);
+    @(negedge spi_if.clk_i);
     
     rx_pkt = spi_seq_item::type_id::create("rx_pkt");
 
     for (int i = 0; i < 8; i++) begin
-        rx_pkt.data[i] = spi_if.rx;
-        #(baud_period);
-    end
-
-    if (spi_if.rx !== 1'b1) begin
-        `uvm_error("UART_MON_RX", "Framing error: Stop bit not 1")
+        @(negedge spi_if.clk_i);
+        rx_pkt.data[i] = spi_if.spi_miso_i;
     end
 
     rx_mon_ap.write(rx_pkt);

@@ -1,12 +1,14 @@
 class cpu_driver extends uvm_driver #(cpu_seq_item);
-   `uvm_component_utils(cpu_driver)
+    `uvm_component_utils(cpu_driver)
 
-   virtual axi4_lite_intf.DRIVER_MOD cpu_drv_intf;
-   cpu_seq_item pkt;
+    virtual axi4_lite_intf.DRIVER_MOD cpu_drv_intf;
+    cpu_seq_item               pkt;
+    bit disable_cpu_fork     = 0;
 
-   function new(string name = "cpu_driver", uvm_component parent);
-      super.new(name, parent);
-   endfunction
+    function new(string name = "cpu_driver", uvm_component parent);
+        super.new(name, parent);
+    	void'(uvm_config_db#(bit)::get(this,"","DCF",disable_cpu_fork));
+    endfunction
 
    task reset_phase(uvm_phase phase);
       `uvm_info(get_full_name(), "reset_phase", UVM_MEDIUM)
@@ -28,16 +30,29 @@ class cpu_driver extends uvm_driver #(cpu_seq_item);
          @(cpu_drv_intf.axil_drv_cb);
          seq_item_port.get_next_item(pkt);
          if (pkt.operation == WRITE) begin
-            fork
-               drive_write_add(pkt);
-               drive_write_data(pkt);
-               drive_write_resp(pkt);
-            join
+            if(disable_cpu_fork) begin
+                drive_write_add(pkt);
+                drive_write_data(pkt);
+                drive_write_resp(pkt);
+            end
+            else begin
+                fork
+                    drive_write_add(pkt);
+                    drive_write_data(pkt);
+                    drive_write_resp(pkt);
+                join
+            end
          end else begin
-            fork
-               drive_read_add(pkt);
-               drive_read_data(pkt);
-            join
+            if(disable_cpu_fork) begin
+                drive_read_add(pkt);
+                drive_read_data(pkt);
+            end
+            else begin
+                fork
+                   drive_read_add(pkt);
+                   drive_read_data(pkt);
+                join
+            end
          end
          seq_item_port.item_done(pkt);
       end

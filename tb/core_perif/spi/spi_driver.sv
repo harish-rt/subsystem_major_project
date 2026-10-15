@@ -14,13 +14,20 @@ class spi_driver extends uvm_driver#(spi_seq_item);
 
     task main_phase(uvm_phase phase);
         `uvm_info(get_full_name(), "spi_main_phase entered", UVM_LOW)
+
         forever begin
-            seq_item_port.get_next_item(pkt);
-            drive_byte(pkt);
-            seq_item_port.item_done();
+            @(negedge spi_if.spi_cs_o);
+            while(spi_if.spi_cs_o == 0)begin
+                seq_item_port.get_next_item(pkt);
+                    for(int i = 0; i < 8; i++)begin
+                        @(negedge spi_if.clk_i);
+                        spi_if.spi_miso_i <= pkt.data[i];
+                        if(spi_if.spi_cs_o == 1) break;
+                    end
+                seq_item_port.item_done();
+            end
+            spi_if.spi_miso_i <= 1'bz;
         end
     endtask
 
-    task drive_byte(spi_seq_item pkt);
-    endtask
 endclass : spi_driver

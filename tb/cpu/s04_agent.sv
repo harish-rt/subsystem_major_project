@@ -1,5 +1,6 @@
 class s04_agent extends uvm_agent;
    `uvm_component_utils(s04_agent)
+
    s04_monitor    mon;
    s04_driver     drv;
    s04_sequencer  sqr;

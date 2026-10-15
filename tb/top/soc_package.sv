@@ -7,14 +7,21 @@ package soc_package;
     import axi_cdma_env_pkg ::*;
     import mem_package :: *;
     import intc_package ::*;
+    import uart_pkg ::*;
+    import spi_pkg ::*;
+    import gpio_pkg ::*;
+    import core_perif_pkg ::*;
 
     `include "soc_config.sv"
     export *::*;
 //IPS_CORE
     `include "../ips_core/ips_core_env.sv"
+//CORE PERIPHERALS
+    //`include "../core_perif/core_perif_env.sv"
 // TOP
     `include "soc_virtual_sequencer.sv"
     `include "soc_virtual_sequence.sv"
+
     `include "wrapper_env.sv"
     `include "base_test.sv"
 endpackage : soc_package
