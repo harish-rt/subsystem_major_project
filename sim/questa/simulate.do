@@ -42,6 +42,10 @@ xil_defaultlib.top core_ip_wraps.glbl \
 -l sim_txt.log
 
 do wave.do
+add wave -recursive /top/dut/IPS_CORE/S04_AXI_0_bvalid
+add wave -recursive /top/dut/IPS_CORE/S04*
+add wave -recursive /top/dut/IPS_CORE/M03*
+run -all
 
 #add wave -r sim:/top/axi4_bram_if/*
 #add wave -r sim:/top/mem_intf/*
@@ -54,7 +58,6 @@ do wave.do
 #add wave -r sim:/top/cdma_data_mov_intf/*
 #add wave -r sim:/top/cdma_sg_intf/*
 
-run -all
 
 
 #add wave -recursive /top/axi4_bram_if/*

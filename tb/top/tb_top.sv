@@ -378,8 +378,8 @@ module top;
  
 
     initial begin
-        run_test("cdma_boundary_check_test");
-        //run_test("load_bram_256_test");   //find the interconnect issue
+        //run_test("cdma_boundary_check_test");
+        run_test("load_bram_256_test");   //find the interconnect issue
         //run_test("soc_master_test");
         //run_test("intc_sw_irq_test");
         //run_test("intc_reg_write_read_test");
@@ -405,10 +405,18 @@ module top;
         areset_n = 0;
         repeat(16)@(posedge aclk);
         areset_n = 1;
-        //#3000;
-        //$finish();
+        #3000;
+        $finish();
     end
-     
+    // checking b channel by bypassing the interconnect
+    // find why interconnect not passign these signals
+    //initial begin
+    //    force slave_if.BID      = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BID;
+    //    force slave_if.BVALID   = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BVALID;
+    //    force slave_if.BREADY   = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BREADY;
+    //    force slave_if.BRESP    = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BRESP;
+    //end
+
     soc_config     soc_config_obj;
 
     initial begin

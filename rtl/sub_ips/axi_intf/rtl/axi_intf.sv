@@ -1,8 +1,8 @@
 //default param config to AXI
 interface axi4_intf();
-   parameter ADDR_WIDTH 	= 32	;
-   parameter DATA_WIDTH 	= 32	;
-   parameter ID_WIDTH 		= 4	;
+   parameter ADDR_WIDTH 	    = 32;
+   parameter DATA_WIDTH 	    = 32;
+   parameter ID_WIDTH 		    = 4	;
    parameter USER_SIGNAL_WIDTH 	= 8	;
 
    //Global signals

@@ -16,8 +16,6 @@ class s04_driver extends uvm_driver #(s04_seq_item, s04_seq_item);
     `uvm_component_utils(s04_driver)
     `uvm_register_cb(s04_driver, master_driver_callback)
 
-    // Base virtual interface handle to prevent config_db SIGSEGV
-    virtual axi4_intf            vif;
     virtual axi4_intf.DRIVER_MOD master_drv_intf;
 
     int                          drv_burst_count;
@@ -30,7 +28,6 @@ class s04_driver extends uvm_driver #(s04_seq_item, s04_seq_item);
         if (!uvm_config_db#(virtual axi4_intf.DRIVER_MOD)::get(this, "", "S04", master_drv_intf)) begin
             `uvm_fatal(get_full_name(), "virtual axi4_intf get failed from config_db!")
         end
-        //master_drv_intf = vif.DRIVER_MOD;
     endfunction
 
     extern task reset_phase      (uvm_phase phase);
@@ -43,9 +40,7 @@ class s04_driver extends uvm_driver #(s04_seq_item, s04_seq_item);
 endclass : s04_driver
 
 
-// ========================================================
 // Reset Phase
-// ========================================================
 task s04_driver::reset_phase(uvm_phase phase);
     phase.raise_objection(this);
     `uvm_info(get_full_name(), "reset_phase: Driving bus to safe defaults...", UVM_LOW)
@@ -93,9 +88,7 @@ task s04_driver::reset_phase(uvm_phase phase);
 endtask : reset_phase
 
 
-// ========================================================
 // Main Phase
-// ========================================================
 task s04_driver::main_phase(uvm_phase phase);
     `uvm_info(get_full_name(), "main_phase running", UVM_MEDIUM)
 
@@ -124,9 +117,6 @@ task s04_driver::main_phase(uvm_phase phase);
 endtask : main_phase
 
 
-// ========================================================
-// Channel Drivers
-// ========================================================
 task s04_driver::drive_write_add(s04_seq_item pkt);
     master_drv_intf.axi4_drv_cb.AWADDR   <= pkt.AWADDR;
     master_drv_intf.axi4_drv_cb.AWBURST  <= pkt.AWBURST;
@@ -158,6 +148,8 @@ task s04_driver::drive_write_data(s04_seq_item pkt);
         master_drv_intf.axi4_drv_cb.WVALID <= 1'b0;
         master_drv_intf.axi4_drv_cb.WLAST  <= 1'b0;
     end
+    
+    @(master_drv_intf.axi4_drv_cb); 
 endtask : drive_write_data
 
 
