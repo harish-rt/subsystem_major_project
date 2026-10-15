@@ -18,7 +18,7 @@ module top;
     import axi_cdma_env_pkg ::*;
     import mem_package :: *;
     import intc_package ::*;
-    import core_perif_pkg ::*;
+    //import core_perif_pkg ::*;
     import soc_package ::*;
 
     bit aclk;

@@ -4,9 +4,9 @@ package core_perif_pkg;
 
     `include "../common/config_tb.sv"
     // Import the component VIP packages
-    import uart_pkg::*;
-    import spi_pkg::*;
-    import gpio_pkg::*;
+    //import uart_pkg::*;
+    //import spi_pkg::*;
+    //import gpio_pkg::*;
     //import timer_pkg::*;
 
     //`include "uart/uart_slave_responder_agent.sv"

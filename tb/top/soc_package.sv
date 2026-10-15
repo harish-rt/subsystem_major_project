@@ -7,9 +7,9 @@ package soc_package;
     import axi_cdma_env_pkg ::*;
     import mem_package :: *;
     import intc_package ::*;
-    import uart_pkg ::*;
-    import spi_pkg ::*;
-    import gpio_pkg ::*;
+    //import uart_pkg ::*;
+    //import spi_pkg ::*;
+    //import gpio_pkg ::*;
     import core_perif_pkg ::*;
 
     `include "soc_config.sv"
