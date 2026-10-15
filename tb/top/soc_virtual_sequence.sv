@@ -301,46 +301,6 @@ class core_perif_master_vseq extends soc_base_virtual_sequence;
     endtask
 endclass : core_perif_master_vseq
 
-        fork
-            //isr_vseq.start(p_sequencer);
-        join_none
-        intc_seq.start(p_sequencer.cpu_sqr);
-        isr_clear();
-    endtask
-endclass : intc_sw_irq_vseq
-
-class cdma_reg_write_read_vseq extends soc_base_virtual_sequence;
-    `uvm_object_utils(cdma_reg_write_read_vseq)
-    `NEW_OBJ
-
-    cdma_reg_write_seq  cdma_wseq;
-    cdma_reg_read_seq   cdma_rseq;
-
-    task body();
-        cdma_wseq = cdma_reg_write_seq  ::type_id::create("cdma_wseq");
-        cdma_rseq = cdma_reg_read_seq   ::type_id::create("cdma_rseq");
-
-        cdma_wseq.start(p_sequencer.cpu_sqr);
-        cdma_rseq.start(p_sequencer.cpu_sqr);
-    endtask
-endclass : cdma_reg_write_read_vseq
-
-class intc_reg_write_read_vseq extends soc_base_virtual_sequence;
-    `uvm_object_utils(intc_reg_write_read_vseq)
-    `NEW_OBJ
-
-    intc_reg_write_seq  intc_wseq;
-    intc_reg_read_seq   intc_rseq;
-
-    task body();
-        intc_wseq = intc_reg_write_seq  ::type_id::create("intc_wseq");
-        intc_rseq = intc_reg_read_seq   ::type_id::create("intc_rseq");
-
-        intc_wseq.start(p_sequencer.cpu_sqr);
-        intc_rseq.start(p_sequencer.cpu_sqr);
-    endtask
-endclass : intc_reg_write_read_vseq
-
 //`GAPS_SEQ(spi_write_data_vseq, spi_write_data_seq)
 
 class spi_write_data_vseq extends soc_base_virtual_sequence;
