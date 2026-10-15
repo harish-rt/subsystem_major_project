@@ -139,12 +139,13 @@ class load_bram_256_test extends cpu_base_test;
         lite_seq = read_bram_vseq::type_id::create("lite_seq");     //axi4 lite
 
         phase.raise_objection(this);
+            `uvm_info("UVM_TEST","started bram loading",UVM_LOW)
             load_seq.start(w_env.c_env.s04_agt.sqr);
             `uvm_info("UVM_TEST","loading bram completed",UVM_LOW)
             //#1000ns;
         fork
             `uvm_info("UVM_TEST","entered fork",UVM_LOW)
-            read_seq.start(w_env.c_env.s04_agt.sqr);
+            //read_seq.start(w_env.c_env.s04_agt.sqr);
             lite_seq.start(w_env.vsqr);
         join
         `uvm_info("UVM_TEST","came out of fork",UVM_LOW)

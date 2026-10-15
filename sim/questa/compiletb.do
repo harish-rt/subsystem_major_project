@@ -40,15 +40,39 @@ vlog -timescale 1ns/1ps -sv -work xil_defaultlib \
   -L core_perif \
   -L spi_mem \
   -L core_wrapper \
-  "../../tb/common/config_tb.sv" \
-  "../../tb/common/soc_addr_pkg.sv" \
-  "../../tb/common/axi_parameters.sv" \
-  "../../tb/top/cpu_package.sv" \
-  "../../tb/ips_core/axi_cdma_env/top/axi_cdma_env_pkg.sv" \
-  "../../tb/mem_agent/mem_pkg.sv" \
-  "../../tb/ips_core/axi_intc/intc_package.sv" \
-  "../../tb/top/soc_package.sv" \
+  "../../tb/common/soc_addr_pkg.sv"  \
+  "../../tb/common/axi_parameters.sv"  \
+  "../../tb/mem_agent/mem_pkg.sv"  \
+  "../../tb/ips_core/axi_intc/intc_package.sv"  \
+  "../../tb/ips_core/axi_cdma_env/top/axi_cdma_env_pkg.sv"  \
+  "../../tb/top/cpu_package.sv"  \
+  "../../tb/core_perif/uart/uart_intf.sv"  \
+  "../../tb/core_perif/spi/spi_intf.sv"  \
+  "../../tb/core_perif/gpio/gpio_intf.sv"  \
+  "../../tb/core_perif/uart/uart_pkg.sv"  \
+  "../../tb/core_perif/spi/spi_pkg.sv"  \
+  "../../tb/core_perif/gpio/gpio_pkg.sv"  \
+  "../../tb/core_perif/core_perif_pkg.sv"  \
+  "../../tb/top/soc_package.sv"  \
   "../../tb/top/tb_top.sv"
+
+
+#  "../../tb/common/config_tb.sv" \
+#  "../../tb/common/soc_addr_pkg.sv" \
+#  "../../tb/common/axi_parameters.sv" \
+#  "../../tb/top/cpu_package.sv" \
+#  "../../tb/ips_core/axi_cdma_env/top/axi_cdma_env_pkg.sv" \
+#  "../../tb/mem_agent/mem_pkg.sv" \
+#  "../../tb/ips_core/axi_intc/intc_package.sv" \
+#  "../../tb/core_perif/uart/uart_intf.sv" \
+#  "../../tb/core_perif/spi/spi_intf.sv"  \
+#  "../../tb/core_perif/gpio/gpio_intf.sv"  \
+#  "../../tb/core_perif/uart/uart_pkg.sv"  \
+#  "../../tb/core_perif/spi/spi_pkg.sv"  \
+#  "../../tb/core_perif/gpio/gpio_pkg.sv"  \
+#  "../../tb/core_perif/core_perif_pkg.sv"  \  
+#  "../../tb/top/soc_package.sv" \
+#  "../../tb/top/tb_top.sv"
 
 
 #transcript file compiletb.log

@@ -40,9 +40,7 @@ class s04_driver extends uvm_driver #(s04_seq_item, s04_seq_item);
 endclass : s04_driver
 
 
-// ========================================================
 // Reset Phase
-// ========================================================
 task s04_driver::reset_phase(uvm_phase phase);
     phase.raise_objection(this);
     `uvm_info(get_full_name(), "reset_phase: Driving bus to safe defaults...", UVM_LOW)
@@ -90,9 +88,7 @@ task s04_driver::reset_phase(uvm_phase phase);
 endtask : reset_phase
 
 
-// ========================================================
 // Main Phase
-// ========================================================
 task s04_driver::main_phase(uvm_phase phase);
     `uvm_info(get_full_name(), "main_phase running", UVM_MEDIUM)
 
@@ -121,9 +117,7 @@ task s04_driver::main_phase(uvm_phase phase);
 endtask : main_phase
 
 
-// ========================================================
 // Channel Drivers
-// ========================================================
 task s04_driver::drive_write_add(s04_seq_item pkt);
     master_drv_intf.axi4_drv_cb.AWADDR   <= pkt.AWADDR;
     master_drv_intf.axi4_drv_cb.AWBURST  <= pkt.AWBURST;

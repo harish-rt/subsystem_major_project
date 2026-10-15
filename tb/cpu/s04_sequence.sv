@@ -81,7 +81,8 @@ class load_bram_256_seq extends base_s04_sequence;
             AWADDR  == 'h7100_0100;
             AWLEN   == 'hf;
             AWBURST == INCR;
-            AWID    == 'h2;
+            //AWID    == 'h0;
+            AWCACHE == 'h0;
             write   == WRITE;
             }) begin
             `uvm_error(get_full_name(), "randomization_failed")
