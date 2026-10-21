@@ -14,6 +14,7 @@ vlib riviera/xpm
 vlib riviera/unisim
 
 vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_VPKG.vhd"
+vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_VCOMP.vhd"
 vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_retarget_VCOMP.vhd"
 # ==============================================================================
 # Create Libraries

@@ -16,17 +16,19 @@ class s04_driver extends uvm_driver #(s04_seq_item, s04_seq_item);
     `uvm_component_utils(s04_driver)
     `uvm_register_cb(s04_driver, master_driver_callback)
 
-    virtual axi4_intf.DRIVER_MOD master_drv_intf;
+    virtual axi4_tb_intf.DRIVER_MOD master_drv_intf;
 
     int                          drv_burst_count;
     s04_seq_item                 pkt;
+    bit disable_cpu_fork       = 0;
 
     `NEW_COMP
 
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-        if (!uvm_config_db#(virtual axi4_intf.DRIVER_MOD)::get(this,"","S04",master_drv_intf)) begin
-            `uvm_fatal(get_full_name(), "virtual axi4_intf get failed from config_db!")
+    	void'(uvm_config_db#(bit)::get(this,"","DCF",disable_cpu_fork));
+        if (!uvm_config_db#(virtual axi4_tb_intf.DRIVER_MOD)::get(this,"","S04",master_drv_intf)) begin
+            `uvm_fatal(get_full_name(), "virtual axi4_tb_intf get failed from config_db!")
         end
     endfunction
 
@@ -97,18 +99,31 @@ task s04_driver::main_phase(uvm_phase phase);
 
         `uvm_do_callbacks(s04_driver, master_driver_callback, pre_drive(pkt));
 
-        if (pkt.write == WRITE) begin
-            fork
+        if (pkt.operation == WRITE) begin
+            if(disable_cpu_fork) begin
                 drive_write_add(pkt);
                 drive_write_data(pkt);
-            join
-            drive_write_resp(pkt);
+                drive_write_resp(pkt);
+            end
+            else begin
+                fork
+                    drive_write_add(pkt);
+                    drive_write_data(pkt);
+                    drive_write_resp(pkt);
+                join
+            end
         end 
-        else if (pkt.write == READ) begin
-            fork
+        else if (pkt.operation == READ) begin
+            if(disable_cpu_fork) begin
                 drive_read_add(pkt);
                 drive_read_data(pkt);
-            join
+            end
+            else begin
+                fork
+                    drive_read_add(pkt);
+                    drive_read_data(pkt);
+                join
+            end
         end
 
         `uvm_do_callbacks(s04_driver, master_driver_callback, post_drive(pkt));
@@ -119,12 +134,14 @@ endtask : main_phase
 
 // Channel Drivers
 task s04_driver::drive_write_add(s04_seq_item pkt);
+    @(master_drv_intf.axi4_drv_cb);
     master_drv_intf.axi4_drv_cb.AWADDR   <= pkt.AWADDR;
     master_drv_intf.axi4_drv_cb.AWBURST  <= pkt.AWBURST;
     master_drv_intf.axi4_drv_cb.AWCACHE  <= pkt.AWCACHE;
     master_drv_intf.axi4_drv_cb.AWID     <= pkt.AWID;
     master_drv_intf.axi4_drv_cb.AWLEN    <= pkt.AWLEN;
     master_drv_intf.axi4_drv_cb.AWSIZE   <= pkt.AWSIZE;
+    master_drv_intf.axi4_drv_cb.AWQOS    <= pkt.AWQOS;
     master_drv_intf.axi4_drv_cb.AWVALID  <= 1'b1;
 
     do begin
@@ -136,6 +153,7 @@ endtask : drive_write_add
 
 
 task s04_driver::drive_write_data(s04_seq_item pkt);
+    @(master_drv_intf.axi4_drv_cb);
     for (int i = 0; i <= pkt.AWLEN; i++) begin
         master_drv_intf.axi4_drv_cb.WDATA  <= pkt.WDATA[i];
         master_drv_intf.axi4_drv_cb.WSTRB  <= pkt.WSTRB[i];
@@ -145,33 +163,36 @@ task s04_driver::drive_write_data(s04_seq_item pkt);
         do begin
             @(master_drv_intf.axi4_drv_cb);
         end while (master_drv_intf.axi4_drv_cb.WREADY !== 1'b1);
-
-        master_drv_intf.axi4_drv_cb.WVALID <= 1'b0;
-        master_drv_intf.axi4_drv_cb.WLAST  <= 1'b0;
     end
+    master_drv_intf.axi4_drv_cb.WVALID <= 1'b0;
+    master_drv_intf.axi4_drv_cb.WLAST  <= 1'b0;
 endtask : drive_write_data
 
 
 task s04_driver::drive_write_resp(s04_seq_item pkt);
+    @(master_drv_intf.axi4_drv_cb);
     master_drv_intf.axi4_drv_cb.BREADY <= 1'b1;
 
     do begin
         @(master_drv_intf.axi4_drv_cb);
     end while (master_drv_intf.axi4_drv_cb.BVALID !== 1'b1);
+    pkt.BID     = master_drv_intf.axi4_drv_cb.BID;
+    pkt.BRESP   = response_t'(master_drv_intf.axi4_drv_cb.BRESP);
 
-    pkt.BRESP = response_t'(master_drv_intf.axi4_drv_cb.BRESP);
     master_drv_intf.axi4_drv_cb.BREADY <= 1'b0;
     drv_burst_count++;
 endtask : drive_write_resp
 
 
 task s04_driver::drive_read_add(s04_seq_item pkt);
+    @(master_drv_intf.axi4_drv_cb);
     master_drv_intf.axi4_drv_cb.ARADDR   <= pkt.ARADDR;
     master_drv_intf.axi4_drv_cb.ARBURST  <= pkt.ARBURST;
     master_drv_intf.axi4_drv_cb.ARCACHE  <= pkt.ARCACHE;
     master_drv_intf.axi4_drv_cb.ARID     <= pkt.ARID;
     master_drv_intf.axi4_drv_cb.ARLEN    <= pkt.ARLEN;
     master_drv_intf.axi4_drv_cb.ARSIZE   <= pkt.ARSIZE;
+    master_drv_intf.axi4_drv_cb.ARQOS    <= pkt.ARQOS;
     master_drv_intf.axi4_drv_cb.ARVALID  <= 1'b1;
 
     do begin
@@ -186,13 +207,14 @@ task s04_driver::drive_read_data(s04_seq_item pkt);
     bit rlast = 1'b0;
     int beat  = 0;
 
+    @(master_drv_intf.axi4_drv_cb);
     master_drv_intf.axi4_drv_cb.RREADY <= 1'b1;
 
     do begin
         @(master_drv_intf.axi4_drv_cb);
         if (master_drv_intf.axi4_drv_cb.RVALID === 1'b1) begin
             pkt.RDATA[beat] = master_drv_intf.axi4_drv_cb.RDATA;
-            pkt.RRESP       = response_t'(master_drv_intf.axi4_drv_cb.RRESP);
+            pkt.RRESP[beat] = response_t'(master_drv_intf.axi4_drv_cb.RRESP);
             beat++;
             if (master_drv_intf.axi4_drv_cb.RLAST === 1'b1) begin
                 rlast = 1'b1;
@@ -213,7 +235,7 @@ class master_driver_callback extends uvm_callback;
      `uvm_info (get_full_name () , "pre_drive :: executing s04_driver call back" , UVM_LOW)
    endtask : pre_drive
 
-   virtual task post_drive (s04_seq_item pkt,virtual axi4_intf.DRIVER_MOD vif,uvm_seq_item_pull_port #(s04_seq_item) port);
+   virtual task post_drive (s04_seq_item pkt,virtual axi4_tb_intf.DRIVER_MOD vif,uvm_seq_item_pull_port #(s04_seq_item) port);
      `uvm_info (get_full_name () , "post_drive :: executing s04_driver call back" , UVM_LOW)
    endtask : post_drive
 
@@ -225,7 +247,7 @@ class s04_driver extends uvm_driver #(s04_seq_item,s04_seq_item);
     `uvm_component_utils (s04_driver)
     `uvm_register_cb (s04_driver , master_driver_callback)
 
-    virtual axi4_intf.DRIVER_MOD        master_drv_intf;
+    virtual axi4_tb_intf.DRIVER_MOD        master_drv_intf;
     int              drv_burst_count;
     s04_seq_item     pkt;
 
@@ -239,7 +261,7 @@ class s04_driver extends uvm_driver #(s04_seq_item,s04_seq_item);
         raddress_mbx  = new();
         rdata_mbx     = new();
         wresponse_mbx = new();
-        if (!uvm_config_db#(virtual axi4_intf.DRIVER_MOD)::get(this,"","S04",master_drv_intf))
+        if (!uvm_config_db#(virtual axi4_tb_intf.DRIVER_MOD)::get(this,"","S04",master_drv_intf))
             `uvm_fatal(get_full_name(), "s04_intf get failed!")
     endfunction
 

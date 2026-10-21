@@ -5,8 +5,11 @@ package cpu_package;
     import soc_addr_pkg::*;
 
     `include "../common/config_tb.sv"
-    `include "../cpu/parameters.sv"
+    //`include "../cpu/parameters.sv"
     `include "../cpu/cpu_config_obj.sv"
+
+    `include "../common/axi_parameters.sv"
+    `include "../common/axi_base_sequence_item.sv"
 
     `include "../cpu/cpu_seq_item.sv"
     `include "../cpu/cpu_sequence.sv"

@@ -1,10 +1,10 @@
    parameter ADDR_WIDTH 	= 32	;
    parameter DATA_WIDTH 	= 32	;
-   parameter STRB_WIDTH   = DATA_WIDTH>>3;
+   parameter STRB_WIDTH     = DATA_WIDTH>>3;
 
 class mem_seq_item extends uvm_sequence_item;
     
-    rand TRANS_TYPE         trans_type;
+   rand TRANS_TYPE              operation;
     //Read address channel signals
    rand bit [ADDR_WIDTH-1:0]	araddr;
    rand bit [2:0] 		    	arprot;
@@ -59,6 +59,7 @@ class mem_seq_item extends uvm_sequence_item;
 	`uvm_field_enum(RESPONSE_TYPE,rresp,UVM_ALL_ON)
     `uvm_field_int(rvalid,UVM_ALL_ON)
     `uvm_field_int(rready,UVM_ALL_ON)
+	`uvm_field_enum(TRANS_TYPE,operation,UVM_ALL_ON)
     `uvm_object_utils_end   
 
     function new (string name = "mem_seq_item");

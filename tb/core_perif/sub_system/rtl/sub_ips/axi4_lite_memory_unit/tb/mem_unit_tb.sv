@@ -14,7 +14,7 @@ module mem_unit_tb;
 
   always #5 clk = ~clk;
   
-  axi4_lite_intf m_axi_intf();
+  axi4_lite_tb_intf m_axi_intf();
 
   axi4_lite_memory_unit #(
     .AXI_AW        (ADDR_WIDTH),

@@ -4,7 +4,8 @@ class cpu_base_test extends uvm_test;
 
     intc_config_obj                 obj;
     wrapper_env                     w_env;
-    virtual axi4_lite_intc_intf     lite_intc_if;
+    virtual axi4_lite_tb_intf       lite_intc_if;
+    //virtual axi4_lite_intc_intf     lite_intc_if;
     
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
@@ -28,7 +29,7 @@ class cpu_base_test extends uvm_test;
             if (lite_intc_if == null) begin
                 `uvm_fatal("TEST_VIF_NULL", "lite_intc_intf is NULL inside reset_phase!")
             end
-            wait (lite_intc_if.areset_n == 1'b1); 
+            wait (lite_intc_if.ARESETn == 1'b1); 
         phase.drop_objection(this);
         `uvm_info(get_full_name(),"outside_drop_objection", UVM_MEDIUM)
     endtask: reset_phase
@@ -128,21 +129,22 @@ class load_bram_256_test extends cpu_base_test;
     `uvm_component_utils(load_bram_256_test)
     `NEW_COMP
 
-    load_bram_256_seq   load_seq;
+    load_bram_seq       load_seq;   //axi4 lite
+    //load_bram_256_seq   load_seq;   //axi4
     read_bram_256_seq   read_seq;   //axi4
     read_bram_vseq      lite_seq;   //axi4 lite
 
     task main_phase(uvm_phase phase);
-        load_seq = load_bram_256_seq::type_id::create("load_seq");  //axi4
+        load_seq = load_bram_seq::type_id::create("load_seq");  //axi4
 
         read_seq = read_bram_256_seq::type_id::create("read_seq");  //axi4
         lite_seq = read_bram_vseq::type_id::create("lite_seq");     //axi4 lite
 
         phase.raise_objection(this);
             `uvm_info("UVM_TEST","started bram loading",UVM_LOW)
-            load_seq.start(w_env.c_env.s04_agt.sqr);
+            load_seq.start(w_env.c_env.cpu_agt.sqr);
+            //load_seq.start(w_env.c_env.s04_agt.sqr);
             `uvm_info("UVM_TEST","loading bram completed",UVM_LOW)
-            //#1000ns;
         fork
             `uvm_info("UVM_TEST","entered fork",UVM_LOW)
             //read_seq.start(w_env.c_env.s04_agt.sqr);

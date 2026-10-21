@@ -3,7 +3,7 @@ class core_perif_monitor extends uvm_monitor;
     `NEW_COMP
 
     uvm_analysis_port #(core_perif_lite_seq_item)   mon_ap;
-    virtual axi4_lite_intf.MONITOR_MOD              cp_mon_intf;
+    virtual axi4_lite_tb_intf.MONITOR_MOD           cp_mon_intf;
 
     // Mailboxes for write/read phases
     mailbox #(core_perif_lite_seq_item)  write_address_mbx, write_data_mbx;

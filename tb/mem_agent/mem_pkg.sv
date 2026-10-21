@@ -3,6 +3,7 @@ package mem_package;
     import uvm_pkg::*;  
     `include "../common/config_tb.sv"
     `include "mem_enum.sv"
+    `include "mem_config_obj.sv"
     `include "mem_seq_item.sv"
     `include "bram_seq_item.sv"
     `include "mem_monitor.sv"

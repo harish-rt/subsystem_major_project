@@ -42,11 +42,15 @@ xil_defaultlib.top core_ip_wraps.glbl \
 -l sim_txt.log
 
 do wave.do
-add wave -recursive /top/dut/IPS_CORE/S04_AXI_0_bvalid
-add wave -recursive /top/dut/IPS_CORE/S04*
-add wave -recursive /top/dut/IPS_CORE/M03*
+add wave -noupdate -group BRAM_CTRL -radix hex /top/dut/IPS_CORE/axi_bram_ctrl_0/s_axi_*
+add wave -noupdate -group BRAM_CTRL_INT -r -internal /top/dut/IPS_CORE/axi_bram_ctrl_0/*
+add wave -noupdate -group M03 -radix binary /top/dut/IPS_CORE/axi_interconnect_0_M03_AXI_*
+add wave -noupdate -group B_ALL -radix binary /top/dut/IPS_CORE/*BVALID /top/dut/IPS_CORE/*BID
 run -all
 
+#add wave -recursive /top/dut/IPS_CORE/S04_AXI_0_bvalid
+#add wave -recursive /top/dut/IPS_CORE/S04*
+#add wave -recursive /top/dut/IPS_CORE/M03*
 #add wave -r sim:/top/axi4_bram_if/*
 #add wave -r sim:/top/mem_intf/*
 #add wave -r sim:/top/axil_riscv_if/*

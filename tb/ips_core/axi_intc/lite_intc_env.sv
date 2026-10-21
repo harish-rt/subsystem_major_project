@@ -3,9 +3,10 @@ class axi_lite_intc_env extends uvm_env;
     `NEW_COMP
     
     uvm_active_passive_enum     is_active;
+    intc_config_obj             obj;
+
     axi_lite_intc_agent         lite_intc_agt;
     intc_agent                  intc_agt;
-    intc_config_obj             obj;
 
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);

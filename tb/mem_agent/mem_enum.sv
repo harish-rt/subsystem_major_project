@@ -21,6 +21,6 @@ typedef enum logic [1:0]{
 	} LOCK_TYPE;
 
 typedef enum bit{
-	WRITE = 0,
-	READ  = 1
+	READ,
+	WRITE
 }TRANS_TYPE;

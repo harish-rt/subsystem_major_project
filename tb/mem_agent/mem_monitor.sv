@@ -5,8 +5,8 @@ class mem_monitor extends uvm_monitor;
         super.new(name,parent);
     endfunction
 
-    virtual axi4_lite_intf.MONITOR_MOD   mon_if;
-    uvm_analysis_port#(mem_seq_item) mon_ap;
+    virtual axi4_lite_tb_intf               mon_if;
+    uvm_analysis_port#(mem_seq_item)        mon_ap;
     mem_seq_item wr_addr_queue[$],wr_data_queue[$],wr_resp_queue[$],rd_addr_queue[$],rd_data_queue[$];
     
     extern function void build_phase(uvm_phase phase);
@@ -22,9 +22,9 @@ endclass
 
 function void mem_monitor::build_phase(uvm_phase phase);
     mon_ap=new("mon_ap",this);
-    if(!uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::get(this,"","MON",mon_if)) begin
-		`uvm_fatal("NO_VIF",{"virtual interface is not set for monitor"})
-	end
+    //if(!uvm_config_db#(virtual axi4_lite_tb_intf.MONITOR_MOD)::get(this,"","MON",mon_if)) begin
+	//	`uvm_fatal("NO_VIF",{"virtual interface is not set for monitor"})
+	//end
 endfunction
 
 task mem_monitor::main_phase(uvm_phase phase);
@@ -46,10 +46,10 @@ task mem_monitor::write_addr();
         @(mon_if.axil_mon_cb);
         wait(mon_if.axil_mon_cb.AWVALID && mon_if.axil_mon_cb.AWREADY);
         aw_pkt.awaddr=mon_if.axil_mon_cb.AWADDR;
-        aw_pkt.trans_type=WRITE;
+        aw_pkt.operation=WRITE;
         wr_addr_queue.push_back(aw_pkt);
         `uvm_info("MEM_MONITOR", "Inside write_addr task", UVM_MEDIUM)
-   end
+    end
 endtask
 
 task mem_monitor::write_data();
@@ -77,6 +77,26 @@ task mem_monitor::write_resp();
     end
 endtask
 
+task mem_monitor::merge_write();
+    mem_seq_item wr_pkt;
+    forever begin
+        wr_pkt=mem_seq_item::type_id::create("wr_pkt");
+        @(mon_if.axil_mon_cb);
+        wait(wr_data_queue.size()>0 && wr_addr_queue.size()>0 && wr_resp_queue.size()>0);
+        wr_pkt.awaddr=wr_addr_queue[0].awaddr;
+        wr_pkt.operation=wr_addr_queue[0].operation;
+        wr_pkt.wdata=wr_data_queue[0].wdata;
+        wr_pkt.wstrb=wr_data_queue[0].wstrb;
+        wr_pkt.bresp=wr_resp_queue[0].bresp;
+        mon_ap.write(wr_pkt);
+        `uvm_info("WR_PKT_MERGE", wr_pkt.sprint(), UVM_MEDIUM)
+        @(mon_if.axil_mon_cb);
+        void'(wr_addr_queue.pop_front());
+        void'(wr_data_queue.pop_front());
+        void'(wr_resp_queue.pop_front());
+    end
+endtask
+
 task mem_monitor::read_addr();
     mem_seq_item ar_pkt;
     forever begin
@@ -84,7 +104,7 @@ task mem_monitor::read_addr();
         @(mon_if.axil_mon_cb);
         wait(mon_if.axil_mon_cb.ARVALID && mon_if.axil_mon_cb.ARREADY);
         ar_pkt.araddr=mon_if.axil_mon_cb.ARADDR;
-        ar_pkt.trans_type=READ;
+        ar_pkt.operation=READ;
         rd_addr_queue.push_back(ar_pkt);
         `uvm_info("MEM_MONITOR", "Inside read_addr task", UVM_MEDIUM)
     end
@@ -103,25 +123,6 @@ task mem_monitor::read_data();
     end
 endtask
 
-task mem_monitor::merge_write();
-    mem_seq_item wr_pkt;
-    forever begin
-        wr_pkt=mem_seq_item::type_id::create("wr_pkt");
-        @(mon_if.axil_mon_cb);
-        wait(wr_data_queue.size()>0 && wr_addr_queue.size()>0 && wr_resp_queue.size()>0);
-        wr_pkt.awaddr=wr_addr_queue[0].awaddr;
-        wr_pkt.trans_type=wr_addr_queue[0].trans_type;
-        wr_pkt.wdata=wr_data_queue[0].wdata;
-        wr_pkt.wstrb=wr_data_queue[0].wstrb;
-        wr_pkt.bresp=wr_resp_queue[0].bresp;
-        `uvm_info("WR_PKT_MERGE", wr_pkt.sprint(), UVM_MEDIUM)
-        void'(wr_addr_queue.pop_front());
-        void'(wr_data_queue.pop_front());
-        void'(wr_resp_queue.pop_front());
-        mon_ap.write(wr_pkt);
-    end
-endtask
-
 task mem_monitor::merge_read();
     mem_seq_item rd_pkt;
     forever begin
@@ -129,12 +130,13 @@ task mem_monitor::merge_read();
         @(mon_if.axil_mon_cb);
         wait(rd_addr_queue.size()>0 && rd_data_queue.size()>0);
         rd_pkt.araddr=rd_addr_queue[0].araddr;
-        rd_pkt.trans_type=rd_addr_queue[0].trans_type;
+        rd_pkt.operation=rd_addr_queue[0].operation;
         rd_pkt.rdata=rd_data_queue[0].rdata;
         rd_pkt.rresp=rd_data_queue[0].rresp;
+        mon_ap.write(rd_pkt);
         `uvm_info("RD_PKT_MERGE", rd_pkt.sprint(), UVM_MEDIUM)
+        @(mon_if.axil_mon_cb);
         void'(rd_addr_queue.pop_front());
         void'(rd_data_queue.pop_front());
-        mon_ap.write(rd_pkt);
     end
 endtask

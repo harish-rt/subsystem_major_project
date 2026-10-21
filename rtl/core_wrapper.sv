@@ -76,13 +76,22 @@ module core_wrapper
   output rsta_busy_0,
   output rstb_busy_0,
 
-  axi4_intf ext_axi4_slave,
-  axi4_intf ext_axi4_master,
-
+  ////S00
+  //axi4_lite_intf    inst_bridge2axi_int,
+  ////S02
+  //axi4_lite_intf    data_bridge2axi_int,
+  ////S04
+  //axi4_intf         ext_axi4_slave,
+  ////M05
+  //axi4_intf         ext_axi4_master
   //S00
-  axi4_lite_intf inst_bridge2axi_int,
+  interface         inst_bridge2axi_int,
   //S02
-  axi4_lite_intf data_bridge2axi_int
+  interface         data_bridge2axi_int,
+  //S04
+  interface         ext_axi4_slave,
+  //M05
+  interface         ext_axi4_master
 );
 
   wire cdma_irq, core_perif_irq, intr_ctrl_irq;
