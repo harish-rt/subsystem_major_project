@@ -1,36 +1,20 @@
-typedef struct {
-    master_e             master_p;
-    bit [ADDR_WIDTH-1:0] addr;
-    int                  num_beats;
-    
-    bit [31:0]           wdata[];
-    bit [3:0]            wstrb[];
-    bit [31:0]           rdata[];
-    bit [1:0]            rresp[];
-} sbd_bram_exp_s;
-
 class ss_scoreboard extends uvm_scoreboard;
     `uvm_component_utils(ss_scoreboard)
     `NEW_COMP
 
-    cpu_seq_item            cpu_pkt;
-    s04_seq_item            s04_pkt;
-    bram_seq_item           bram_pkt;
-    mem_seq_item            mem_pkt;
-    master_seq_item         cdma_pkt;
-
     sb_config               sb_cfg;
+    master_e                port_id;
 
-    uvm_tlm_analysis_fifo #(cpu_seq_item)       master_af;
-    uvm_tlm_analysis_fifo #(s04_seq_item)       s04_af;
-    uvm_tlm_analysis_fifo #(bram_seq_item)      bram_af;
-    uvm_tlm_analysis_fifo #(mem_seq_item)       mem_af;
-    uvm_tlm_analysis_fifo #(master_seq_item)    cdma_af;
-    uvm_tlm_analysis_fifo #(lite_intc_seq_item) intc_af;
-    uvm_tlm_analysis_fifo #(core_perif_lite_seq_item) core_perif_af;
+    uvm_tlm_analysis_fifo #(cpu_seq_item)               master_af[2];
+    uvm_tlm_analysis_fifo #(s04_seq_item)               s04_af;
+    uvm_tlm_analysis_fifo #(bram_seq_item)              bram_af;
+    uvm_tlm_analysis_fifo #(mem_seq_item)               mem_af;
+    uvm_tlm_analysis_fifo #(master_seq_item)            cdma_af;
+    uvm_tlm_analysis_fifo #(lite_intc_seq_item)         intc_af;
+    uvm_tlm_analysis_fifo #(core_perif_lite_seq_item)   core_perif_af;
 
-    sbd_bram_exp_s          exp_bram_wr_q[$];
-    sbd_bram_exp_s          exp_bram_rd_q[$];
+    axi_base_sequence_item  exp_bram_wr_q[master_e][$];
+    axi_base_sequence_item  exp_bram_rd_q[master_e][$];
 
     axi_base_sequence_item  exp_lite_wr_q[$];
     axi_base_sequence_item  exp_lite_rd_q[$];
@@ -53,19 +37,22 @@ class ss_scoreboard extends uvm_scoreboard;
     lite_intc_seq_item      act_intc_wr_q[$];
     lite_intc_seq_item      act_intc_rd_q[$];
 
-    // 0 = BRAM monitor reports the full system address
-    // 1 = BRAM monitor reports a local offset (addr - BRAM_BASE)
+    // 0 = Monitor sends the full address
+    // 1 = Monitor sends offset address (AxADDR - BASE)
     bit                     addr_is_local = 1;
     
     extern function void    build_phase(uvm_phase phase);
     extern task             main_phase(uvm_phase phase);
     
     extern task             master_traffic();
+    //extern task             s02_traffic();
     extern task             s04_traffic();
 
     extern task             bram_traffic();
     extern function void    match_bram_wr();
     extern function void    match_bram_rd();
+    extern function void    bram_wr_compare(axi_base_sequence_item exp, bram_seq_item act);
+    extern function void    bram_rd_compare(axi_base_sequence_item exp, bram_seq_item act);
 
     extern task             mem_traffic();
     extern function void    match_lite_wr();
@@ -85,7 +72,10 @@ function void ss_scoreboard::build_phase(uvm_phase phase);
     super.build_phase(phase);
 	if(!uvm_config_db #(sb_config)::get(this,"","SB_CFG",sb_cfg))
         `uvm_fatal("SS_SBD_ERR","Failed to get sb_cfg!")
-    master_af       = new("master_af",this);
+    foreach(master_af[i])begin
+        master_af[i]       = new($sformatf("master_af[%0d]",i),this);
+    end
+    //master_af       = new("master_af",this);
     s04_af          = new("s04_af",this);
     bram_af         = new("bram_af",this);
     mem_af          = new("mem_af",this);
@@ -108,86 +98,80 @@ task ss_scoreboard::main_phase(uvm_phase phase);
 endtask
 
 task ss_scoreboard::master_traffic();
-    //axi_base_sequence_item    pkt;
-    cpu_seq_item    pkt;
-    sbd_bram_exp_s  exp;
-    slave_t         dec_slave;
 
-    forever begin
-        master_af.get(pkt);
+    foreach(master_af[i])begin
+        automatic int id = i;
 
-        if(pkt.master_p != MST_S00)
-            `uvm_error("SBD_MASTER",$sformatf("master_af packet stamped %s, expected MST_S00",pkt.master_p.name()))
+        fork
+            forever begin
+                cpu_seq_item    pkt;
+                slave_t         dec_slave;
 
-        if(pkt.operation == WRITE) begin
-            if(!sb_cfg.decode_slave(pkt.AWADDR, dec_slave)) begin
-                if(pkt.BRESP !== 2'b11)
-                    `uvm_error("SBD_DECERR",$sformatf("CPU Write to unmapped addr 0x%08h: BRESP=%0b, expected DECERR",pkt.AWADDR,pkt.BRESP))
+                master_af[id].get(pkt);
+
+                if(id == 0) port_id = MST_S00;
+                if(id == 1) port_id = MST_S02;
+
+                if(pkt.master_p != port_id)
+                    `uvm_error("SBD_MASTER",$sformatf("master_af packet stamped %s, expected %s",pkt.master_p.name(),port_id))
+
+                if(pkt.operation == WRITE) begin
+                    if(!sb_cfg.decode_slave(pkt.AWADDR, dec_slave)) begin
+                        if(pkt.BRESP !== 2'b11)
+                            `uvm_error("SBD_DECERR",$sformatf("CPU Write to unmapped addr 0x%08h: BRESP=%0b, expected DECERR",pkt.AWADDR,pkt.BRESP))
+                    end
+                    else begin
+                        case (dec_slave)
+                            BRAM: begin
+                                `uvm_info("SBD_S00_BRAM_W", $sformatf("[%s] -> BRAM Write: Addr=0x%08h Data: %0h", pkt.master_p.name(), pkt.AWADDR, {>>{pkt.WDATA}}), UVM_LOW)
+                                exp_bram_wr_q[port_id].push_back(pkt);
+                            end
+                            LITE_MEM: begin
+                                `uvm_info("SBD_S00_MEM_W",$sformatf("CPU -> LITE_MEM Write: Addr=0x%08h Data=0x%0h Strb=0x%0h",pkt.AWADDR,{>>{pkt.WDATA}},{>>{pkt.WSTRB}}),UVM_LOW)
+                                exp_lite_wr_q.push_back(pkt);
+                            end
+                            CDMA: begin
+                                `uvm_info("SBD_S00_CDMA_W", $sformatf("[%s] -> CDMA Write: Addr=0x%08h Data=0x%0h", pkt.master_p.name(), pkt.AWADDR, {>>{pkt.WDATA}}), UVM_LOW)
+                                exp_cdma_wr_q.push_back(pkt);
+                            end
+                            INTC: begin
+                                `uvm_info("SBD_S00_INTC_W", $sformatf("[%s] -> INTC Write: Addr=0x%08h Data=0x%0h", pkt.master_p.name(), pkt.AWADDR, {>>{pkt.WDATA}}), UVM_LOW)
+                                exp_intc_wr_q.push_back(pkt);
+                            end
+                            default: `uvm_info("SS_SBD","No Slave Selected",UVM_LOW)
+                        endcase
+                    end
+                end
+                else if(pkt.operation == READ) begin
+                    //`uvm_info("SBD_CPU_READ", $sformatf("[%s] ARADDR @0x%08h\n--- Expected CPU Packet ---\n%s", pkt.master_p.name(), pkt.ARADDR, pkt.sprint()),UVM_LOW)
+                    if(!sb_cfg.decode_slave(pkt.ARADDR, dec_slave)) begin
+                        if(pkt.RRESP[0] !== 2'b11)
+                            `uvm_error("SBD_DECERR",$sformatf("CPU Read from unmapped addr 0x%08h: RRESP=%0h, expected DECERR",pkt.ARADDR,{>>{pkt.RRESP}}))
+                    end
+                    else begin
+                        case (dec_slave)
+                            BRAM: begin
+                                `uvm_info("SBD_S00_BRAM_R", $sformatf("[%s] -> BRAM Read: Addr=0x%08h Data: %0h", pkt.master_p.name(), pkt.ARADDR, {>>{pkt.RDATA}}), UVM_LOW)
+                                exp_bram_rd_q[port_id].push_back(pkt);
+                            end
+                            LITE_MEM: begin
+                                `uvm_info("SBD_S00_MEM_R",$sformatf("LITE_MEM -> CPU Read: Addr=0x%08h Data=0x%0h",pkt.ARADDR,{>>{pkt.RDATA}}),UVM_LOW)
+                                exp_lite_rd_q.push_back(pkt);
+                            end
+                            CDMA: begin
+                                `uvm_info("SBD_S00_CDMA_R", $sformatf("[%s] -> CDMA Read: Addr=0x%08h", pkt.master_p.name(), pkt.ARADDR), UVM_LOW)
+                                exp_cdma_rd_q.push_back(pkt); // For s04_traffic, push pkt_c
+                            end
+                            INTC: begin
+                                `uvm_info("SBD_S00_INTC_R", $sformatf("[%s] -> INTC Read: Addr=0x%08h", pkt.master_p.name(), pkt.ARADDR), UVM_LOW)
+                                exp_intc_rd_q.push_back(pkt);
+                            end
+                            default: `uvm_info("SS_SBD","No Slave Selected",UVM_LOW)
+                        endcase
+                    end
+                end
             end
-            else begin
-                case (dec_slave)
-                    BRAM: begin
-                        `uvm_info("SBD_CPU_BRAM_W", $sformatf("[%s] -> BRAM Write: Addr=0x%08h Data: %0h", pkt.master_p.name(), pkt.AWADDR, {>>{pkt.WDATA}}), UVM_LOW)
-                        exp.master_p  = master_e'(pkt.master_p); // MST_S00
-                        exp.addr      = pkt.AWADDR;
-                        exp.num_beats = 1;
-                        exp.wdata     = new[1];
-                        exp.wstrb     = new[1];
-                        exp.wdata[0]  = pkt.WDATA[0];    // Scalar to Array index 0
-                        exp.wstrb[0]  = pkt.WSTRB[0];
-                        exp_bram_wr_q.push_back(exp);
-                        match_bram_wr();   // write case
-                    end
-                    LITE_MEM: begin
-                        `uvm_info("SBD_CPU_MEM_W",$sformatf("CPU -> LITE_MEM Write: Addr=0x%08h Data=0x%0h Strb=0x%0h",pkt.AWADDR,{>>{pkt.WDATA}},{>>{pkt.WSTRB}}),UVM_LOW)
-                        exp_lite_wr_q.push_back(pkt);
-                    end
-                    CDMA: begin
-                        `uvm_info("SBD_MST_CDMA_W", $sformatf("[%s] -> CDMA Write: Addr=0x%08h Data=0x%0h", pkt.master_p.name(), pkt.AWADDR, {>>{pkt.WDATA}}), UVM_LOW)
-                        exp_cdma_wr_q.push_back(pkt); // For s04_traffic, push pkt_c
-                    end
-                    INTC: begin
-                        `uvm_info("SBD_MST_INTC_W", $sformatf("[%s] -> INTC Write: Addr=0x%08h Data=0x%0h", pkt.master_p.name(), pkt.AWADDR, {>>{pkt.WDATA}}), UVM_LOW)
-                        exp_intc_wr_q.push_back(pkt);
-                    end
-                    default: `uvm_info("SS_SBD","No Slave Selected",UVM_LOW)
-                endcase
-            end
-        end
-        else if(pkt.operation == READ) begin
-            //`uvm_info("SBD_CPU_READ", $sformatf("[%s] ARADDR @0x%08h\n--- Expected CPU Packet ---\n%s", pkt.master_p.name(), pkt.ARADDR, pkt.sprint()),UVM_LOW)
-            if(!sb_cfg.decode_slave(pkt.ARADDR, dec_slave)) begin
-                if(pkt.RRESP[0] !== 2'b11)
-                    `uvm_error("SBD_DECERR",$sformatf("CPU Read from unmapped addr 0x%08h: RRESP=%0h, expected DECERR",pkt.ARADDR,{>>{pkt.RRESP}}))
-            end
-            else begin
-                case (dec_slave)
-                    BRAM: begin
-                        `uvm_info("SBD_CPU_BRAM_R", $sformatf("[%s] -> BRAM Read: Addr=0x%08h Data: %0h", pkt.master_p.name(), pkt.ARADDR, {>>{pkt.RDATA}}), UVM_LOW)
-                        exp.master_p  = master_e'(pkt.master_p); // MST_S00
-                        exp.addr      = pkt.ARADDR;
-                        exp.num_beats = 1;
-                        exp.rdata     = new[1];
-                        exp.rdata[0]  = pkt.RDATA[0];
-                        exp_bram_rd_q.push_back(exp);
-                        match_bram_rd();   // read case
-                    end
-                    LITE_MEM: begin
-                        `uvm_info("SBD_CPU_MEM_R",$sformatf("LITE_MEM -> CPU Read: Addr=0x%08h Data=0x%0h",pkt.ARADDR,{>>{pkt.RDATA}}),UVM_LOW)
-                        exp_lite_rd_q.push_back(pkt);
-                    end
-                    CDMA: begin
-                        `uvm_info("SBD_MST_CDMA_R", $sformatf("[%s] -> CDMA Read: Addr=0x%08h", pkt.master_p.name(), pkt.ARADDR), UVM_LOW)
-                        exp_cdma_rd_q.push_back(pkt); // For s04_traffic, push pkt_c
-                    end
-                    INTC: begin
-                        `uvm_info("SBD_MST_INTC_R", $sformatf("[%s] -> INTC Read: Addr=0x%08h", pkt.master_p.name(), pkt.ARADDR), UVM_LOW)
-                        exp_intc_rd_q.push_back(pkt);
-                    end
-                    default: `uvm_info("SS_SBD","No Slave Selected",UVM_LOW)
-                endcase
-            end
-        end
+        join_none
     end
 endtask : master_traffic
 
@@ -211,34 +195,20 @@ task ss_scoreboard::s04_traffic();
             else begin
                 case (dec_slave)
                     BRAM: begin
-                        sbd_bram_exp_s exp;
                         `uvm_info("SBD_S04_BRAM_W", $sformatf("[%s] -> BRAM Write: Addr=0x%08h Len=%0d Data: %0h", pkt.master_p.name(), pkt.AWADDR, pkt.AWLEN, {>>{pkt.WDATA}}), UVM_LOW)
                         
-                        // Translate AXI4 to Normalized BRAM Struct
-                        exp.master_p  = master_e'(pkt.master_p); // MST_S04
-                        exp.addr      = pkt.AWADDR;
-                        exp.num_beats = pkt.AWLEN + 1;
-                        exp.wdata     = new[exp.num_beats];
-                        exp.wstrb     = new[exp.num_beats];
-                        
-                        foreach(pkt.WDATA[i]) begin
-                            exp.wdata[i] = pkt.WDATA[i];
-                            exp.wstrb[i] = pkt.WSTRB[i];
-                        end
-                        
-                        exp_bram_wr_q.push_back(exp);
-                        match_bram_wr();
+                        exp_bram_wr_q[port_id].push_back(pkt);
                     end
                     LITE_MEM: begin
                         `uvm_info("SBD_S04_MEM_W",$sformatf("[%s] -> LITE_MEM Write: Addr=0x%08h Data: %0h", pkt.master_p.name(), pkt.AWADDR, {>>{pkt.WDATA}}), UVM_LOW)
                         exp_lite_wr_q.push_back(pkt);
                     end
                     CDMA: begin
-                        `uvm_info("SBD_MST_CDMA_W", $sformatf("[%s] -> CDMA Write: Addr=0x%08h Data=0x%0h", pkt.master_p.name(), pkt.AWADDR, {>>{pkt.WDATA}}), UVM_LOW)
+                        `uvm_info("SBD_S04_CDMA_W", $sformatf("[%s] -> CDMA Write: Addr=0x%08h Data=0x%0h", pkt.master_p.name(), pkt.AWADDR, {>>{pkt.WDATA}}), UVM_LOW)
                         exp_cdma_wr_q.push_back(pkt); // s04_traffic push pkt_c
                     end
                     INTC: begin
-                        `uvm_info("SBD_MST_INTC_W", $sformatf("[%s] -> INTC Write: Addr=0x%08h Data=0x%0h", pkt.master_p.name(), pkt.AWADDR, {>>{pkt.WDATA}}), UVM_LOW)
+                        `uvm_info("SBD_S04_INTC_W", $sformatf("[%s] -> INTC Write: Addr=0x%08h Data=0x%0h", pkt.master_p.name(), pkt.AWADDR, {>>{pkt.WDATA}}), UVM_LOW)
                         exp_intc_wr_q.push_back(pkt);
                     end
                     default: `uvm_info("SS_SBD","No Slave Selected", UVM_LOW)
@@ -254,34 +224,20 @@ task ss_scoreboard::s04_traffic();
             else begin
                 case (dec_slave)
                     BRAM: begin
-                        sbd_bram_exp_s exp;
                         `uvm_info("SBD_S04_BRAM_R", $sformatf("[%s] -> BRAM Read: Addr=0x%08h Len=%0d Data: %0h", pkt.master_p.name(), pkt.ARADDR, pkt.ARLEN, {>>{pkt.RDATA}}), UVM_LOW)
                         
-                        // Translate AXI4 to Normalized BRAM Struct
-                        exp.master_p  = master_e'(pkt.master_p); // MST_S04
-                        exp.addr      = pkt.ARADDR;
-                        exp.num_beats = pkt.ARLEN + 1;
-                        exp.rdata     = new[exp.num_beats];
-                        exp.rresp     = new[exp.num_beats];
-                        
-                        foreach(pkt.RDATA[i]) begin
-                            exp.rdata[i] = pkt.RDATA[i];
-                            exp.rresp[i] = pkt.RRESP[i];
-                        end
-                        
-                        exp_bram_rd_q.push_back(exp);
-                        match_bram_rd();
+                        exp_bram_rd_q[port_id].push_back(pkt);
                     end
                     LITE_MEM: begin
                         `uvm_info("SBD_S04_MEM_R",$sformatf("[%s] -> LITE_MEM Read: Addr=0x%08h Data: %0h", pkt.master_p.name(), pkt.ARADDR, {>>{pkt.RDATA}}), UVM_LOW)
                         exp_lite_rd_q.push_back(pkt);
                     end
                     CDMA: begin
-                        `uvm_info("SBD_MST_CDMA_R", $sformatf("[%s] -> CDMA Read: Addr=0x%08h", pkt.master_p.name(), pkt.ARADDR), UVM_LOW)
+                        `uvm_info("SBD_S04_CDMA_R", $sformatf("[%s] -> CDMA Read: Addr=0x%08h", pkt.master_p.name(), pkt.ARADDR), UVM_LOW)
                         exp_cdma_rd_q.push_back(pkt); // s04_traffic push pkt
                     end
                     INTC: begin
-                        `uvm_info("SBD_MST_INTC_R", $sformatf("[%s] -> INTC Read: Addr=0x%08h", pkt.master_p.name(), pkt.ARADDR), UVM_LOW)
+                        `uvm_info("SBD_S04_INTC_R", $sformatf("[%s] -> INTC Read: Addr=0x%08h", pkt.master_p.name(), pkt.ARADDR), UVM_LOW)
                         exp_intc_rd_q.push_back(pkt);
                     end
                     default: `uvm_info("SS_SBD","No Slave Selected", UVM_LOW)
@@ -293,6 +249,7 @@ endtask : s04_traffic
 
 task ss_scoreboard::bram_traffic();
     bram_seq_item pkt;
+
     forever begin
         bram_af.get(pkt);
 
@@ -310,68 +267,108 @@ task ss_scoreboard::bram_traffic();
 endtask
 
 function void ss_scoreboard::match_bram_wr();
-    sbd_bram_exp_s  exp;
+    axi_base_sequence_item  exp;
     bram_seq_item   act;
-    bit [ADDR_WIDTH-1:0] exp_addr;
-    int iter_beats;
 
-    while(exp_bram_wr_q.size() && act_bram_wr_q.size()) begin
-        exp = exp_bram_wr_q.pop_front();
-        act = act_bram_wr_q.pop_front();
-        
-        exp_addr = addr_is_local ? (exp.addr - BRAM_BASE) : exp.addr;
-
-        if(exp_addr !== act.AWADDR)
-            `uvm_error("SBD_BRAM_WR_ERR", $sformatf("[%s] AWADDR mismatch exp=0x%08h act=0x%08h", exp.master_p.name(), exp_addr, act.AWADDR))
-        
-        if(exp.num_beats !== act.WDATA.size()) begin
-            `uvm_error("SBD_BRAM_WR_ERR", $sformatf("[%s] Burst Length mismatch @0x%08h! expected %0d beats, monitor saw %0d beats", exp.master_p.name(), exp_addr, exp.num_beats, act.WDATA.size()))
-        end
-
-        iter_beats = (exp.num_beats < act.WDATA.size()) ? exp.num_beats : act.WDATA.size();
-
-        for(int b = 0; b < iter_beats; b++) begin
-            if(exp.wstrb[b] !== act.WSTRB[b])
-                `uvm_error("SBD_BRAM_WR_ERR", $sformatf("[%s] WSTRB mismatch @0x%08h beat %0d: exp=0x%0h act=0x%0h", exp.master_p.name(), exp_addr, b, exp.wstrb[b], act.WSTRB[b]))
-            
-            for(int i = 0; i < 4; i++) begin
-                if(exp.wstrb[b][i] && (exp.wdata[b][8*i +: 8] !== act.WDATA[b][8*i +: 8]))
-                    `uvm_error("SBD_BRAM_WR_ERR", $sformatf("[%s] DATA mismatch @0x%08h beat %0d byte %0d: exp=0x%02h act=0x%02h", exp.master_p.name(), exp_addr, b, i, exp.wdata[b][8*i +: 8], act.WDATA[b][8*i +: 8]))
+    if(act_bram_wr_q.size() > 0) begin
+        case (port_id)
+            MST_S00:begin
+                if(exp_bram_wr_q[port_id].size() > 0) begin
+                    exp = exp_bram_wr_q[port_id].pop_front();
+                    act = act_bram_wr_q.pop_front();
+                    bram_wr_compare(exp, act);
+                end
             end
-        end
+            MST_S02:begin
+                if(exp_bram_wr_q[port_id].size() > 0) begin
+                    exp = exp_bram_wr_q[port_id].pop_front();
+                    act = act_bram_wr_q.pop_front();
+                    bram_wr_compare(exp, act);
+                end
+            end
+        endcase
     end
 endfunction
+    
+function void ss_scoreboard::bram_wr_compare(axi_base_sequence_item exp, bram_seq_item act);
+    bit [ADDR_WIDTH-1:0] exp_addr;
+    int iter_beats, exp_beats;
+
+    exp_addr = addr_is_local ? (exp.AWADDR - BRAM_BASE) : exp.AWADDR;
+
+    if(exp_addr !== act.AWADDR)
+        `uvm_error("SBD_BRAM_WR_ERR", $sformatf("[%s] AWADDR mismatch exp=0x%08h act=0x%08h", exp.master_p.name(), exp_addr, act.AWADDR))
+    
+    exp_beats = (exp.master_p == port_id) ? 1 : (exp.AWLEN + 1);
+    //$display("this_is_from_match_bram_wr: %s",port_id);
+    
+    if(exp_beats !== act.WDATA.size()) begin
+        `uvm_error("SBD_BRAM_WR_ERR", $sformatf("[%s] Burst Length mismatch @0x%08h! expected %0d beats, monitor saw %0d beats", exp.master_p.name(), exp_addr, exp_beats, act.WDATA.size()))
+    end
+
+    iter_beats = (exp_beats < act.WDATA.size()) ? exp_beats : act.WDATA.size();
+
+    for(int b = 0; b < iter_beats; b++) begin
+        if(exp.WSTRB[b] !== act.WSTRB[b])
+            `uvm_error("SBD_BRAM_WR_ERR", $sformatf("[%s] WSTRB mismatch @0x%08h beat %0d: exp=0x%0h act=0x%0h", exp.master_p.name(), exp_addr, b, exp.WSTRB[b], act.WSTRB[b]))
+        
+        for(int i = 0; i < 4; i++) begin
+            if(exp.WSTRB[b][i] && (exp.WDATA[b][8*i +: 8] !== act.WDATA[b][8*i +: 8]))
+                `uvm_error("SBD_BRAM_WR_ERR", $sformatf("[%s] DATA mismatch @0x%08h beat %0d byte %0d: exp=0x%02h act=0x%02h", exp.master_p.name(), exp_addr, b, i, exp.WDATA[b][8*i +: 8], act.WDATA[b][8*i +: 8]))
+        end
+    end
+endfunction : bram_wr_compare
 
 function void ss_scoreboard::match_bram_rd();
-    sbd_bram_exp_s  exp;
+    axi_base_sequence_item  exp;
     bram_seq_item   act;
-    bit [ADDR_WIDTH-1:0] exp_addr;
-    int iter_beats;
 
-    while(exp_bram_rd_q.size() && act_bram_rd_q.size()) begin
-        exp = exp_bram_rd_q.pop_front();
-        act = act_bram_rd_q.pop_front();
-        
-        exp_addr = addr_is_local ? (exp.addr - BRAM_BASE) : exp.addr;
-
-        if(exp_addr !== act.ARADDR)
-            `uvm_error("SBD_BRAM_RD_ERR", $sformatf("[%s] ARADDR mismatch exp=0x%08h act=0x%08h", exp.master_p.name(), exp_addr, act.ARADDR))
-        
-        if(exp.num_beats !== act.RDATA.size()) begin
-            `uvm_error("SBD_BRAM_RD_ERR", $sformatf("[%s] Burst Length mismatch @0x%08h! expected %0d beats, returned %0d beats", exp.master_p.name(), exp_addr, exp.num_beats, act.RDATA.size()))
-        end
-
-        iter_beats = (exp.num_beats < act.RDATA.size()) ? exp.num_beats : act.RDATA.size();
-
-        for(int b = 0; b < iter_beats; b++) begin
-            if(exp.rdata[b] !== act.RDATA[b])
-                `uvm_error("SBD_BRAM_RD_ERR", $sformatf("[%s] DATA mismatch @0x%08h beat %0d: CPU saw=0x%08h BRAM returned=0x%08h", exp.master_p.name(), exp_addr, b, exp.rdata[b], act.RDATA[b]))
-            
-            if(exp.rresp[b] !== act.RRESP[b])
-                `uvm_error("SBD_BRAM_RD_ERR", $sformatf("[%s] RRESP mismatch @0x%08h beat %0d: exp=0x%0h act=0x%0h", exp.master_p.name(), exp_addr, b, exp.rresp[b], act.RRESP[b]))
-        end
+    if(act_bram_rd_q.size() > 0) begin
+        case (port_id)
+            MST_S00:begin
+                if(exp_bram_rd_q[port_id].size() > 0) begin
+                    exp = exp_bram_rd_q[port_id].pop_front();
+                    act = act_bram_rd_q.pop_front();
+                    bram_rd_compare(exp,act);
+                end
+            end
+            MST_S02:begin
+                if(exp_bram_rd_q[port_id].size() > 0) begin
+                    exp = exp_bram_rd_q[port_id].pop_front();
+                    act = act_bram_rd_q.pop_front();
+                    bram_rd_compare(exp,act);
+                end
+            end
+        endcase
     end
 endfunction
+
+function void ss_scoreboard::bram_rd_compare(axi_base_sequence_item exp, bram_seq_item act);
+    bit [ADDR_WIDTH-1:0] exp_addr;
+    int iter_beats, exp_beats;
+
+    exp_addr = addr_is_local ? (exp.ARADDR - BRAM_BASE) : exp.ARADDR;
+
+    if(exp_addr !== act.ARADDR)
+        `uvm_error("SBD_BRAM_RD_ERR", $sformatf("[%s] ARADDR mismatch exp=0x%08h act=0x%08h", exp.master_p.name(), exp_addr, act.ARADDR))
+    
+    exp_beats = (exp.master_p == port_id) ? 1 : (exp.ARLEN + 1);
+    //$display("this_is_from_match_bram_rd: %s",port_id);
+
+    if(exp_beats !== act.RDATA.size()) begin
+        `uvm_error("SBD_BRAM_RD_ERR", $sformatf("[%s] Burst Length mismatch @0x%08h! expected %0d beats, monitor saw %0d beats", exp.master_p.name(), exp_addr, exp_beats, act.RDATA.size()))
+    end
+
+    iter_beats = (exp_beats < act.RDATA.size()) ? exp_beats : act.RDATA.size();
+
+    for(int b = 0; b < iter_beats; b++) begin
+        if(exp.RDATA[b] !== act.RDATA[b])
+            `uvm_error("SBD_BRAM_RD_ERR", $sformatf("[%s] DATA mismatch @0x%08h beat %0d: CPU saw=0x%08h BRAM returned=0x%08h", exp.master_p.name(), exp_addr, b, exp.RDATA[b], act.RDATA[b]))
+        
+        if(exp.RRESP[b] !== act.RRESP[b])
+            `uvm_error("SBD_BRAM_RD_ERR", $sformatf("[%s] RRESP mismatch @0x%08h beat %0d: exp=0x%0h act=0x%0h", exp.master_p.name(), exp_addr, b, exp.RRESP[b], act.RRESP[b]))
+    end
+endfunction:bram_rd_compare
 
 task ss_scoreboard::mem_traffic();
     mem_seq_item    pkt;
@@ -412,7 +409,7 @@ function void ss_scoreboard::match_lite_wr();
 
         if(exp.WSTRB[0] !== act.wstrb) begin
             `uvm_error("SBD_LITE_WR_ERR", $sformatf("[%s] WSTRB mismatch @0x%08h: exp=0x%0h act=0x%0h\n--- Expected CPU Packet ---\n%s\n--- Actual MEM Packet ---\n%s", exp.master_p.name(), exp.AWADDR, {>>{exp.WSTRB}}, act.wstrb, exp.sprint(), act.sprint()))
-            //`uvm_error("SBD_LITE_WR_ERR", $sformatf("[%s] WSTRB mismatch @0x%08h: exp=0x%0h act=0x%0h", exp.master_p.name(), exp.AWADDR, exp.WSTRB, act.wstrb))
+            //`uvm_error("SBD_LITE_WR_ERR", $sformatf("[%s] WSTRB mismatch @0x%08h: exp=0x%0h act=0x%0h", exp.master_p.name(), exp.AWADDR, exp.WSTRB, act.WSTRB))
             match_failed = 1;
         end
         
@@ -501,7 +498,7 @@ function void ss_scoreboard::match_cdma_wr();
         
         for(int i = 0; i < 4; i++) begin
             if(exp.WSTRB[0][i] && (exp.WDATA[0][8*i +: 8] !== act.wdata[0][8*i +: 8])) begin
-                `uvm_error("SBD_CDMA_WR_ERR", $sformatf("[%s] DATA mismatch @0x%08h byte %0d: exp=0x%0h act=0x%0h\n--- Expected CPU Packet ---\n%s\n--- Actual CDMA Packet ---\n%s", exp.master_p.name(), exp.AWADDR, i, {>>{exp.WDATA[8*i +: 8]}}, {>>{act.wdata[8*i +: 8]}}, exp.sprint(), act.sprint()))
+                `uvm_error("SBD_CDMA_WR_ERR", $sformatf("[%s] DATA mismatch @0x%08h byte %0d: exp=0x%0h act=0x%0h\n--- Expected CPU Packet ---\n%s\n--- Actual CDMA Packet ---\n%s", exp.master_p.name(), exp.AWADDR, i, {>>{exp.WDATA[0][8*i +: 8]}}, {>>{act.wdata[8*i +: 8]}}, exp.sprint(), act.sprint()))
                 match_failed = 1;
             end
         end
@@ -561,7 +558,70 @@ task ss_scoreboard::intc_traffic();
 endtask : intc_traffic
 
 function void ss_scoreboard::match_intc_wr();
-    
+    axi_base_sequence_item      exp;
+    lite_intc_seq_item          act;
+    bit [ADDR_WIDTH-1:0] exp_addr;
+    bit match_failed;
+
+    while(exp_intc_wr_q.size() && act_intc_wr_q.size()) begin
+        exp = exp_intc_wr_q.pop_front();
+        act = act_intc_wr_q.pop_front();
+        match_failed = 0;
+
+        exp_addr = addr_is_local ? (exp.AWADDR - INTC_BASE) : exp.AWADDR;
+
+        `uvm_info("SBD_INTC_WR_TRACE", $sformatf("Starting comparison for [%s] INTC Write: Exp Addr=0x%08h, Act Addr=0x%08h", exp.master_p.name(), exp.AWADDR, act.AWADDR), UVM_HIGH)
+
+        if(exp_addr !== act.AWADDR) begin
+            `uvm_error("SBD_INTC_WR_ERR", $sformatf("[%s] AWADDR mismatch exp=0x%08h act=0x%08h", exp.master_p.name(), exp_addr, act.AWADDR))
+            match_failed = 1;
+        end
+
+        if(exp.WSTRB[0]!== act.WSTRB) begin
+            `uvm_error("SBD_INTC_WR_ERR", $sformatf("[%s] WSTRB mismatch @0x%08h: exp=0x%0h act=0x%0h", exp.master_p.name(), exp.AWADDR, {>>{exp.WSTRB}}, act.WSTRB))
+            match_failed = 1;
+        end
+        
+        for(int i = 0; i < 4; i++) begin
+            if(exp.WSTRB[0][i] && (exp.WDATA[0][8*i +: 8] !== act.WDATA[8*i +: 8])) begin
+                `uvm_error("SBD_INTC_WR_ERR", $sformatf("[%s] DATA mismatch @0x%08h byte %0d: exp=0x%02h act=0x%02h\n--- Expected Packet ---\n%s\n--- Actual Packet ---\n%s", exp.master_p.name(), exp.AWADDR, i, {>>{exp.WDATA[0][8*i +: 8]}}, act.WDATA[8*i +: 8], exp.sprint(), act.sprint()))
+                match_failed = 1;
+            end
+        end
+
+        if(!match_failed) begin
+            `uvm_info("SBD_INTC_WR_PASS", $sformatf("[%s] INTC Write match SUCCESS at Addr=0x%08h", exp.master_p.name(), exp.AWADDR), UVM_LOW)
+        end
+    end
 endfunction
+
 function void ss_scoreboard::match_intc_rd();
+    axi_base_sequence_item      exp;
+    lite_intc_seq_item          act;
+    bit [ADDR_WIDTH-1:0]        exp_addr;
+    bit match_failed;
+
+    while(exp_intc_rd_q.size() && act_intc_rd_q.size()) begin
+        exp = exp_intc_rd_q.pop_front();
+        act = act_intc_rd_q.pop_front();
+        match_failed = 0;
+
+        exp_addr = addr_is_local ? (exp.ARADDR - INTC_BASE) : exp.ARADDR;
+
+        `uvm_info("SBD_INTC_RD_TRACE", $sformatf("Starting comparison for [%s] INTC Read: Exp Addr=0x%08h, Act Addr=0x%08h", exp.master_p.name(), exp.ARADDR, act.ARADDR), UVM_HIGH)
+
+        if(exp_addr !== act.ARADDR) begin
+            `uvm_error("SBD_INTC_RD_ERR", $sformatf("[%s] ARADDR mismatch exp=0x%08h act=0x%08h", exp.master_p.name(), exp_addr, act.ARADDR))
+            match_failed = 1;
+        end
+
+        if(exp.RDATA[0] !== act.RDATA) begin
+            `uvm_error("SBD_INTC_RD_ERR", $sformatf("[%s] DATA mismatch @0x%08h: CPU expected=0x%08h INTC returned=0x%08h", exp.master_p.name(), exp.ARADDR, {>>{exp.RDATA}}, act.RDATA))
+            match_failed = 1;
+        end
+
+        if(!match_failed) begin
+            `uvm_info("SBD_INTC_RD_PASS", $sformatf("[%s] INTC Read match SUCCESS at Addr=0x%08h", exp.master_p.name(), exp.ARADDR), UVM_LOW)
+        end
+    end
 endfunction

@@ -9,5 +9,7 @@ function new(string name=""); \
 endfunction
 
 // Macro to disable fork in CPU DRV
-`define SET_CPU_FORK_DISABLE(VAL) \
-    w_env.c_env.cpu_agt.drv.disable_cpu_fork = VAL;
+`define SET_S00_FORK_DISABLE(VAL) \
+    w_env.c_env.cpu_agt[0].drv.disable_cpu_fork = VAL;
+`define SET_S02_FORK_DISABLE(VAL) \
+    w_env.c_env.cpu_agt[1].drv.disable_cpu_fork = VAL;

@@ -8,7 +8,7 @@ class wrapper_env extends uvm_env;
     core_perif_env          cp_env;
 
     intc_config_obj         cfg;
-    soc_virtual_sequencer   vsqr;
+    soc_virtual_sequencer   vsqr[2];
 
     ss_scoreboard           sbd;
 
@@ -20,18 +20,29 @@ class wrapper_env extends uvm_env;
         m_env       = mem_env::type_id::create("m_env",this);
         cp_env      = core_perif_env::type_id::create("cp_env",this);
         ips_env     = ips_core_env::type_id::create("ips_env",this);
-        vsqr        = soc_virtual_sequencer::type_id::create("vsqr",this);
         sbd         = ss_scoreboard::type_id::create("sbd",this);
-        vsqr.cfg    = cfg;
+        foreach(vsqr[i])begin
+            vsqr[i]= soc_virtual_sequencer::type_id::create($sformatf("vsqr[%0d]",i),this);
+            vsqr[i].cfg    = cfg;
+        end
+        //vsqr        = soc_virtual_sequencer::type_id::create("vsqr",this);
+        //vsqr.cfg    = cfg;
     endfunction
 
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
-        vsqr.cpu_sqr    =   c_env.cpu_agt.sqr;
-        ips_env.intc_env.intc_agt.mon.resp_ap.connect(vsqr.intc_af.analysis_export);
+        foreach(vsqr[i])begin
+            vsqr[i].cpu_sqr    =   c_env.cpu_agt[i].sqr;
+        end
+
+        foreach(vsqr[i])begin
+            ips_env.intc_env.intc_agt.mon.resp_ap.connect(vsqr[i].intc_af.analysis_export);
+        end
 
     // Scoreboard af connections with Monitor ap
-        c_env.cpu_agt.mon.mon_ap.connect(sbd.master_af.analysis_export);
+        foreach(c_env.cpu_agt[i])begin
+            c_env.cpu_agt[i].mon.mon_ap.connect(sbd.master_af[i].analysis_export);
+        end
         c_env.s04_agt.mon.mon_ap.connect(sbd.s04_af.analysis_export);
         m_env.mem_agt.bram_mon.mon_ap.connect(sbd.bram_af.analysis_export);
         m_env.mem_agt.mem_mon.mon_ap.connect(sbd.mem_af.analysis_export);

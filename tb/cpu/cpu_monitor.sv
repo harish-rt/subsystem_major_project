@@ -1,25 +1,28 @@
 class cpu_monitor extends uvm_monitor;
    `uvm_component_utils(cpu_monitor)
 
-   //uvm_analysis_port #(axi_base_sequence_item)        mon_ap;
-   uvm_analysis_port #(cpu_seq_item)        mon_ap;
-   virtual axi4_lite_tb_intf.MONITOR_MOD    cpu_mon_intf;
+    uvm_analysis_port #(cpu_seq_item)        mon_ap;
+    virtual axi4_lite_tb_intf.MONITOR_MOD    cpu_mon_intf;
 
-   mailbox #(cpu_seq_item) write_address_mbx, write_data_mbx, read_address_mbx, read_data_mbx;
+    mailbox #(cpu_seq_item) write_address_mbx, write_data_mbx, read_address_mbx, read_data_mbx;
+    master_e   port_id;
 
-   function new(string name="cpu_monitor", uvm_component parent);
-      super.new(name, parent);
-   endfunction
+    function new(string name="cpu_monitor", uvm_component parent);
+        super.new(name, parent);
+    endfunction
 
-   function void build_phase(uvm_phase phase);
-      super.build_phase(phase);
-      mon_ap = new("mon_ap", this);
-      `uvm_info(get_full_name(), phase.get_name(), UVM_MEDIUM)
-      write_address_mbx = new();
-      write_data_mbx = new();
-      read_address_mbx = new();
-      read_data_mbx = new();
-   endfunction
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        if (!uvm_config_db#(master_e)::get(this, "", "port_id", port_id)) begin
+            `uvm_warning("MON_CFG", "port_id not found in config_db, using default.")
+        end
+        mon_ap = new("mon_ap", this);
+        `uvm_info(get_full_name(), phase.get_name(), UVM_MEDIUM)
+        write_address_mbx = new();
+        write_data_mbx = new();
+        read_address_mbx = new();
+        read_data_mbx = new();
+    endfunction
 
    task main_phase(uvm_phase phase);
       `uvm_info(get_full_name(), phase.get_name(), UVM_MEDIUM)
@@ -112,7 +115,7 @@ class cpu_monitor extends uvm_monitor;
             merged_pkt.BRESP       = response_t'(cpu_mon_intf.axil_mon_cb.BRESP);
             merged_pkt.wresp_hndshk= $realtime();
             `uvm_info("cpu_monitor::capture_write_response","Sending pkt to SB",UVM_LOW);
-            merged_pkt.master_p   = MST_S00;
+            merged_pkt.master_p   = this.port_id;
             mon_ap.write(merged_pkt);
             `uvm_info("cpu_monitor_write_mon",merged_pkt.sprint(),UVM_LOW);
          end
@@ -155,7 +158,7 @@ class cpu_monitor extends uvm_monitor;
             data_pkt.RRESP[0]       = response_t'(cpu_mon_intf.axil_mon_cb.RRESP);
             data_pkt.rdata_hndshk[i]= $realtime();
             `uvm_info("cpu_monitor::capture_read_data","Sending READ pkt to SB",UVM_LOW);
-            data_pkt.master_p   = MST_S00;
+            data_pkt.master_p   = this.port_id;
             mon_ap.write(data_pkt);
             `uvm_info("cpu_monitor_read_mon",data_pkt.sprint(),UVM_LOW);
          end

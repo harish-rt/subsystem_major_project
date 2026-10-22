@@ -38,10 +38,10 @@ module top;
 // BRAM interface
     axi4_tb_intf       axi4_bram_if();
 
-// S00
-    axi4_lite_tb_intf  axil_riscv_if();
-// S02
-    axi4_lite_tb_intf  lite_data_if();
+// S00 - S02
+    axi4_lite_tb_intf  axil_riscv_if[2]();
+//// S02
+//    axi4_lite_tb_intf  lite_data_if();
 
 // memory interface
     axi4_lite_tb_intf  mem_intf();
@@ -153,9 +153,10 @@ module top;
 
     //instructions and data interfaces
         //S00
-        .inst_bridge2axi_int(axil_riscv_if),
+        .inst_bridge2axi_int(axil_riscv_if[0]),
         //S02
-        .data_bridge2axi_int(lite_data_if),
+        .data_bridge2axi_int(axil_riscv_if[1]),
+        //.data_bridge2axi_int(lite_data_if),
         //M05
         .ext_axi4_master(master_if),
         //S04
@@ -166,13 +167,16 @@ module top;
     assign slave_if.ACLK            = aclk;
     assign slave_if.ARESETn         = areset_n;
     
-    // S02
-    assign lite_data_if.ACLK       = aclk;
-    assign lite_data_if.ARESETn    = areset_n;
+    //// S02
+    //assign lite_data_if.ACLK       = aclk;
+    //assign lite_data_if.ARESETn    = areset_n;
 
     // S00
-    assign axil_riscv_if.ACLK       = aclk;
-    assign axil_riscv_if.ARESETn    = areset_n;
+    assign axil_riscv_if[0].ACLK       = aclk;
+    assign axil_riscv_if[0].ARESETn    = areset_n;
+    // S02
+    assign axil_riscv_if[1].ACLK       = aclk;
+    assign axil_riscv_if[1].ARESETn    = areset_n;
 
     // Core Peripherals
     assign core_perif_if.ACLK       = aclk;
@@ -450,13 +454,11 @@ module top;
         //run_test("intc_reg_write_read_test");
         //run_test("cdma_reg_write_read_test");
         //run_test("reg_read_test");
-        run_test("soc_master_test");
-        //run_test("bram_address_range_test");
+        //run_test("soc_master_test");
+        run_test("bram_address_range_test");
         //run_test("bram_upper_invalid_addr_test");
         //run_test("bram_lower_invalid_addr_test");
         //run_test("bram_multiple_write_read_test");
-        //run_test("load_bram_test");
-        //run_test("read_bram_test");
         //run_test("config_cdma_ral_test");
         //run_test("cpu_base_test");
         //run_test("cdma_wr_rd_test");
@@ -509,12 +511,15 @@ module top;
     `ifdef SBD_COMPONENTS
         sb_config sb_cfg;
         sb_cfg = sb_config::type_id::create("sb_cfg");
-        sb_cfg.perif_addr    = new[5];
+        sb_cfg.perif_addr    = new[8];
         sb_cfg.perif_addr[0] = '{BRAM, BRAM_BASE, BRAM_END};
         sb_cfg.perif_addr[1] = '{LITE_MEM, LITE_MEM_BASE, LITE_MEM_END};
         sb_cfg.perif_addr[2] = '{CDMA, CDMA_BASE, CDMA_END};
         sb_cfg.perif_addr[3] = '{INTC, INTC_BASE, INTC_END};
-        sb_cfg.perif_addr[4] = '{CORE_PERIF, CORE_PERIF_BASE, CORE_PERIF_END};
+        sb_cfg.perif_addr[4] = '{CORE_INTC, IRQ_BASE, IRQ_END};
+        sb_cfg.perif_addr[5] = '{UART, UART_BASE, UART_END};
+        sb_cfg.perif_addr[6] = '{SPI, SPI_BASE, SPI_END};
+        sb_cfg.perif_addr[7] = '{GPIO, GPIO_BASE, GPIO_END};
 	    uvm_config_db #(sb_config)::set(null,"*","SB_CFG",sb_cfg);
     `endif
         //sb_cfg.perif_addr[0] = '{BRAM, 32'h7100_0000, 32'h713F_FFFF};
@@ -540,7 +545,10 @@ module top;
 
         //CPU
         soc_config_obj.cpu_obj = cpu_config_obj :: type_id :: create ("obj");
-        soc_config_obj.cpu_obj.cpu_i  = axil_riscv_if;
+        soc_config_obj.cpu_obj.no_of_masters  = 2;
+        soc_config_obj.cpu_obj.cpu_i    = new[2];
+        soc_config_obj.cpu_obj.cpu_i[0] = axil_riscv_if[0];     // S00
+        soc_config_obj.cpu_obj.cpu_i[1] = axil_riscv_if[1];     // S02
         soc_config_obj.cpu_obj.mas_is_active = 1;        // agent active
         uvm_config_db #(cpu_config_obj)::set(null,"*","cpu_config_obj",soc_config_obj.cpu_obj);
 

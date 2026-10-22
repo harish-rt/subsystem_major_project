@@ -520,6 +520,7 @@ class bram_address_range_seq extends base_cpu_sequence;
             `uvm_error("RAND_FAIL","Randomization fail")
 
         finish_item(pkt);
+        get_response(pkt);
         start_item(pkt);
             if(!pkt.randomize() with {operation ==WRITE;
             AWADDR==32'h7100_0100;
@@ -527,6 +528,7 @@ class bram_address_range_seq extends base_cpu_sequence;
             WSTRB[0]==4'b1111;})
             `uvm_error("RAND_FAIL","Randomization fail")
         finish_item(pkt);
+        get_response(pkt);
 
         start_item(pkt);
             if(!pkt.randomize() with {
@@ -536,6 +538,7 @@ class bram_address_range_seq extends base_cpu_sequence;
             WSTRB[0]==4'b1111;})
             `uvm_error("RAND_FAIL","Randomization fail")
         finish_item(pkt);
+        get_response(pkt);
 
         start_item(pkt);
             if(!pkt.randomize() with {
@@ -545,6 +548,7 @@ class bram_address_range_seq extends base_cpu_sequence;
            WSTRB[0]==4'b1111;})
             `uvm_error("RAND_FAIL","Randomization fail")
         finish_item(pkt);
+        get_response(pkt);
 
         start_item(pkt);
             if(!pkt.randomize() with {operation == WRITE;
@@ -553,6 +557,7 @@ class bram_address_range_seq extends base_cpu_sequence;
             WSTRB[0]==4'b1111;})
             `uvm_error("RAND_FAIL","Randomization fail")
         finish_item(pkt);
+        get_response(pkt);
 
         start_item(pkt);
             if(!pkt.randomize() with {
@@ -561,35 +566,41 @@ class bram_address_range_seq extends base_cpu_sequence;
             WSTRB[0]       ==  4'b1111;})
             `uvm_error("RAND_FAIL","RANDOMIZATION FAIL")
         finish_item(pkt);
+        get_response(pkt);
 
         start_item(pkt);
             if(!pkt.randomize() with {operation ==READ;
             ARADDR==32'h7100_0000;})
             `uvm_error("RAND_FAIL","Randomization fail")
         finish_item(pkt);
+        get_response(pkt);
 
         start_item(pkt);
             if(!pkt.randomize() with {operation ==READ;
             ARADDR==32'h7100_0100;})
             `uvm_error("RAND_FAIL","Randomization fail")
         finish_item(pkt);
+        get_response(pkt);
 
         start_item(pkt);
             if(!pkt.randomize() with {operation ==READ; ARADDR == 32'h7110_0000;})
             `uvm_error("RAND_FAIL","Randomization fail")
         finish_item(pkt);
+        get_response(pkt);
 
          start_item(pkt);
             if(!pkt.randomize() with {operation ==READ;
             ARADDR==32'h7120_0000;})
             `uvm_error("RAND_FAIL","Randomization fail")
         finish_item(pkt);
+        get_response(pkt);
 
         start_item(pkt);
             if(!pkt.randomize() with {operation ==READ;
             ARADDR==32'h7130_0000;})
             `uvm_error("RAND_FAIL","Randomization fail")
         finish_item(pkt);
+        get_response(pkt);
 
         start_item(pkt);
             if(!pkt.randomize() with  {
@@ -597,6 +608,7 @@ class bram_address_range_seq extends base_cpu_sequence;
             operation   ==  READ;})
             `uvm_error("RAND_FAIL","Randomization Fail")
         finish_item(pkt);
+        get_response(pkt);
 
     endtask
 endclass : bram_address_range_seq

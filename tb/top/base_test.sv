@@ -47,7 +47,7 @@ class intc_sw_irq_test extends cpu_base_test;
 
         phase.raise_objection(this);
 
-            intc_seq.start(w_env.vsqr);
+            intc_seq.start(w_env.vsqr[0]);
 
             phase.phase_done.set_drain_time(this, 100ns);
         phase.drop_objection(this);
@@ -61,7 +61,7 @@ class bram_multiple_write_read_test extends cpu_base_test;
     task main_phase(uvm_phase phase);
         bram_multiple_wr_rd_seq multiple_wr_rd_seq=bram_multiple_wr_rd_seq::type_id::create("multiple_wr_rd_seq");
         phase.raise_objection(this);
-            multiple_wr_rd_seq.start(w_env.c_env.cpu_agt.sqr);
+            multiple_wr_rd_seq.start(w_env.c_env.cpu_agt[0].sqr);
             phase.phase_done.set_drain_time(this,100ns);
         phase.drop_objection(this);
     endtask
@@ -75,7 +75,7 @@ class bram_upper_invalid_addr_test extends cpu_base_test;
     task main_phase(uvm_phase phase);
         bram_upper_invalid_addr_seq bram_seq=bram_upper_invalid_addr_seq::type_id::create("bram_seq");
         phase.raise_objection(this);
-            bram_seq.start(w_env.c_env.cpu_agt.sqr);
+            bram_seq.start(w_env.c_env.cpu_agt[0].sqr);
             phase.phase_done.set_drain_time(this,100ns);
         phase.drop_objection(this);
     endtask
@@ -88,7 +88,7 @@ class bram_lower_invalid_addr_test extends cpu_base_test;
     task main_phase(uvm_phase phase);
         bram_lower_invalid_addr_seq bram_seq=bram_lower_invalid_addr_seq::type_id::create("bram_seq");
         phase.raise_objection(this);
-            bram_seq.start(w_env.c_env.cpu_agt.sqr);
+            bram_seq.start(w_env.c_env.cpu_agt[0].sqr);
             phase.phase_done.set_drain_time(this,100ns);
         phase.drop_objection(this);
     endtask
@@ -101,7 +101,7 @@ class bram_address_range_test extends cpu_base_test;
     task main_phase(uvm_phase phase);
         bram_address_range_seq bram_seq=bram_address_range_seq::type_id::create("bram_seq");
         phase.raise_objection(this);
-            bram_seq.start(w_env.c_env.cpu_agt.sqr);
+            bram_seq.start(w_env.c_env.cpu_agt[0].sqr);
             phase.phase_done.set_drain_time(this,100ns);
         phase.drop_objection(this);
     endtask
@@ -118,7 +118,7 @@ class soc_master_test extends cpu_base_test;
 
         phase.raise_objection(this);
 
-            master_vseq.start(w_env.vsqr);
+            master_vseq.start(w_env.vsqr[0]);
 
         phase.phase_done.set_drain_time(this, 500ns);
         phase.drop_objection(this);
@@ -129,26 +129,27 @@ class load_bram_256_test extends cpu_base_test;
     `uvm_component_utils(load_bram_256_test)
     `NEW_COMP
 
-    load_bram_seq       load_seq;   //axi4 lite
-    //load_bram_256_seq   load_seq;   //axi4
+    //load_bram_seq       load_seq;   //axi4 lite
+    load_bram_256_seq   load_seq;   //axi4
     read_bram_256_seq   read_seq;   //axi4
     read_bram_vseq      lite_seq;   //axi4 lite
 
     task main_phase(uvm_phase phase);
-        load_seq = load_bram_seq::type_id::create("load_seq");  //axi4
+        //load_seq = load_bram_seq::type_id::create("load_seq");  //axi4
+        load_seq = load_bram_256_seq::type_id::create("load_seq");  //axi4
 
         read_seq = read_bram_256_seq::type_id::create("read_seq");  //axi4
         lite_seq = read_bram_vseq::type_id::create("lite_seq");     //axi4 lite
 
         phase.raise_objection(this);
             `uvm_info("UVM_TEST","started bram loading",UVM_LOW)
-            load_seq.start(w_env.c_env.cpu_agt.sqr);
-            //load_seq.start(w_env.c_env.s04_agt.sqr);
+            //load_seq.start(w_env.c_env.cpu_agt[0].sqr);
+            load_seq.start(w_env.c_env.s04_agt.sqr);
             `uvm_info("UVM_TEST","loading bram completed",UVM_LOW)
         fork
             `uvm_info("UVM_TEST","entered fork",UVM_LOW)
             //read_seq.start(w_env.c_env.s04_agt.sqr);
-            lite_seq.start(w_env.vsqr);
+            lite_seq.start(w_env.vsqr[0]);
         join
         `uvm_info("UVM_TEST","came out of fork",UVM_LOW)
         phase.phase_done.set_drain_time(this, 2000ns);
@@ -166,7 +167,7 @@ class cdma_boundary_check_test extends cpu_base_test;
         cdma_seq = cdma_boundary_check_seq::type_id::create("cdma_seq");
 
         phase.raise_objection(this);
-            cdma_seq.start(w_env.c_env.cpu_agt.sqr);
+            cdma_seq.start(w_env.c_env.cpu_agt[0].sqr);
             //cdma_seq.start(w_env.c_env.s04_agt.sqr);
         phase.drop_objection(this);
     endtask
@@ -186,8 +187,8 @@ class cdma_wr_rd_test extends cpu_base_test;
 
         phase.raise_objection(this);
 
-            mem_seq.start(w_env.c_env.cpu_agt.sqr);
-            seq.start(w_env.c_env.cpu_agt.sqr);
+            mem_seq.start(w_env.c_env.cpu_agt[0].sqr);
+            seq.start(w_env.c_env.cpu_agt[0].sqr);
 
         phase.phase_done.set_drain_time(this, 1000ns);
         phase.drop_objection(this);
@@ -207,8 +208,8 @@ class mem_wr_rd_test extends cpu_base_test;
 
         phase.raise_objection(this);
 
-            mem_seq.start(w_env.c_env.cpu_agt.sqr);
-            seq.start(w_env.c_env.cpu_agt.sqr);
+            mem_seq.start(w_env.c_env.cpu_agt[0].sqr);
+            seq.start(w_env.c_env.cpu_agt[0].sqr);
 
         phase.phase_done.set_drain_time(this, 1000ns);
         phase.drop_objection(this);
@@ -223,7 +224,7 @@ class cdma_reg_read_test extends cpu_base_test;
     task main_phase(uvm_phase phase);
         reg_vseq = cdma_reg_read_vseq::type_id::create("reg_vseq");
         phase.raise_objection(this);
-            reg_vseq.start(w_env.vsqr);
+            reg_vseq.start(w_env.vsqr[0]);
         phase.drop_objection(this);
     endtask
 endclass : cdma_reg_read_test
@@ -236,7 +237,7 @@ class reg_read_test extends cpu_base_test;
     task main_phase(uvm_phase phase);
         reg_vseq = reg_read_vseq::type_id::create("reg_vseq");
         phase.raise_objection(this);
-            reg_vseq.start(w_env.vsqr);
+            reg_vseq.start(w_env.vsqr[0]);
         phase.drop_objection(this);
     endtask
 endclass : reg_read_test
@@ -250,7 +251,7 @@ class cdma_reg_write_read_test extends cpu_base_test;
     task main_phase(uvm_phase phase);
         reg_vseq = cdma_reg_write_read_vseq::type_id::create("reg_vseq");
         phase.raise_objection(this);
-            reg_vseq.start(w_env.vsqr);
+            reg_vseq.start(w_env.vsqr[0]);
         phase.drop_objection(this);
     endtask
 endclass : cdma_reg_write_read_test
@@ -264,7 +265,7 @@ class intc_reg_write_read_test extends cpu_base_test;
     task main_phase(uvm_phase phase);
         reg_vseq = intc_reg_write_read_vseq::type_id::create("reg_vseq");
         phase.raise_objection(this);
-            reg_vseq.start(w_env.vsqr);
+            reg_vseq.start(w_env.vsqr[0]);
         phase.drop_objection(this);
     endtask
 endclass : intc_reg_write_read_test
@@ -276,10 +277,10 @@ class perif_reg_read_test extends cpu_base_test;
     perif_reg_read_vseq   reg_vseq;
     task main_phase(uvm_phase phase);
         //w_env.c_env.cpu_agt.drv.disable_cpu_fork = 1;
-        `SET_CPU_FORK_DISABLE(1);
+        `SET_S00_FORK_DISABLE(1);
         reg_vseq = perif_reg_read_vseq::type_id::create("reg_vseq");
         phase.raise_objection(this);
-            reg_vseq.start(w_env.vsqr);
+            reg_vseq.start(w_env.vsqr[0]);
         phase.drop_objection(this);
     endtask
 endclass : perif_reg_read_test
@@ -290,10 +291,10 @@ class uart_write_data_test extends cpu_base_test;
 
     uart_write_data_vseq   reg_vseq;
     task main_phase(uvm_phase phase);
-        `SET_CPU_FORK_DISABLE(1);
+        `SET_S00_FORK_DISABLE(1);
         reg_vseq = uart_write_data_vseq::type_id::create("reg_vseq");
         phase.raise_objection(this);
-            reg_vseq.start(w_env.vsqr);
+            reg_vseq.start(w_env.vsqr[0]);
         phase.phase_done.set_drain_time(this, 6000ns);
         phase.drop_objection(this);
     endtask
@@ -305,10 +306,10 @@ class TESTNAME extends cpu_base_test;\
     `NEW_COMP\
     VSEQ_NAME   vseq;\
     task main_phase(uvm_phase phase);\
-        `SET_CPU_FORK_DISABLE(CFD);\
+        `SET_S00_FORK_DISABLE(CFD);\
         vseq = VSEQ_NAME::type_id::create("vseq");\
         phase.raise_objection(this);\
-            vseq.start(w_env.vsqr);\
+            vseq.start(w_env.vsqr[0]);\
         phase.phase_done.set_drain_time(this, 1000ns);\
         phase.drop_objection(this);\
     endtask\
@@ -328,12 +329,12 @@ class spi_write_data_test extends cpu_base_test;
     spi_slave_sequence      slv_seq;
 
     task main_phase(uvm_phase phase);
-        `SET_CPU_FORK_DISABLE(1);
+        `SET_S00_FORK_DISABLE(1);
         reg_vseq = spi_write_data_vseq::type_id::create("reg_vseq");
         slv_seq = spi_slave_sequence::type_id::create("slv_seq");
         phase.raise_objection(this);
         fork
-            reg_vseq.start(w_env.vsqr);
+            reg_vseq.start(w_env.vsqr[0]);
             slv_seq.start(w_env.cp_env.spi_agt.sequencer);
         join
         phase.phase_done.set_drain_time(this, 8000ns);
@@ -348,12 +349,12 @@ class core_perif_master_test extends cpu_base_test;
     core_perif_master_vseq   reg_vseq;
     uart_slave_sequence      slv_seq;
     task main_phase(uvm_phase phase);
-        `SET_CPU_FORK_DISABLE(1);
+        `SET_S00_FORK_DISABLE(1);
         reg_vseq = core_perif_master_vseq::type_id::create("reg_vseq");
         slv_seq  = uart_slave_sequence  ::type_id::create("slv_seq");
         phase.raise_objection(this);
         fork
-            reg_vseq.start(w_env.vsqr);
+            reg_vseq.start(w_env.vsqr[0]);
             slv_seq.start(w_env.cp_env.uart_agt.sequencer);
         join
         phase.phase_done.set_drain_time(this, 1000ns);
@@ -376,14 +377,14 @@ class cdma_sg_test extends cpu_base_test;
 
         phase.raise_objection(this);
 
-            mem_seq.start(w_env.c_env.cpu_agt.sqr);
-            desc_seq.start(w_env.c_env.cpu_agt.sqr);
+            mem_seq.start(w_env.c_env.cpu_agt[0].sqr);
+            desc_seq.start(w_env.c_env.cpu_agt[0].sqr);
 
             //seq.current_desc  = desc_seq.curdesc_addr;
             //seq.tail_desc = desc_seq.taildesc_addr;
             seq.desc_mem = desc_seq;
                        
-            seq.start(w_env.c_env.cpu_agt.sqr);
+            seq.start(w_env.c_env.cpu_agt[0].sqr);
 
         phase.phase_done.set_drain_time(this, 5000ns);
         phase.drop_objection(this);
