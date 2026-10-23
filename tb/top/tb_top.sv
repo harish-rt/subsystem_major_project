@@ -441,7 +441,7 @@ module top;
     assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
 
     initial begin
-        //run_test("load_bram_256_test");             //find the interconnect issue
+        run_test("load_bram_256_test");             //find the interconnect issue
         //run_test("core_perif_master_test");
         //run_test("spi_write_data_test");
         //run_test("perif_gap_interconnect_test");
@@ -455,7 +455,7 @@ module top;
         //run_test("cdma_reg_write_read_test");
         //run_test("reg_read_test");
         //run_test("soc_master_test");
-        run_test("bram_address_range_test");
+        //run_test("bram_address_range_test");
         //run_test("bram_upper_invalid_addr_test");
         //run_test("bram_lower_invalid_addr_test");
         //run_test("bram_multiple_write_read_test");
@@ -497,8 +497,8 @@ module top;
     	uvm_config_db#(virtual axi4_lite_tb_intf)::set(null,"*","CP_MON",core_perif_if);
     	//uvm_config_db#(virtual axi4_lite_tb_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
     	//uvm_config_db#(virtual axi4_tb_intf.MONITOR_MOD)::set(null,"*","BRAM_MON",axi4_bram_if);
-    	uvm_config_db#(virtual axi4_tb_intf.DRIVER_MOD)::set(null,"*","S04",slave_if);
-    	uvm_config_db#(virtual axi4_tb_intf.MONITOR_MOD)::set(null,"*","S04_MON",slave_if);
+    	//uvm_config_db#(virtual axi4_tb_intf.DRIVER_MOD)::set(null,"*","S04",slave_if);
+    	//uvm_config_db#(virtual axi4_tb_intf.MONITOR_MOD)::set(null,"*","S04_MON",slave_if);
     end
 
     //initial begin
@@ -549,7 +549,8 @@ module top;
         soc_config_obj.cpu_obj.cpu_i    = new[2];
         soc_config_obj.cpu_obj.cpu_i[0] = axil_riscv_if[0];     // S00
         soc_config_obj.cpu_obj.cpu_i[1] = axil_riscv_if[1];     // S02
-        soc_config_obj.cpu_obj.mas_is_active = 1;        // agent active
+        soc_config_obj.cpu_obj.s04_if   = slave_if;             // S04
+        soc_config_obj.cpu_obj.mas_is_active = 1;               // agent active
         uvm_config_db #(cpu_config_obj)::set(null,"*","cpu_config_obj",soc_config_obj.cpu_obj);
 
         //Lite MEM - BRAM

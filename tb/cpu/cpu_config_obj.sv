@@ -4,6 +4,8 @@ class cpu_config_obj extends uvm_object;
 
    //virtual axi4_lite_tb_intf    cpu_i;
    virtual axi4_lite_tb_intf    cpu_i[];
+   virtual axi4_tb_intf         s04_if;
+
    bit                          mas_is_active; 
    int                          no_of_masters;
 

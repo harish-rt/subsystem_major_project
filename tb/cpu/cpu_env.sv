@@ -26,14 +26,16 @@ class cpu_env extends uvm_env;
     virtual function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
         foreach(cpu_agt[i])begin
-            cpu_agt[i].mon.cpu_mon_intf = obj.cpu_i[i].MONITOR_MOD;
             cpu_agt[i].drv.cpu_drv_intf = obj.cpu_i[i].DRIVER_MOD;
+            cpu_agt[i].mon.cpu_mon_intf = obj.cpu_i[i].MONITOR_MOD;
+            s04_agt.drv.drv_intf        = obj.s04_if.TB_MASTER_MOD;
+            s04_agt.mon.mon_intf        = obj.s04_if;
+        end
+
+        foreach(cpu_agt[i])begin
             cpu_agt[i].drv.seq_item_port.connect(cpu_agt[i].sqr.seq_item_export);
         end
         s04_agt.drv.seq_item_port.connect(s04_agt.sqr.seq_item_export);
     endfunction
 
-   virtual task main_phase(uvm_phase phase);
-      `uvm_info("cpu_env::main", phase.get_name(), UVM_MEDIUM)
-   endtask
 endclass:cpu_env
