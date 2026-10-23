@@ -6,34 +6,34 @@ interface axi4_lite_intf();
    logic ACLK;
    logic ARESETn;
 
-   // Write address channel signals (declared as wire to allow multi-module port connections)
-   wire [ADDR_WIDTH-1:0]       AWADDR;
-   wire                        AWREADY;
-   wire                        AWVALID;
-   wire [2:0]                  AWPROT;
+   // Write address channel signals (declared as logic to allow multi-module port connections)
+   logic [ADDR_WIDTH-1:0]       AWADDR;
+   logic                        AWREADY;
+   logic                        AWVALID;
+   logic [2:0]                  AWPROT;
 
    // Write data channel signals
-   wire [DATA_WIDTH-1:0]       WDATA;
-   wire [(DATA_WIDTH/8)-1:0]   WSTRB;
-   wire                        WREADY;
-   wire                        WVALID;
+   logic [DATA_WIDTH-1:0]       WDATA;
+   logic [(DATA_WIDTH/8)-1:0]   WSTRB;
+   logic                        WREADY;
+   logic                        WVALID;
 
    // Write response channel signals
-   wire [1:0]                  BRESP;
-   wire                        BREADY;
-   wire                        BVALID;
+   logic [1:0]                  BRESP;
+   logic                        BREADY;
+   logic                        BVALID;
 
    // Read address channel signals
-   wire [ADDR_WIDTH-1:0]       ARADDR;
-   wire                        ARREADY;
-   wire                        ARVALID;
-   wire [2:0]                  ARPROT;
+   logic [ADDR_WIDTH-1:0]       ARADDR;
+   logic                        ARREADY;
+   logic                        ARVALID;
+   logic [2:0]                  ARPROT;
  
    // Read data channel signals
-   wire [DATA_WIDTH-1:0]       RDATA;
-   wire [1:0]                  RRESP;
-   wire                        RREADY;
-   wire                        RVALID;
+   logic [DATA_WIDTH-1:0]       RDATA;
+   logic [1:0]                  RRESP;
+   logic                        RREADY;
+   logic                        RVALID;
 
    // -------------------------------------------------------------------------
    // Clocking Blocks (Verification / TB)

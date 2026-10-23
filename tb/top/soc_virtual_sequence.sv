@@ -294,11 +294,7 @@ class core_perif_master_vseq extends soc_base_virtual_sequence;
         intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
         
         intc_seq.core_en = 1;
-
-        fork
-            //isr_vseq.start(p_sequencer);
-        join_none
-
+      
         uart_seq.start(p_sequencer.cpu_sqr);
         intc_seq.start(p_sequencer.cpu_sqr);
         //isr_clear();    // waits for irq down before ending core_perif_master_vseq

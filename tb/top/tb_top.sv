@@ -14,6 +14,7 @@ import uvm_pkg :: *;
 //import soc_package ::*;
 module top;
     
+    import soc_addr_pkg ::*;
     import cpu_package ::*;
     import axi_cdma_env_pkg ::*;
     import mem_package :: *;
@@ -31,23 +32,26 @@ module top;
     wire axi_intr;
     wire axi_irq;
 
-    axi4_intf       master_if();
-    axi4_intf       slave_if();
-
-// S00
-    axi4_lite_intf  axil_riscv_if();
-// S02
-    axi4_lite_intf  lite_data_if();
-
-// memory interface
-    axi4_lite_intf  mem_intf();
+    axi4_tb_intf       master_if();
+    axi4_tb_intf       slave_if();
 
 // BRAM interface
-    axi4_intf       axi4_bram_if();
+    axi4_tb_intf       axi4_bram_if();
+
+// S00 - S02
+    axi4_lite_tb_intf  axil_riscv_if[2]();
+//// S02
+//    axi4_lite_tb_intf  lite_data_if();
+
+// memory interface
+    axi4_lite_tb_intf  mem_intf();
+
+// core peripherals monitor
+    axi4_lite_tb_intf              core_perif_if();
 
 // AXI Interrupt Controller
+    axi4_lite_tb_intf           lite_intc_if();
     assign intc_proc_rst    =   ~areset_n;
-    axi4_lite_intc_intf         lite_intc_if(.aclk(aclk),.areset_n(areset_n));
     intc_intf                   intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
      
 //axi cdma interfaces 
@@ -55,9 +59,6 @@ module top;
     axi_cdma_axi_slave_intf     cdma_sg_intf        (.aclk(aclk),.areset_n(areset_n));
     axi_cdma_axi_slave_intf     cdma_data_mov_intf  (.aclk(aclk),.areset_n(areset_n));
     axi_cdma_interrupt_intf     cdma_interrupt_intf (.aclk(aclk));
-
-// core peripherals monitor
-    axi4_lite_intf              core_perif_if();
 
 // UART interface
     uart_slave_if   uart_if(.clk(aclk),.rst_n(intc_proc_rst));
@@ -149,25 +150,33 @@ module top;
         .rsta_busy_0(),
         .rstb_busy_0(),
 
-        //M05
-        .ext_axi4_master(master_if),
-        //S04
-        .ext_axi4_slave(slave_if),
 
     //instructions and data interfaces
         //S00
-        .inst_bridge2axi_int(axil_riscv_if),
+        .inst_bridge2axi_int(axil_riscv_if[0]),
         //S02
-        .data_bridge2axi_int(lite_data_if)
+        .data_bridge2axi_int(axil_riscv_if[1]),
+        //.data_bridge2axi_int(lite_data_if),
+        //M05
+        .ext_axi4_master(master_if),
+        //S04
+        .ext_axi4_slave(slave_if)
     );
 
     // S04
     assign slave_if.ACLK            = aclk;
     assign slave_if.ARESETn         = areset_n;
     
-    // Cpu 
-    assign axil_riscv_if.ACLK       = aclk;
-    assign axil_riscv_if.ARESETn    = areset_n;
+    //// S02
+    //assign lite_data_if.ACLK       = aclk;
+    //assign lite_data_if.ARESETn    = areset_n;
+
+    // S00
+    assign axil_riscv_if[0].ACLK       = aclk;
+    assign axil_riscv_if[0].ARESETn    = areset_n;
+    // S02
+    assign axil_riscv_if[1].ACLK       = aclk;
+    assign axil_riscv_if[1].ARESETn    = areset_n;
 
     // Core Peripherals
     assign core_perif_if.ACLK       = aclk;
@@ -193,34 +202,35 @@ module top;
     assign core_perif_if.RREADY  = dut.axi_int2core_peri.RREADY;
     //defparam dut.IPS_CORE.axi_cdma_0.U0.C_M_AXI_MAX_BURST_LEN = 64;
 
-    // Open port S04
-    assign slave_if.ACLK    =   aclk;
-    assign slave_if.ARESETn =   areset_n;
-
-    // Interuppt controller
+    // Interrupt controller
+    assign lite_intc_if.ACLK        = aclk;
+    assign lite_intc_if.ARESETn     = areset_n;
     // --- Write Channels (AW) ---
-    assign lite_intc_if.axi_awaddr  = dut.IPS_CORE.axi_intc_0.s_axi_awaddr;
-    assign lite_intc_if.axi_awvalid = dut.IPS_CORE.axi_intc_0.s_axi_awvalid;
-    assign lite_intc_if.axi_awready = dut.IPS_CORE.axi_intc_0.s_axi_awready;
+    assign lite_intc_if.AWADDR  = dut.IPS_CORE.axi_intc_0.s_axi_awaddr;
+    assign lite_intc_if.AWVALID = dut.IPS_CORE.axi_intc_0.s_axi_awvalid;
+    assign lite_intc_if.AWREADY = dut.IPS_CORE.axi_intc_0.s_axi_awready;
+    
     // --- Write Data Channel (W) ---
-    assign lite_intc_if.axi_wdata   = dut.IPS_CORE.axi_intc_0.s_axi_wdata;
-    assign lite_intc_if.axi_wstrb   = dut.IPS_CORE.axi_intc_0.s_axi_wstrb;
-    assign lite_intc_if.axi_wvalid  = dut.IPS_CORE.axi_intc_0.s_axi_wvalid;
-    assign lite_intc_if.axi_wready  = dut.IPS_CORE.axi_intc_0.s_axi_wready;
+    assign lite_intc_if.WDATA   = dut.IPS_CORE.axi_intc_0.s_axi_wdata;
+    assign lite_intc_if.WSTRB   = dut.IPS_CORE.axi_intc_0.s_axi_wstrb;
+    assign lite_intc_if.WVALID  = dut.IPS_CORE.axi_intc_0.s_axi_wvalid;
+    assign lite_intc_if.WREADY  = dut.IPS_CORE.axi_intc_0.s_axi_wready;
+    
     // --- Write Response Channel (B) ---
-    assign lite_intc_if.axi_bresp   = dut.IPS_CORE.axi_intc_0.s_axi_bresp;
-    assign lite_intc_if.axi_bvalid  = dut.IPS_CORE.axi_intc_0.s_axi_bvalid;
-    assign lite_intc_if.axi_bready  = dut.IPS_CORE.axi_intc_0.s_axi_bready;
+    assign lite_intc_if.BRESP   = dut.IPS_CORE.axi_intc_0.s_axi_bresp;
+    assign lite_intc_if.BVALID  = dut.IPS_CORE.axi_intc_0.s_axi_bvalid;
+    assign lite_intc_if.BREADY  = dut.IPS_CORE.axi_intc_0.s_axi_bready;
     
     // --- Read Channels (AR) ---
-    assign lite_intc_if.axi_araddr  = dut.IPS_CORE.axi_intc_0.s_axi_araddr;
-    assign lite_intc_if.axi_arvalid = dut.IPS_CORE.axi_intc_0.s_axi_arvalid;
-    assign lite_intc_if.axi_arready = dut.IPS_CORE.axi_intc_0.s_axi_arready;
+    assign lite_intc_if.ARADDR  = dut.IPS_CORE.axi_intc_0.s_axi_araddr;
+    assign lite_intc_if.ARVALID = dut.IPS_CORE.axi_intc_0.s_axi_arvalid;
+    assign lite_intc_if.ARREADY = dut.IPS_CORE.axi_intc_0.s_axi_arready;
+    
     // --- Read Data Channel (R) ---
-    assign lite_intc_if.axi_rdata   = dut.IPS_CORE.axi_intc_0.s_axi_rdata;
-    assign lite_intc_if.axi_rresp   = dut.IPS_CORE.axi_intc_0.s_axi_rresp;
-    assign lite_intc_if.axi_rvalid  = dut.IPS_CORE.axi_intc_0.s_axi_rvalid;
-    assign lite_intc_if.axi_rready  = dut.IPS_CORE.axi_intc_0.s_axi_rready;
+    assign lite_intc_if.RDATA   = dut.IPS_CORE.axi_intc_0.s_axi_rdata;
+    assign lite_intc_if.RRESP   = dut.IPS_CORE.axi_intc_0.s_axi_rresp;
+    assign lite_intc_if.RVALID  = dut.IPS_CORE.axi_intc_0.s_axi_rvalid;
+    assign lite_intc_if.RREADY  = dut.IPS_CORE.axi_intc_0.s_axi_rready;
 
     // Interrupt Wires
     assign intc_if.intc_intr        = dut.IPS_CORE.intr_0;   //CDMA is 26 | Core Peri is 27
@@ -342,13 +352,13 @@ module top;
     assign cdma_sg_intf.awid=0;
     assign cdma_sg_intf.bid=0;
     assign cdma_sg_intf.arid=0;
-    assign cdma_sg_intf.rid=0;
 
     assign cdma_data_mov_intf.arlock=0;
     assign cdma_data_mov_intf.awid=0;
     assign cdma_data_mov_intf.bid=0;
     assign cdma_data_mov_intf.arid=0;
     assign cdma_data_mov_intf.rid=0;
+    assign cdma_sg_intf.rid=0;
     assign cdma_sg_intf.awlock=0;
     assign cdma_sg_intf.awqos=0;
     assign cdma_sg_intf.awregion=0;
@@ -430,15 +440,16 @@ module top;
     assign mem_intf.WSTRB   = dut.AXI_SLAVE_MEM.s_axi_intf.WSTRB;    
     assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
 
-
     initial begin
+        run_test("load_bram_256_test");             //find the interconnect issue
+        //run_test("core_perif_master_test");
+        //run_test("spi_write_data_test");
         //run_test("perif_gap_interconnect_test");
         //run_test("interconnect_gaps_test");
         //run_test("gap_pre_system_test");
-        //run_test("uart_write_data_test");   //`SET_CPU_FORK_DISABLE(1) in test
-        //run_test("perif_reg_read_test");  //`SET_CPU_FORK_DISABLE(1) in test
-        run_test("cdma_boundary_check_test");
-        //run_test("load_bram_256_test");   //find the interconnect issue
+        //run_test("uart_write_data_test");         //`SET_CPU_FORK_DISABLE(1) in test
+        //run_test("perif_reg_read_test");          //`SET_CPU_FORK_DISABLE(1) in test
+        //run_test("cdma_boundary_check_test");
         //run_test("intc_sw_irq_test");
         //run_test("intc_reg_write_read_test");
         //run_test("cdma_reg_write_read_test");
@@ -448,8 +459,6 @@ module top;
         //run_test("bram_upper_invalid_addr_test");
         //run_test("bram_lower_invalid_addr_test");
         //run_test("bram_multiple_write_read_test");
-        //run_test("load_bram_test");
-        //run_test("read_bram_test");
         //run_test("config_cdma_ral_test");
         //run_test("cpu_base_test");
         //run_test("cdma_wr_rd_test");
@@ -468,14 +477,28 @@ module top;
         //#3000;
         //$finish();
     end
-     
-    soc_config     soc_config_obj;
+    // checking b channel by bypassing the interconnect
+    // find why interconnect not passign these signals
+    //initial begin
+    //    force slave_if.BID      = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BID;
+    //    force slave_if.BVALID   = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BVALID;
+    //    force slave_if.BREADY   = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BREADY;
+    //    force slave_if.BRESP    = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BRESP;
+    //end
+
+    always @(posedge aclk) begin
+        if (dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWVALID && dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWREADY)
+        $display("%t M03 AWID=%b (width %0d)", $time, dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWID, $bits(dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWID));
+        if (dut.IPS_CORE.axi_interconnect_0_M03_AXI_BVALID && dut.IPS_CORE.axi_interconnect_0_M03_AXI_BREADY)
+        $display("%t M03 BID=%b", $time, dut.IPS_CORE.axi_interconnect_0_M03_AXI_BID);
+    end
 
     initial begin
-    	uvm_config_db#(virtual axi4_lite_intf)::set(null,"*","CP_MON",core_perif_if);
-    	uvm_config_db#(virtual axi4_lite_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
-    	uvm_config_db#(virtual axi4_intf.MONITOR_MOD)::set(null,"*","BRAM_MON",axi4_bram_if);
-    	uvm_config_db#(virtual axi4_intf.DRIVER_MOD)::set(null,"*","S04",slave_if);
+    	uvm_config_db#(virtual axi4_lite_tb_intf)::set(null,"*","CP_MON",core_perif_if);
+    	//uvm_config_db#(virtual axi4_lite_tb_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
+    	//uvm_config_db#(virtual axi4_tb_intf.MONITOR_MOD)::set(null,"*","BRAM_MON",axi4_bram_if);
+    	//uvm_config_db#(virtual axi4_tb_intf.DRIVER_MOD)::set(null,"*","S04",slave_if);
+    	//uvm_config_db#(virtual axi4_tb_intf.MONITOR_MOD)::set(null,"*","S04_MON",slave_if);
     end
 
     //initial begin
@@ -484,17 +507,29 @@ module top;
    
     initial begin
         //$value$plusargs("DISABLE_CPU_FORK=%b", disable_cpu_fork);
-    	//uvm_config_db#(bit)::set(null,"*","DCF",disable_cpu_fork);
 
     `ifdef SBD_COMPONENTS
         sb_config sb_cfg;
         sb_cfg = sb_config::type_id::create("sb_cfg");
-        sb_cfg.perif_addr = new[2];
-        sb_cfg.perif_addr[0] = '{BRAM, 32'h7100_0000, 32'h713F_FFFF};
-        sb_cfg.perif_addr[1] = '{LITE_MEM, 32'h8000_0000, 32'h9FFF_FFFF};
+        sb_cfg.perif_addr    = new[8];
+        sb_cfg.perif_addr[0] = '{BRAM, BRAM_BASE, BRAM_END};
+        sb_cfg.perif_addr[1] = '{LITE_MEM, LITE_MEM_BASE, LITE_MEM_END};
+        sb_cfg.perif_addr[2] = '{CDMA, CDMA_BASE, CDMA_END};
+        sb_cfg.perif_addr[3] = '{INTC, INTC_BASE, INTC_END};
+        sb_cfg.perif_addr[4] = '{CORE_INTC, IRQ_BASE, IRQ_END};
+        sb_cfg.perif_addr[5] = '{UART, UART_BASE, UART_END};
+        sb_cfg.perif_addr[6] = '{SPI, SPI_BASE, SPI_END};
+        sb_cfg.perif_addr[7] = '{GPIO, GPIO_BASE, GPIO_END};
 	    uvm_config_db #(sb_config)::set(null,"*","SB_CFG",sb_cfg);
     `endif
+        //sb_cfg.perif_addr[0] = '{BRAM, 32'h7100_0000, 32'h713F_FFFF};
+        //sb_cfg.perif_addr[1] = '{LITE_MEM, 32'h8000_0000, 32'h9FFF_FFFF};
+        //sb_cfg.perif_addr[2] = '{CDMA, 32'h7000_0000, 32'h7000_0FFF};
+        //sb_cfg.perif_addr[3] = '{INTC, 32'h7000_1000, 32'h7000_1FFF};
+        //sb_cfg.perif_addr[4] = '{CORE_PERIF, 32'hA000_0000, 32'hBFFF_FFFF};
     end
+
+    soc_config     soc_config_obj;
     
     initial begin
         //soc_config
@@ -510,9 +545,21 @@ module top;
 
         //CPU
         soc_config_obj.cpu_obj = cpu_config_obj :: type_id :: create ("obj");
-        soc_config_obj.cpu_obj.cpu_i  = axil_riscv_if;
-        soc_config_obj.cpu_obj.mas_is_active = 1;        // agent active
+        soc_config_obj.cpu_obj.no_of_masters  = 2;
+        soc_config_obj.cpu_obj.cpu_i    = new[2];
+        soc_config_obj.cpu_obj.cpu_i[0] = axil_riscv_if[0];     // S00
+        soc_config_obj.cpu_obj.cpu_i[1] = axil_riscv_if[1];     // S02
+        soc_config_obj.cpu_obj.s04_if   = slave_if;             // S04
+        soc_config_obj.cpu_obj.mas_is_active = 1;               // agent active
         uvm_config_db #(cpu_config_obj)::set(null,"*","cpu_config_obj",soc_config_obj.cpu_obj);
+
+        //Lite MEM - BRAM
+        soc_config_obj.mem_obj = mem_config_obj :: type_id :: create ("mem_obj");
+        soc_config_obj.mem_obj.mem_intf         = mem_intf;
+        soc_config_obj.mem_obj.bram_intf        = axi4_bram_if;
+        soc_config_obj.mem_obj.mem_is_active    = UVM_PASSIVE;
+        soc_config_obj.mem_obj.bram_is_active   = UVM_PASSIVE;
+        uvm_config_db #(mem_config_obj)::set(null,"*","mem_config_obj",soc_config_obj.mem_obj);
 
         //CDMA
         soc_config_obj.cdma_config_obj=axi_cdma_config_obj::type_id::create("cdma_config_obj");

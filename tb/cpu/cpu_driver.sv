@@ -1,7 +1,7 @@
 class cpu_driver extends uvm_driver #(cpu_seq_item);
     `uvm_component_utils(cpu_driver)
 
-    virtual axi4_lite_intf.DRIVER_MOD cpu_drv_intf;
+    virtual axi4_lite_tb_intf.DRIVER_MOD cpu_drv_intf;
     cpu_seq_item               pkt;
     bit disable_cpu_fork     = 0;
 
@@ -66,18 +66,18 @@ class cpu_driver extends uvm_driver #(cpu_seq_item);
       wait(cpu_drv_intf.axil_drv_cb.AWREADY);
       cpu_drv_intf.axil_drv_cb.AWVALID <= 0;
       cpu_drv_intf.axil_drv_cb.AWADDR  <= 0;
-      `uvm_info(get_full_name(),"AXI-Lite drive_write_add -- address handshake complete", UVM_LOW);
+      `uvm_info("driver_pkt_from_write_addr",pkt.sprint(),UVM_MEDIUM)
    endtask
 
    task drive_write_data(cpu_seq_item pkt);
       `uvm_info(get_full_name(),"AXI-Lite drive_write_data -- task triggered", UVM_LOW);
-      cpu_drv_intf.axil_drv_cb.WDATA   <= pkt.WDATA;
-      cpu_drv_intf.axil_drv_cb.WSTRB   <= pkt.WSTRB;
+      cpu_drv_intf.axil_drv_cb.WDATA   <= pkt.WDATA[0];
+      cpu_drv_intf.axil_drv_cb.WSTRB   <= pkt.WSTRB[0];
       cpu_drv_intf.axil_drv_cb.WVALID  <= 1;
       wait(cpu_drv_intf.axil_drv_cb.WREADY);
       cpu_drv_intf.axil_drv_cb.WVALID  <= 0;
       cpu_drv_intf.axil_drv_cb.WDATA   <= 0;
-      `uvm_info(get_full_name(),"AXI-Lite drive_write_data -- data handshake complete", UVM_LOW);
+      `uvm_info(get_full_name(),"AXI-Lite drive_write_data -- data handshake complete",UVM_LOW);
       `uvm_info("driver_pkt_from_write_data",pkt.sprint(),UVM_MEDIUM)
    endtask
 
@@ -104,10 +104,12 @@ class cpu_driver extends uvm_driver #(cpu_seq_item);
 
    task drive_read_data(cpu_seq_item pkt);
       `uvm_info(get_full_name(),"AXI-Lite drive_read_data -- task triggered", UVM_LOW);
+      pkt.RDATA = new[1];
+      pkt.RRESP = new[1];
       cpu_drv_intf.axil_drv_cb.RREADY <= 1;
       wait(cpu_drv_intf.axil_drv_cb.RVALID);
-      pkt.RDATA = cpu_drv_intf.axil_drv_cb.RDATA;
-      pkt.RRESP = response_t'(cpu_drv_intf.axil_drv_cb.RRESP);
+      pkt.RDATA[0] = cpu_drv_intf.axil_drv_cb.RDATA;
+      pkt.RRESP[0] = response_t'(cpu_drv_intf.axil_drv_cb.RRESP);
       cpu_drv_intf.axil_drv_cb.RREADY <= 0;
       `uvm_info(get_full_name(),"AXI-Lite drive_read_data -- data handshake complete", UVM_LOW);
    endtask

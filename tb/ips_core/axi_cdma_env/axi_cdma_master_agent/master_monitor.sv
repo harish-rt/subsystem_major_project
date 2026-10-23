@@ -110,13 +110,14 @@ task  master_monitor ::  capture_write_data();
       pkt.wstrobe =new[pkt.wstrobe.size() +1](pkt.wstrobe);
       pkt.wdata_hndshk[i] = $realtime();  //capturing timestamp for handshake.
       pkt.wdata[i]    = master_mon_intf.mas_mon_cb.wdata;
+      //pkt.wstrobe[i]  = 'hf;
       pkt.wstrobe[i]  = master_mon_intf.mas_mon_cb.wstrobe;
       last = master_mon_intf.mas_mon_cb.wlast;
       i=i+1;
       @(master_mon_intf.mas_mon_cb); //wait till next clk posedge
       end while(last==0);           //keeps sampling till last indicates end of data phase.
       write_data_mbx.put(pkt);
-     // `uvm_info("master_monitor::capture_write_data_task",pkt.sprint(),UVM_LOW)
+      `uvm_info("master_monitor::capture_write_data_task",pkt.sprint(),UVM_LOW)
  end
 endtask
 
@@ -135,7 +136,7 @@ task  master_monitor ::  capture_write_response();
        //`uvm_info("master_monitor :: capture_write_response","Sending pkt to SB",UVM_LOW);
        pkt.print_write_txn(pkt);
       // `uvm_info("write_response_phase",$sformatf("Printing pkt handshake Timestamps - add= %t data =%p wresp =%t",pkt.wadd_hndshk,pkt.wdata_hndshk, pkt.wresp_hndshk),UVM_LOW);
-       //`uvm_info("write_reponse_phase_pkt",pkt.sprint(),UVM_LOW)
+       `uvm_info("write_reponse_phase_pkt",pkt.sprint(),UVM_LOW)
        mon_ap.write(pkt);//write pkt to sb
     end
     //else `uvm_error("Master_monitor :: capture_write_response",$sformatf("unexpected write response, BID not found bid= %b",master_mon_intf.mas_mon_cb.bid))

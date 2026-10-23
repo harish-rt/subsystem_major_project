@@ -1,5 +1,5 @@
 // default param config to AXI4_lite
-interface axi4_lite_intf();
+interface axi4_lite_tb_intf();
    parameter ADDR_WIDTH = 32;
    parameter DATA_WIDTH = 32;
     
@@ -106,7 +106,7 @@ endinterface
 
 /*
 //default param config to AXI4_lite
-interface axi4_lite_intf();
+interface axi4_lite_tb_intf();
    parameter ADDR_WIDTH 	= 32	;
    parameter DATA_WIDTH 	= 32	;
     
@@ -176,7 +176,7 @@ interface axi4_lite_intf();
 endinterface
 /*
 //default param config to AXI4_lite
-interface axi4_lite_intf();
+interface axi4_lite_tb_intf();
    parameter ADDR_WIDTH 	= 32	;
    parameter DATA_WIDTH 	= 32	;
     
@@ -246,7 +246,7 @@ interface axi4_lite_intf();
 endinterface
 /*
 //default param config to AXI4_lite
-interface axi4_lite_intf();
+interface axi4_lite_tb_intf();
    parameter ADDR_WIDTH 	= 32	;
    parameter DATA_WIDTH 	= 32	;
 

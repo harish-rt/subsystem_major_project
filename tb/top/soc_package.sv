@@ -1,11 +1,16 @@
+`include "axi4_tb_intf.sv"
+`include "axi4_lite_tb_intf.sv"
 package soc_package;
     `include "uvm_macros.svh"
     import uvm_pkg::*;
+    //`include "axi_parameters.sv"
+    `include "../common/axi_parameters.sv"
     `include "../common/config_tb.sv"
+    //`include "../common/axi_base_sequence_item.sv"
     import soc_addr_pkg::*;
     import cpu_package ::*;
-    import axi_cdma_env_pkg ::*;
     import mem_package :: *;
+    import axi_cdma_env_pkg ::*;
     import intc_package ::*;
     import uart_pkg ::*;
     import spi_pkg ::*;
@@ -21,6 +26,9 @@ package soc_package;
 // TOP
     `include "soc_virtual_sequencer.sv"
     `include "soc_virtual_sequence.sv"
+
+    `include "../common/sb_config.sv"
+    `include "../common/ss_sbd.sv"
 
     `include "wrapper_env.sv"
     `include "base_test.sv"

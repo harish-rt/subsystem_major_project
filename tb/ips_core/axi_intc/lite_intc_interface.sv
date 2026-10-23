@@ -1,3 +1,76 @@
+interface axi4_lite_intc_intf(input bit ACLK, logic ARESETn);
+
+`include "uvm_macros.svh"
+ import uvm_pkg :: *;
+
+  logic [31:0]  AWADDR;                
+  logic         AWVALID;               
+  logic         AWREADY;                
+  logic [31:0]  WDATA;               
+  logic [3:0]   WSTRB;                   
+  logic         WVALID;                  
+  logic         WREADY;                  
+  logic [1:0]   BRESP;                
+  logic         BVALID;                  
+  logic         BREADY;               
+  logic [31:0]  ARADDR;                
+  logic         ARVALID;
+  logic         ARREADY;                                
+  logic [31:0]  RDATA;                   
+  logic [1:0]   RRESP;                   
+  logic         RVALID;                 
+  logic         RREADY;
+
+//driver_clocking block//
+clocking axi4_lite_drv_cb @(posedge ACLK);
+  default input #1 output #0;
+  output AWADDR;
+  output AWVALID;      
+  input  AWREADY;      
+  output WDATA;
+  output WSTRB;
+  output WVALID;
+  input  WREADY;
+  output BREADY;
+  input  BRESP;
+  input  BVALID;
+  output ARADDR;  
+  output ARVALID;      
+  input  ARREADY;      
+  input  RDATA;   
+  input  RRESP;  
+  input  RVALID;       
+  output RREADY;
+endclocking 
+
+//monitor clocking block//
+clocking axi4_lite_mon_cb @(posedge ACLK);
+  default input #1 output #0;  
+  input AWADDR;
+  input AWVALID;      
+  input AWREADY;      
+  input WDATA;
+  input WSTRB;
+  input WVALID;
+  input WREADY;
+  input BREADY;
+  input BRESP;
+  input BVALID;
+  input ARADDR;  
+  input ARVALID;      
+  input ARREADY;      
+  input RDATA;   
+  input RRESP;  
+  input RVALID;       
+  input RREADY;
+endclocking
+
+  modport DRIVER_MOD(clocking axi4_lite_drv_cb, output ARESETn);
+  modport MONITOR_MOD(clocking axi4_lite_mon_cb, input  ARESETn);
+
+endinterface
+
+/*
 interface axi4_lite_intc_intf(input bit aclk, logic areset_n);
 
 `include "uvm_macros.svh"
@@ -72,6 +145,7 @@ endclocking
   modport axi4_lite_mon_mod(clocking axi4_lite_mon_cb,input areset_n);
 
 endinterface
+*/
 
 /*
 	property aw_addr;

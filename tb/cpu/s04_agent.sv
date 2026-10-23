@@ -16,8 +16,4 @@ class s04_agent extends uvm_agent;
       sqr = s04_sequencer::type_id::create("sqr", this);
    endfunction
 
-   function void connect_phase(uvm_phase phase);
-      super.connect_phase(phase);
-      `uvm_info("s04_agent::connect", phase.get_name(), UVM_MEDIUM)
-   endfunction
 endclass:s04_agent

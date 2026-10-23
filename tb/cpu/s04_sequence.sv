@@ -1,3 +1,4 @@
+//class base_s04_sequence extends uvm_sequence#(axi_base_sequence_item);
 class base_s04_sequence extends uvm_sequence#(s04_seq_item);
     `uvm_object_utils(base_s04_sequence)
     `NEW_OBJ
@@ -35,6 +36,7 @@ class base_s04_sequence extends uvm_sequence#(s04_seq_item);
     task body ();
         `uvm_info(get_full_name(),"inside base_s04_sequence body", UVM_LOW)
 
+        //pkt = axi_base_sequence_item::type_id::create("pkt");
         pkt = s04_seq_item::type_id::create("pkt");
     endtask
 
@@ -47,7 +49,7 @@ class base_s04_sequence extends uvm_sequence#(s04_seq_item);
                 WDATA[0]    == data;
             }
             WSTRB[0]    == 'hf;
-            write   == WRITE;
+            operation   == WRITE;
         })begin
             `uvm_fatal("REG_ACCESS", "write_reg randomization failed!")        
         end
@@ -60,13 +62,15 @@ class base_s04_sequence extends uvm_sequence#(s04_seq_item);
         start_item(r_pkt);
         if(!r_pkt.randomize() with {
             ARADDR      == reg_addr;
-            write   == READ;
+            operation   == READ;
         })begin
             `uvm_fatal("REG_ACCESS", "read_reg randomization failed!")        
         end
         finish_item(r_pkt);
         get_response(r_pkt);
-        data            = r_pkt.RDATA;
+        foreach(r_pkt.RDATA[i])begin
+            data    = r_pkt.RDATA[i];
+        end
     endtask
 endclass : base_s04_sequence
 
@@ -79,10 +83,12 @@ class load_bram_256_seq extends base_s04_sequence;
         start_item(pkt);
         if(!pkt.randomize() with{
             AWADDR  == 'h7100_0100;
-            AWLEN   == 'hf;
+            AWLEN   == 'h3;
             AWBURST == INCR;
-            AWID    == 'h2;
-            write   == WRITE;
+            AWID    == 'h4;
+            AWCACHE == 'h0;
+            AWQOS   == 'h0;
+            operation   == WRITE;
             }) begin
             `uvm_error(get_full_name(), "randomization_failed")
         end
@@ -100,10 +106,10 @@ class read_bram_256_seq extends base_s04_sequence;
         start_item(pkt);
         if(!pkt.randomize() with{
             ARADDR  == 'h7100_0100;
-            ARLEN   == 'h7;
+            ARLEN   == 'h0;
             ARBURST == INCR;
             ARID    == 'h1;
-            write   == READ;
+            operation   == READ;
             }) begin
             `uvm_error(get_full_name(), "randomization_failed")
         end

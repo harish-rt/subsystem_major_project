@@ -76,13 +76,13 @@ module core_wrapper
   output rsta_busy_0,
   output rstb_busy_0,
 
-  axi4_intf ext_axi4_slave,
-  axi4_intf ext_axi4_master,
+  axi4_tb_intf ext_axi4_slave,
+  axi4_tb_intf ext_axi4_master,
 
   //S00
-  axi4_lite_intf inst_bridge2axi_int,
+  axi4_lite_tb_intf inst_bridge2axi_int,
   //S02
-  axi4_lite_intf data_bridge2axi_int
+  axi4_lite_tb_intf data_bridge2axi_int
 );
 
   wire cdma_irq, core_perif_irq, intr_ctrl_irq;
@@ -95,8 +95,8 @@ module core_wrapper
   // Core Clock Input
   logic      core_clk_i;
 
-  axi4_lite_intf	axi_int2core_peri 	();
-  axi4_lite_intf 	axi_int2main_mem	();
+  axi4_lite_tb_intf	axi_int2core_peri 	();
+  axi4_lite_tb_intf 	axi_int2main_mem	();
 
 
 //peripheral intr to intr cntrl
@@ -141,7 +141,7 @@ module core_wrapper
     end      
   end
 
-//memory unit axi4_lite_intf
+//memory unit axi4_lite_tb_intf
  axi4_lite_memory_unit #(
 	.AXI_DW         (32	), 
 	.AXI_AW         (32	), 
