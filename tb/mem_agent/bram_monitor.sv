@@ -116,7 +116,7 @@ task bram_monitor :: capture_write_response();
             wresp_array[t_bid].get(pkt);
             
             pkt.BID   = bram_if.axi4_mon_cb.BID;
-            pkt.BRESP = bram_if.axi4_mon_cb.BRESP;
+            pkt.BRESP = bram_seq_item::response_t'(bram_if.axi4_mon_cb.BRESP);
             
             mon_ap.write(pkt); 
             `uvm_info("MASTER_MONITOR_capture_write_resp",pkt.sprint(),UVM_MEDIUM)

@@ -6,7 +6,6 @@ class intc_config_obj extends uvm_object;
     uvm_active_passive_enum         intc_is_active;
 
     virtual axi4_lite_tb_intf       lite_intc_intf;
-    //virtual axi4_lite_intc_intf     lite_intc_intf;
     virtual intc_intf               intc_if;
 
     uvm_event                       irq_event;

@@ -50,8 +50,8 @@ module top;
     axi4_lite_tb_intf              core_perif_if();
 
 // AXI Interrupt Controller
-    assign intc_proc_rst    =   ~areset_n;
     axi4_lite_tb_intf           lite_intc_if();
+    assign intc_proc_rst    =   ~areset_n;
     intc_intf                   intc_if(.intc_procss_clk(aclk),.intc_procss_rst(intc_proc_rst));
      
 //axi cdma interfaces 
@@ -495,7 +495,7 @@ module top;
 
     initial begin
     	uvm_config_db#(virtual axi4_lite_tb_intf)::set(null,"*","CP_MON",core_perif_if);
-    	uvm_config_db#(virtual axi4_lite_tb_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
+    	//uvm_config_db#(virtual axi4_lite_tb_intf.MONITOR_MOD)::set(null,"*","MON",mem_intf);
     	//uvm_config_db#(virtual axi4_tb_intf.MONITOR_MOD)::set(null,"*","BRAM_MON",axi4_bram_if);
     	uvm_config_db#(virtual axi4_tb_intf.DRIVER_MOD)::set(null,"*","S04",slave_if);
     	uvm_config_db#(virtual axi4_tb_intf.MONITOR_MOD)::set(null,"*","S04_MON",slave_if);

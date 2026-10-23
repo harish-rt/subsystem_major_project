@@ -133,13 +133,16 @@ class load_bram_256_test extends cpu_base_test;
     load_bram_256_seq   load_seq;   //axi4
     read_bram_256_seq   read_seq;   //axi4
     read_bram_vseq      lite_seq;   //axi4 lite
-
-    task main_phase(uvm_phase phase);
+    
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
         //load_seq = load_bram_seq::type_id::create("load_seq");  //axi4
         load_seq = load_bram_256_seq::type_id::create("load_seq");  //axi4
-
         read_seq = read_bram_256_seq::type_id::create("read_seq");  //axi4
         lite_seq = read_bram_vseq::type_id::create("lite_seq");     //axi4 lite
+    endfunction
+
+    task main_phase(uvm_phase phase);
 
         phase.raise_objection(this);
             `uvm_info("UVM_TEST","started bram loading",UVM_LOW)
