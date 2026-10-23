@@ -46,7 +46,8 @@ task mem_monitor::write_addr();
     end
     forever begin
         aw_pkt=mem_seq_item::type_id::create("aw_pkt");
-        @(posedge mon_if.ACLK);
+        @(mon_if.axil_mon_cb);
+        //@(posedge mon_if.ACLK);
         wait(mon_if.axil_mon_cb.AWVALID && mon_if.axil_mon_cb.AWREADY);
         aw_pkt.awaddr=mon_if.axil_mon_cb.AWADDR;
         aw_pkt.operation=WRITE;
@@ -59,8 +60,8 @@ task mem_monitor::write_data();
     mem_seq_item w_pkt;
     forever begin
         w_pkt=mem_seq_item::type_id::create("w_pkt");
-        //@(mon_if.axil_mon_cb);
-        @(posedge mon_if.ACLK);
+        @(mon_if.axil_mon_cb);
+        //@(posedge mon_if.ACLK);
         wait(mon_if.axil_mon_cb.WVALID && mon_if.axil_mon_cb.WREADY);
         w_pkt.wdata=mon_if.axil_mon_cb.WDATA;
         w_pkt.wstrb=mon_if.axil_mon_cb.WSTRB;
@@ -73,8 +74,8 @@ task mem_monitor::write_resp();
     mem_seq_item b_pkt;
     forever begin
         b_pkt=mem_seq_item::type_id::create("b_pkt");
-        //@(mon_if.axil_mon_cb);
-        @(posedge mon_if.ACLK);
+        @(mon_if.axil_mon_cb);
+        //@(posedge mon_if.ACLK);
         wait(mon_if.axil_mon_cb.BVALID && mon_if.axil_mon_cb.BREADY);
         b_pkt.bresp=RESPONSE_TYPE'(mon_if.axil_mon_cb.BRESP);
         wr_resp_queue.push_back(b_pkt);
@@ -86,8 +87,8 @@ task mem_monitor::merge_write();
     mem_seq_item wr_pkt;
     forever begin
         wr_pkt=mem_seq_item::type_id::create("wr_pkt");
-        //@(mon_if.axil_mon_cb);
-        @(posedge mon_if.ACLK);
+        @(mon_if.axil_mon_cb);
+        //@(posedge mon_if.ACLK);
         wait(wr_data_queue.size()>0 && wr_addr_queue.size()>0 && wr_resp_queue.size()>0);
         wr_pkt.awaddr=wr_addr_queue[0].awaddr;
         wr_pkt.operation=wr_addr_queue[0].operation;
@@ -96,8 +97,8 @@ task mem_monitor::merge_write();
         wr_pkt.bresp=wr_resp_queue[0].bresp;
         mon_ap.write(wr_pkt);
         `uvm_info("WR_PKT_MERGE", wr_pkt.sprint(), UVM_MEDIUM)
-        //@(mon_if.axil_mon_cb);
-        @(posedge mon_if.ACLK);
+        @(mon_if.axil_mon_cb);
+        //@(posedge mon_if.ACLK);
         void'(wr_addr_queue.pop_front());
         void'(wr_data_queue.pop_front());
         void'(wr_resp_queue.pop_front());
@@ -108,8 +109,8 @@ task mem_monitor::read_addr();
     mem_seq_item ar_pkt;
     forever begin
         ar_pkt=mem_seq_item::type_id::create("ar_pkt");
-        //@(mon_if.axil_mon_cb);
-        @(posedge mon_if.ACLK);
+        @(mon_if.axil_mon_cb);
+        //@(posedge mon_if.ACLK);
         wait(mon_if.axil_mon_cb.ARVALID && mon_if.axil_mon_cb.ARREADY);
         ar_pkt.araddr=mon_if.axil_mon_cb.ARADDR;
         ar_pkt.operation=READ;
@@ -122,8 +123,8 @@ task mem_monitor::read_data();
     mem_seq_item r_pkt;
     forever begin
         r_pkt=mem_seq_item::type_id::create("r_pkt");
-        //@(mon_if.axil_mon_cb);
-        @(posedge mon_if.ACLK);
+        @(mon_if.axil_mon_cb);
+        //@(posedge mon_if.ACLK);
         wait(mon_if.axil_mon_cb.RVALID && mon_if.axil_mon_cb.RREADY);
         r_pkt.rdata=mon_if.axil_mon_cb.RDATA;
         r_pkt.rresp=RESPONSE_TYPE'(mon_if.axil_mon_cb.RRESP);
@@ -136,8 +137,8 @@ task mem_monitor::merge_read();
     mem_seq_item rd_pkt;
     forever begin
         rd_pkt=mem_seq_item::type_id::create("rd_pkt");
-        //@(mon_if.axil_mon_cb);
-        @(posedge mon_if.ACLK);
+        @(mon_if.axil_mon_cb);
+        //@(posedge mon_if.ACLK);
         wait(rd_addr_queue.size()>0 && rd_data_queue.size()>0);
         rd_pkt.araddr=rd_addr_queue[0].araddr;
         rd_pkt.operation=rd_addr_queue[0].operation;
@@ -145,8 +146,8 @@ task mem_monitor::merge_read();
         rd_pkt.rresp=rd_data_queue[0].rresp;
         mon_ap.write(rd_pkt);
         `uvm_info("RD_PKT_MERGE", rd_pkt.sprint(), UVM_MEDIUM)
-        //@(mon_if.axil_mon_cb);
-        @(posedge mon_if.ACLK);
+        @(mon_if.axil_mon_cb);
+        //@(posedge mon_if.ACLK);
         void'(rd_addr_queue.pop_front());
         void'(rd_data_queue.pop_front());
     end

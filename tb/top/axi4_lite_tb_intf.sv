@@ -3,37 +3,37 @@ interface axi4_lite_tb_intf();
    parameter ADDR_WIDTH = 32;
    parameter DATA_WIDTH = 32;
     
-   logic ACLK;
-   logic ARESETn;
+   wire ACLK;
+   wire ARESETn;
 
-   // Write address channel signals (declared as logic to allow multi-module port connections)
-   logic [ADDR_WIDTH-1:0]       AWADDR;
-   logic                        AWREADY;
-   logic                        AWVALID;
-   logic [2:0]                  AWPROT;
+   // Write address channel signals (declared as wire to allow multi-module port connections)
+   wire [ADDR_WIDTH-1:0]       AWADDR;
+   wire                        AWREADY;
+   wire                        AWVALID;
+   wire [2:0]                  AWPROT;
 
    // Write data channel signals
-   logic [DATA_WIDTH-1:0]       WDATA;
-   logic [(DATA_WIDTH/8)-1:0]   WSTRB;
-   logic                        WREADY;
-   logic                        WVALID;
+   wire [DATA_WIDTH-1:0]       WDATA;
+   wire [(DATA_WIDTH/8)-1:0]   WSTRB;
+   wire                        WREADY;
+   wire                        WVALID;
 
    // Write response channel signals
-   logic [1:0]                  BRESP;
-   logic                        BREADY;
-   logic                        BVALID;
+   wire [1:0]                  BRESP;
+   wire                        BREADY;
+   wire                        BVALID;
 
    // Read address channel signals
-   logic [ADDR_WIDTH-1:0]       ARADDR;
-   logic                        ARREADY;
-   logic                        ARVALID;
-   logic [2:0]                  ARPROT;
+   wire [ADDR_WIDTH-1:0]       ARADDR;
+   wire                        ARREADY;
+   wire                        ARVALID;
+   wire [2:0]                  ARPROT;
  
    // Read data channel signals
-   logic [DATA_WIDTH-1:0]       RDATA;
-   logic [1:0]                  RRESP;
-   logic                        RREADY;
-   logic                        RVALID;
+   wire [DATA_WIDTH-1:0]       RDATA;
+   wire [1:0]                  RRESP;
+   wire                        RREADY;
+   wire                        RVALID;
 
    // -------------------------------------------------------------------------
    // Clocking Blocks (Verification / TB)
@@ -110,36 +110,36 @@ interface axi4_lite_tb_intf();
    parameter ADDR_WIDTH 	= 32	;
    parameter DATA_WIDTH 	= 32	;
     
-   logic ACLK;
-   logic ARESETn;
+   wire ACLK;
+   wire ARESETn;
    //Write address channel signals
-   logic [ADDR_WIDTH-1:0]	AWADDR	;
-   logic  			AWREADY	;
-   logic  			AWVALID	;
-   logic [2:0] 		AWPROT	;
+   wire [ADDR_WIDTH-1:0]	AWADDR	;
+   wire  			AWREADY	;
+   wire  			AWVALID	;
+   wire [2:0] 		AWPROT	;
 
    //Write data channel signals
-   logic [DATA_WIDTH-1:0]	WDATA	;
-   logic [(DATA_WIDTH/8)-1:0] 	WSTRB	;
-   logic  			WREADY	;
-   logic  			WVALID	;
+   wire [DATA_WIDTH-1:0]	WDATA	;
+   wire [(DATA_WIDTH/8)-1:0] 	WSTRB	;
+   wire  			WREADY	;
+   wire  			WVALID	;
 
    //Write response channel signals
-   logic [1:0]		BRESP	;
-   logic			BREADY	;
-   logic 			BVALID	;
+   wire [1:0]		BRESP	;
+   wire			BREADY	;
+   wire 			BVALID	;
 
    //Read address channel signals
-   logic [ADDR_WIDTH-1:0]	ARADDR	;
-   logic 			ARREADY	;
-   logic			ARVALID	;
-   logic [2:0] 		ARPROT	;
+   wire [ADDR_WIDTH-1:0]	ARADDR	;
+   wire 			ARREADY	;
+   wire			ARVALID	;
+   wire [2:0] 		ARPROT	;
  
    //Read data channel signals
-   logic [DATA_WIDTH-1:0]	RDATA	;
-   logic [1:0]		RRESP	;
-   logic 			RREADY  ;
-   logic 			RVALID	;
+   wire [DATA_WIDTH-1:0]	RDATA	;
+   wire [1:0]		RRESP	;
+   wire 			RREADY  ;
+   wire 			RVALID	;
 
    clocking axil_drv_cb @(posedge ACLK);
       default input #1ns output #1ns;
@@ -180,36 +180,36 @@ interface axi4_lite_tb_intf();
    parameter ADDR_WIDTH 	= 32	;
    parameter DATA_WIDTH 	= 32	;
     
-   logic ACLK;
-   logic ARESETn;
+   wire ACLK;
+   wire ARESETn;
    //Write address channel signals
-   logic [ADDR_WIDTH-1:0]	AWADDR	;
-   logic  			AWREADY	;
-   logic  			AWVALID	;
-   logic [2:0] 		AWPROT	;
+   wire [ADDR_WIDTH-1:0]	AWADDR	;
+   wire  			AWREADY	;
+   wire  			AWVALID	;
+   wire [2:0] 		AWPROT	;
 
    //Write data channel signals
-   logic [DATA_WIDTH-1:0]	WDATA	;
-   logic [(DATA_WIDTH/8)-1:0] 	WSTRB	;
-   logic  			WREADY	;
-   logic  			WVALID	;
+   wire [DATA_WIDTH-1:0]	WDATA	;
+   wire [(DATA_WIDTH/8)-1:0] 	WSTRB	;
+   wire  			WREADY	;
+   wire  			WVALID	;
 
    //Write response channel signals
-   logic [1:0]		BRESP	;
-   logic			BREADY	;
-   logic 			BVALID	;
+   wire [1:0]		BRESP	;
+   wire			BREADY	;
+   wire 			BVALID	;
 
    //Read address channel signals
-   logic [ADDR_WIDTH-1:0]	ARADDR	;
-   logic 			ARREADY	;
-   logic			ARVALID	;
-   logic [2:0] 		ARPROT	;
+   wire [ADDR_WIDTH-1:0]	ARADDR	;
+   wire 			ARREADY	;
+   wire			ARVALID	;
+   wire [2:0] 		ARPROT	;
  
    //Read data channel signals
-   logic [DATA_WIDTH-1:0]	RDATA	;
-   logic [1:0]		RRESP	;
-   logic 			RREADY  ;
-   logic 			RVALID	;
+   wire [DATA_WIDTH-1:0]	RDATA	;
+   wire [1:0]		RRESP	;
+   wire 			RREADY  ;
+   wire 			RVALID	;
 
    clocking axil_drv_cb @(posedge ACLK);
       default input #1ns output #1ns;
@@ -251,36 +251,36 @@ interface axi4_lite_tb_intf();
    parameter DATA_WIDTH 	= 32	;
 
    //Global signals
-   logic 			ACLK	;
-   logic 			ARESETn	;
+   wire 			ACLK	;
+   wire 			ARESETn	;
 
    //Read address channel signals
-   logic [ADDR_WIDTH-1:0]	ARADDR	;
-   logic [2:0] 			ARPROT	;
-   logic 			ARREADY	;
-   logic			ARVALID	;
+   wire [ADDR_WIDTH-1:0]	ARADDR	;
+   wire [2:0] 			ARPROT	;
+   wire 			ARREADY	;
+   wire			ARVALID	;
  
    //Write address channel signals
-   logic [ADDR_WIDTH-1:0]	AWADDR	;
-   logic [2:0] 			AWPROT	;
-   logic  			AWREADY	;
-   logic  			AWVALID	;
+   wire [ADDR_WIDTH-1:0]	AWADDR	;
+   wire [2:0] 			AWPROT	;
+   wire  			AWREADY	;
+   wire  			AWVALID	;
 
    //Write response channel signals
-   logic			BREADY	;
-   logic [1:0]			BRESP	;
-   logic 			BVALID	;
+   wire			BREADY	;
+   wire [1:0]			BRESP	;
+   wire 			BVALID	;
 
    //Read data channel signals
-   logic [DATA_WIDTH-1:0]	RDATA	;
-   logic 			RREADY ;
-   logic [1:0]			RRESP	;
-   logic 			RVALID	;
+   wire [DATA_WIDTH-1:0]	RDATA	;
+   wire 			RREADY ;
+   wire [1:0]			RRESP	;
+   wire 			RVALID	;
 
    //Write data channel signals
-   logic [DATA_WIDTH-1:0]	WDATA	;
-   logic  			WREADY	;
-   logic [DATA_WIDTH>>3-1:0] 	WSTRB	;
-   logic  			WVALID	;
+   wire [DATA_WIDTH-1:0]	WDATA	;
+   wire  			WREADY	;
+   wire [DATA_WIDTH>>3-1:0] 	WSTRB	;
+   wire  			WVALID	;
 endinterface
 */
