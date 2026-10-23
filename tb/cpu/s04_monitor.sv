@@ -4,7 +4,7 @@ class s04_monitor extends uvm_monitor;
    //uvm_analysis_port #(axi_base_sequence_item)    mon_ap;
    uvm_analysis_port #(s04_seq_item)    mon_ap;
    uvm_analysis_port #(s04_seq_item)    resp_ap;
-   virtual axi4_tb_intf.MONITOR_MOD        mon_intf;
+   virtual axi4_tb_intf                 mon_intf;
    mailbox #(s04_seq_item)  write_address_mbx ,write_data_mbx;      //to capture transactions on write address channel // Preserve ordering
    mailbox #(s04_seq_item) wresp_array [id_t];    //associative array of mailboxes. Will hold packets waiting for write response.Mailboxes will preserve ordering based on ID.
    mailbox #(s04_seq_item) read_address_array [id_t];
@@ -25,9 +25,9 @@ endclass :s04_monitor
 
 function void s04_monitor :: build_phase (uvm_phase phase);
   super.build_phase (phase);
-        if (!uvm_config_db#(virtual axi4_tb_intf.MONITOR_MOD)::get(this,"","S04_MON",mon_intf)) begin
-            `uvm_fatal(get_full_name(), "virtual axi4_tb_intf get failed from config_db!")
-        end
+        //if (!uvm_config_db#(virtual axi4_tb_intf.MONITOR_MOD)::get(this,"","S04_MON",mon_intf)) begin
+        //    `uvm_fatal(get_full_name(), "virtual axi4_tb_intf get failed from config_db!")
+        //end
   mon_ap = new ("mon_ap",this);
   resp_ap = new("resp_ap",this);
   `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)

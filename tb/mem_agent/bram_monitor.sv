@@ -84,7 +84,7 @@ task  bram_monitor ::  capture_write_data();
       `uvm_info("bram_monitor :: capture_write_data","Inside dowhile loop",UVM_LOW);
       pkt.WDATA =new[pkt.WDATA.size() +1](pkt.WDATA);
       pkt.WSTRB =new[pkt.WSTRB.size() +1](pkt.WSTRB);
-      pkt.WDATA[i]    = bram_if.axi4_mon_cb.WDATA;
+      pkt.WDATA[i]  = bram_if.axi4_mon_cb.WDATA;
       pkt.WSTRB[i]  = bram_if.axi4_mon_cb.WSTRB;
       last = bram_if.axi4_mon_cb.WLAST;
       i=i+1;
