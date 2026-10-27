@@ -2,7 +2,7 @@
 interface axi4_tb_intf();
    parameter ADDR_WIDTH 	    = 32;
    parameter DATA_WIDTH 	    = 32;
-   parameter ID_WIDTH 		    = 4	;
+   parameter ID_WIDTH 		    = 8	;
    parameter USER_SIGNAL_WIDTH 	= 8	;
 
    //Global signals

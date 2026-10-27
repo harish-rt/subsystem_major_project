@@ -1,4 +1,3 @@
-//class base_cpu_sequence extends uvm_sequence#(axi_base_sequence_item);
 class base_cpu_sequence extends uvm_sequence#(cpu_seq_item);
     `uvm_object_utils(base_cpu_sequence)
     `NEW_OBJ
@@ -207,40 +206,6 @@ class intc_sw_irq_seq extends base_cpu_sequence;
 endclass : intc_sw_irq_seq
 
 
-class load_mem_seq extends base_cpu_sequence;
-    `uvm_object_utils(load_mem_seq)
-    `NEW_OBJ
-    
-    int addr;
-    int beats = 2;
-
-    task body();
-        super.body();
-    
-        `uvm_info("load_mem_seq", "start of Memory load Sequence", UVM_MEDIUM)
-
-        for (int i = 0; i < beats; i++) begin        
-            addr = LITE_MEM_BASE + (i * 4);
-            start_item(pkt);
-            if(!pkt.randomize() with {
-                AWADDR  == addr;
-                foreach(WSTRB[i]){
-                    WSTRB[i]   == 'hf; 
-                }
-                operation   == WRITE;
-                })begin
-                `uvm_error(get_full_name(), "randomization_failed")
-            end
-            finish_item(pkt);
-            get_response(pkt);             
-        end
-        
-        `uvm_info("load_mem_seq", "end of Memory load Sequence", UVM_MEDIUM)
-
-     endtask
-endclass:load_mem_seq
-
-
 class read_mem_seq extends base_cpu_sequence;
     `uvm_object_utils(read_mem_seq)
     `NEW_OBJ
@@ -251,7 +216,7 @@ class read_mem_seq extends base_cpu_sequence;
     task body();
         super.body();
     
-        `uvm_info("read_mem_seq", "start of Memory read Sequence", UVM_MEDIUM)
+        `uvm_info("read_mem_seq", "start of Memory read Sequence", UVM_LOW)
 
         for (int i = 0; i < beats; i++) begin        
             addr = LITE_MEM_BASE + (i*4);
@@ -266,7 +231,7 @@ class read_mem_seq extends base_cpu_sequence;
             get_response(pkt);             
         end
         
-        `uvm_info("read_mem_seq", "end of Memory read Sequence", UVM_MEDIUM)
+        `uvm_info("read_mem_seq", "end of Memory read Sequence", UVM_LOW)
 
      endtask
 endclass:read_mem_seq
@@ -356,17 +321,17 @@ class cpu_isr_seq extends base_cpu_sequence;
         do begin
             read_reg(INTC_BASE + 'h4, ipr_data);
             
-            if (ipr_data == 0) break; 
+            if (ipr_data == 0) break;
 
             if (ipr_data[26]) handle_cdma_isr();
             if (ipr_data[27]) handle_core_perif_isr();
-            
+
             loop_count++;
             if (loop_count > 10) begin
                 `uvm_error("cpu_isr_seq", "Interrupt loop timeout! IPR stuck high")
                 break;
             end
-            
+
         end while (ipr_data != 0);
 
         `uvm_info("cpu_isr_seq", "All pending interrupts successfully cleared", UVM_LOW)
@@ -378,6 +343,9 @@ class cpu_isr_seq extends base_cpu_sequence;
         if (cdmasr_data[12]) begin
             `uvm_info("cpu_isr_seq", "CDMA IOC Asserted", UVM_LOW)
             write_reg(CDMA_BASE + 'h4, 'h1000);    //W1C
+            do begin
+                read_reg(CDMA_BASE + 'h4,cdmasr_data);
+            end while(cdmasr_data[12] == 1);         // Confirms IoC cleared
         end 
 
         if (cdmasr_data[14]) begin
@@ -394,11 +362,33 @@ class cpu_isr_seq extends base_cpu_sequence;
     task handle_core_perif_isr();
         read_reg(IRQ_BASE + 'h4, ipr_data);
         `uvm_info("CPF_ISR_SEQ",$sformatf("ipr data: %b",ipr_data),UVM_LOW)
+
         if(ipr_data[0]) begin   //timer
         end
+
         if(ipr_data[1]) begin   //uart
             read_reg(UART_BASE + 'h8, sr_data);
             `uvm_info("CPF_ISR_SEQ",$sformatf("uart sr data: %b",sr_data),UVM_LOW)
+
+            if(sr_data[3]) begin    // tx_fifo_full
+                write_reg(UART_BASE + 'hc, 'h1);    // uart control_reg
+                do begin
+                    read_reg(UART_BASE + 'h8,sr_data);
+                end while(sr_data[3] == 1);         // Confirms tx_fifo_full irq cleared
+            end
+            if(sr_data[1]) begin    // rx_fifo_full
+                write_reg(UART_BASE + 'hc, 'h2);
+                do begin
+                    read_reg(UART_BASE + 'h8,sr_data);
+                end while(sr_data[1] == 1);         // Confirms rx_fifo_full irq cleared
+            end
+            if(sr_data[0]) begin    // rx_fifo_valid_data
+                write_reg(UART_BASE + 'hc, 'h2);
+                do begin
+                    read_reg(UART_BASE + 'h8,sr_data);
+                end while(sr_data[0] == 1);         // Confirms rx_fifo_valid_data irq cleared
+            end
+            write_reg(IRQ_BASE + 'hc, 'h2);      // INTC ACK
         end
         if(ipr_data[2]) begin   //spi
             read_reg(SPI_BASE + 'h20, sr_data);
@@ -412,31 +402,6 @@ class cpu_isr_seq extends base_cpu_sequence;
     endtask
 
 endclass : cpu_isr_seq
-
-
-class cdma_config_seq extends base_cpu_sequence;
-    `uvm_object_utils(cdma_config_seq)
-    `NEW_OBJ
-
-    task body();
-        super.body();
-        cdmacr_data = 'h5000;
-        sa_data     = 'h7100_0000;
-        da_data     = 'h8000_0000;
-        btt_data    = 'h8;
-
-        do begin
-            read_reg(CDMA_BASE + 'h4,cdmasr_data);
-        end while(cdmasr_data[1]==0);
-
-        `uvm_info("cdma_config_seq","idle cleared",UVM_LOW)
-        write_reg(CDMA_BASE + 'h0,cdmacr_data);
-        write_reg(CDMA_BASE + 'h18,sa_data);
-        write_reg(CDMA_BASE + 'h20,da_data);
-        write_reg(CDMA_BASE + 'h28,btt_data);
-        `uvm_info("cdma_config_seq","btt written",UVM_LOW)
-    endtask
-endclass : cdma_config_seq
 
 
 class bram_multiple_wr_rd_seq extends base_cpu_sequence;
@@ -743,16 +708,16 @@ class uart_write_data_seq extends base_cpu_sequence;
 
     task body();
         super.body();
-        write_reg(IRQ_BASE + 'h8,'h2);
-        write_reg(IRQ_BASE + 'h1c,'h3);
-        write_reg(UART_BASE + 'hc,'h10);
-        write_reg(UART_BASE + 'h4,'haa);
+        write_reg(IRQ_BASE + 'h8,'h2);      // ier
+        write_reg(IRQ_BASE + 'h1c,'h3);     // mer
+        write_reg(UART_BASE + 'hc,'h10);    // ctrl
+        write_reg(UART_BASE + 'h4,'haa);    // tx fifo
         do begin
             read_reg(UART_BASE + 'h8, reg_data);
         end while ((reg_data & 32'h1) == 0);
 
         read_reg(UART_BASE + 'h0, reg_data);
-    
+
         `uvm_info("UART_TEST", $sformatf("Read back from UART RX FIFO: 0x%02h", reg_data[7:0]), UVM_LOW)
         if (reg_data[7:0] == 8'hba) begin
             `uvm_info("UART_TEST", "SUCCESS: Data loopback matched 0xBA!", UVM_LOW)
@@ -760,8 +725,6 @@ class uart_write_data_seq extends base_cpu_sequence;
             `uvm_error("UART_TEST", $sformatf("MISMATCH: Expected 0xBA, got 0x%02h", reg_data[7:0]))
         end
     endtask
-    //monitor and compare
-    //using top level sbd
 endclass:uart_write_data_seq
 
 class spi_write_data_seq extends base_cpu_sequence;
@@ -960,3 +923,69 @@ class cdma_sg_seq extends base_cpu_sequence;
 
      endtask
 endclass:cdma_sg_seq
+
+
+class cdma_config_seq extends base_cpu_sequence;
+    `uvm_object_utils(cdma_config_seq)
+    `NEW_OBJ
+
+    rand bit [31:0] cdmacr_data;
+    rand bit [31:0] sa_data;
+    rand bit [31:0] da_data;
+    rand bit [31:0] btt_data;
+
+    constraint safe_btt_c {
+        btt_data > 0;
+    }
+    
+    constraint default_config_c {
+        soft cdmacr_data == 'h5000;
+    }
+
+    task body();
+        super.body();
+        cdmacr_data = 'h5000;
+        sa_data     = 'h7100_0000;
+        da_data     = 'h8000_0000;
+        btt_data    = 'h8;
+
+        do begin
+            read_reg(CDMA_BASE + 'h4,cdmasr_data);
+        end while(cdmasr_data[1]==0);
+
+        `uvm_info("cdma_config_seq","idle cleared",UVM_LOW)
+        write_reg(CDMA_BASE + 'h0,cdmacr_data);
+        write_reg(CDMA_BASE + 'h18,sa_data);
+        write_reg(CDMA_BASE + 'h20,da_data);
+        write_reg(CDMA_BASE + 'h28,btt_data);
+        `uvm_info("cdma_config_seq","btt written",UVM_LOW)
+    endtask
+endclass : cdma_config_seq
+
+
+class load_mem_lite_seq extends base_cpu_sequence;
+    `uvm_object_utils(load_mem_lite_seq)
+    `NEW_OBJ
+    
+    rand bit [31:0] addr;
+    rand int        beats = 1;
+
+    constraint default_config_c {
+        soft addr == LITE_MEM_BASE;
+        soft beats      == 2;
+        beats inside {[1:1024]};
+    }
+
+    task body();
+        bit [31:0] current_addr;
+        super.body();
+
+        `uvm_info(get_type_name(), $sformatf("Starting Memory Load: Base ADDR=0x%0h, BEATS=%0d", addr, beats), UVM_LOW)
+
+        for (int i = 0; i < beats; i++) begin        
+            current_addr = addr + (i * 4);
+            write_reg(current_addr);
+        end
+        `uvm_info(get_type_name(), "End of Memory Load Sequence", UVM_LOW)
+     endtask
+endclass : load_mem_lite_seq

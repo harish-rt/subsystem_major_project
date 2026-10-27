@@ -85,7 +85,7 @@ class load_bram_256_seq extends base_s04_sequence;
             AWADDR  == 'h7100_0100;
             AWLEN   == 'h3;
             AWBURST == INCR;
-            AWID    == 'h4;
+            //AWID    == 'h4;
             AWCACHE == 'h0;
             AWQOS   == 'h0;
             operation   == WRITE;
@@ -93,7 +93,7 @@ class load_bram_256_seq extends base_s04_sequence;
             `uvm_error(get_full_name(), "randomization_failed")
         end
         finish_item(pkt);
-        //get_response(pkt);
+        get_response(pkt);
     endtask
 endclass : load_bram_256_seq
 
@@ -114,6 +114,43 @@ class read_bram_256_seq extends base_s04_sequence;
             `uvm_error(get_full_name(), "randomization_failed")
         end
         finish_item(pkt);
-        //get_response(pkt);
+        get_response(pkt);
     endtask
 endclass : read_bram_256_seq
+
+
+class load_mem_seq extends base_s04_sequence;
+    `uvm_object_utils(load_mem_seq)
+    `NEW_OBJ
+
+    rand bit [31:0] addr;
+    rand bit [7:0]  len;
+    rand bit [1:0]  burst;
+    rand bit        is_write;
+
+    constraint default_config_c {
+        soft addr inside {[LITE_MEM_BASE : LITE_MEM_BASE+'h1000]};
+        soft len        == 8'hf;
+        soft burst      == INCR;
+        soft is_write   == 1'b1;
+    }
+
+    task body();
+        super.body();
+        
+        `uvm_info(get_type_name(), $sformatf("Driving stress pkt: ADDR=0x%0h, LEN=0x%0h", addr, len), UVM_LOW)
+
+        start_item(pkt);
+            if(!pkt.randomize() with {
+                AWADDR      == local::addr;
+                AWLEN       == local::len;
+                AWBURST     == local::burst;
+                AWID        != 0;
+                operation   == (local::is_write ? WRITE : READ); 
+            }) begin
+                `uvm_error(get_full_name(), "load_mem_seq randomization failed")
+            end
+        finish_item(pkt);
+        get_response(pkt);
+    endtask
+endclass : load_mem_seq

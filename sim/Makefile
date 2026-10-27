@@ -3,7 +3,7 @@
 # ==============================================================================
 
 TEST          ?= soc_master_test
-VERBOSITY     ?= UVM_LOW
+VERBOSITY     ?= UVM_DEBUG
 SEED          ?= random
 GUI           ?= 0
 WAVE          ?= 1

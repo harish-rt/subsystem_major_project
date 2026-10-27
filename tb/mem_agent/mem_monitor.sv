@@ -52,7 +52,7 @@ task mem_monitor::write_addr();
         aw_pkt.awaddr=mon_if.axil_mon_cb.AWADDR;
         aw_pkt.operation=WRITE;
         wr_addr_queue.push_back(aw_pkt);
-        `uvm_info("MEM_MONITOR", "Inside write_addr task", UVM_MEDIUM)
+        `uvm_info("MEM_MONITOR", "Inside write_addr task", UVM_LOW)
     end
 endtask
 
@@ -66,7 +66,7 @@ task mem_monitor::write_data();
         w_pkt.wdata=mon_if.axil_mon_cb.WDATA;
         w_pkt.wstrb=mon_if.axil_mon_cb.WSTRB;
         wr_data_queue.push_back(w_pkt);
-        `uvm_info("MEM_MONITOR", "Inside write_data task", UVM_MEDIUM)
+        `uvm_info("MEM_MONITOR", "Inside write_data task", UVM_LOW)
     end
 endtask
 
@@ -79,7 +79,7 @@ task mem_monitor::write_resp();
         wait(mon_if.axil_mon_cb.BVALID && mon_if.axil_mon_cb.BREADY);
         b_pkt.bresp=RESPONSE_TYPE'(mon_if.axil_mon_cb.BRESP);
         wr_resp_queue.push_back(b_pkt);
-        `uvm_info("MEM_MONITOR", "Inside write_resp task", UVM_MEDIUM)
+        `uvm_info("MEM_MONITOR", "Inside write_resp task", UVM_LOW)
     end
 endtask
 
@@ -96,7 +96,7 @@ task mem_monitor::merge_write();
         wr_pkt.wstrb=wr_data_queue[0].wstrb;
         wr_pkt.bresp=wr_resp_queue[0].bresp;
         mon_ap.write(wr_pkt);
-        `uvm_info("WR_PKT_MERGE", wr_pkt.sprint(), UVM_MEDIUM)
+        `uvm_info("WR_PKT_MERGE", wr_pkt.sprint(), UVM_LOW)
         @(mon_if.axil_mon_cb);
         //@(posedge mon_if.ACLK);
         void'(wr_addr_queue.pop_front());
@@ -115,7 +115,7 @@ task mem_monitor::read_addr();
         ar_pkt.araddr=mon_if.axil_mon_cb.ARADDR;
         ar_pkt.operation=READ;
         rd_addr_queue.push_back(ar_pkt);
-        `uvm_info("MEM_MONITOR", "Inside read_addr task", UVM_MEDIUM)
+        `uvm_info("MEM_MONITOR", "Inside read_addr task", UVM_LOW)
     end
 endtask
 
@@ -129,7 +129,7 @@ task mem_monitor::read_data();
         r_pkt.rdata=mon_if.axil_mon_cb.RDATA;
         r_pkt.rresp=RESPONSE_TYPE'(mon_if.axil_mon_cb.RRESP);
         rd_data_queue.push_back(r_pkt);
-        `uvm_info("MEM_MONITOR", "Inside read_data task", UVM_MEDIUM)
+        `uvm_info("MEM_MONITOR", "Inside read_data task", UVM_LOW)
     end
 endtask
 
@@ -145,7 +145,7 @@ task mem_monitor::merge_read();
         rd_pkt.rdata=rd_data_queue[0].rdata;
         rd_pkt.rresp=rd_data_queue[0].rresp;
         mon_ap.write(rd_pkt);
-        `uvm_info("RD_PKT_MERGE", rd_pkt.sprint(), UVM_MEDIUM)
+        `uvm_info("RD_PKT_MERGE", rd_pkt.sprint(), UVM_LOW)
         @(mon_if.axil_mon_cb);
         //@(posedge mon_if.ACLK);
         void'(rd_addr_queue.pop_front());

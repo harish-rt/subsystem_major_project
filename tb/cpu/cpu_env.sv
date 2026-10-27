@@ -28,8 +28,8 @@ class cpu_env extends uvm_env;
         foreach(cpu_agt[i])begin
             cpu_agt[i].drv.cpu_drv_intf = obj.cpu_i[i].DRIVER_MOD;
             cpu_agt[i].mon.cpu_mon_intf = obj.cpu_i[i].MONITOR_MOD;
-            s04_agt.drv.drv_intf        = obj.s04_if.TB_MASTER_MOD;
-            s04_agt.mon.mon_intf        = obj.s04_if;
+            s04_agt.drv.drv_intf        = obj.s04_if;
+            s04_agt.mon.mon_intf        = obj.s04_if.MONITOR_MOD;
         end
 
         foreach(cpu_agt[i])begin
