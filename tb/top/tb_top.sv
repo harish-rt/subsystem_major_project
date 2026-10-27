@@ -441,10 +441,10 @@ module top;
     assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
 
     initial begin
-        run_test("load_bram_256_test");             //find the interconnect issue
+        //run_test("load_bram_256_test");             //find the interconnect issue
         //run_test("core_perif_master_test");
         //run_test("spi_write_data_test");
-        //run_test("perif_gap_interconnect_test");
+        run_test("perif_gap_interconnect_test");
         //run_test("interconnect_gaps_test");
         //run_test("gap_pre_system_test");
         //run_test("uart_write_data_test");         //`SET_CPU_FORK_DISABLE(1) in test
