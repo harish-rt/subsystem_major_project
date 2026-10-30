@@ -456,7 +456,6 @@ class bram_multiple_wr_rd_seq extends base_cpu_sequence;
                    end
                 finish_item(pkt);
             end
-
         endtask
 endclass : bram_multiple_wr_rd_seq
 
@@ -724,7 +723,9 @@ class uart_write_data_seq extends base_cpu_sequence;
         write_reg(UART_BASE + 'h4,'haa);
         do begin
             read_reg(UART_BASE + 'h8, reg_data);
+            $display("UART_TEST_IN_WHILE");
         end while ((reg_data & 32'h1) == 0);
+            $display("UART_TEST_OUT_WHILE");
 
         read_reg(UART_BASE + 'h0, reg_data);
     
@@ -935,3 +936,87 @@ class cdma_sg_seq extends base_cpu_sequence;
 
      endtask
 endclass:cdma_sg_seq
+
+
+
+class slave_mem_address_range_seq extends base_cpu_sequence;
+    `uvm_object_utils(slave_mem_address_range_seq)
+    `NEW_OBJ
+
+    bit [31:0] rdata;
+    bit [31:0] expected_data;
+
+    task body();
+        super.body();
+
+        // Beginning address
+        write_reg(32'h8000_0000 );
+        read_reg(32'h8000_0000,rdata);
+
+        // Intermediate address
+        write_reg(32'h8FFF_FFFC);
+        read_reg(32'h8FFF_FFFC, rdata);
+
+
+        // Last valid 32-bit word address
+        write_reg(32'h9FFF_FFFC);
+        read_reg(32'h9FFF_FFFC, rdata);
+
+
+        `uvm_info("SLAVE_MEM","Address range test completed",UVM_LOW)
+    endtask
+endclass : slave_mem_address_range_seq
+
+
+class slave_mem_multiple_write_read_seq extends base_cpu_sequence;
+    `uvm_object_utils(slave_mem_multiple_write_read_seq)
+    `NEW_OBJ
+
+    bit [31:0] addr;
+    bit [31:0] start_addr;
+    bit [31:0] end_addr;
+    bit [31:0] size;
+
+
+    task body();
+        super.body();
+
+        start_addr = LITE_MEM_BASE;
+        end_addr   = 32'h9FFF_FFFF;
+        size       = 32'h0320_0000;
+
+
+        // Write transactions across the SLAVE_MEM address range
+        for (addr = start_addr; addr <= end_addr; addr = addr + size) begin
+
+            write_reg(addr);
+
+            `uvm_info("SLAVE_MEM",$sformatf("WRITE: Addr=%h", addr),UVM_MEDIUM)
+        end
+
+        // Read transactions from the same addresses
+        for (addr = start_addr; addr <= end_addr; addr = addr + size) begin
+            read_reg(addr,reg_data);
+            `uvm_info("SLAVE_MEM",$sformatf("WRITE: Addr=%h", addr),UVM_MEDIUM)
+        end
+
+    endtask
+endclass : slave_mem_multiple_write_read_seq
+
+
+class slave_mem_upper_invalid_addr_seq extends base_cpu_sequence;
+    `uvm_object_utils(slave_mem_upper_invalid_addr_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+
+        write_reg(32'h7FFF_FFFF, 32'hDEAD_BEEF);
+
+        `uvm_info("SLAVE_MEM",
+                  "Upper invalid address write issued",
+                  UVM_LOW)
+    endtask
+endclass : slave_mem_upper_invalid_addr_seq
+
+

@@ -333,3 +333,4 @@ class spi_write_data_vseq extends soc_base_virtual_sequence;
         //isr_clear();    // waits for irq down before ending spi_write_data_vseq
     endtask
 endclass : spi_write_data_vseq
+

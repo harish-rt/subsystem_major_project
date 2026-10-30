@@ -18,7 +18,7 @@ module top;
     import axi_cdma_env_pkg ::*;
     import mem_package :: *;
     import intc_package ::*;
-    //import core_perif_pkg ::*;
+    import core_perif_pkg ::*;
     import soc_package ::*;
 
     bit aclk;
@@ -437,7 +437,7 @@ module top;
         //run_test("gap_pre_system_test");
         //run_test("uart_write_data_test");   //`SET_CPU_FORK_DISABLE(1) in test
         //run_test("perif_reg_read_test");  //`SET_CPU_FORK_DISABLE(1) in test
-        run_test("cdma_boundary_check_test");
+        //run_test("cdma_boundary_check_test");
         //run_test("load_bram_256_test");   //find the interconnect issue
         //run_test("intc_sw_irq_test");
         //run_test("intc_reg_write_read_test");
@@ -455,6 +455,10 @@ module top;
         //run_test("cdma_wr_rd_test");
         //run_test("mem_wr_rd_test");
         //run_test("cdma_sg_test");
+        //run_test("slave_mem_address_range_test");
+        //run_test("slave_mem_multiple_wr_rd_test");
+        //run_test("slave_mem_upper_invalid_addr_test");
+        run_test("spi_write_data_test");
     end
 
     initial begin
