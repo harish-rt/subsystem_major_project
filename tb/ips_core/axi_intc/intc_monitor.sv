@@ -2,7 +2,6 @@ class intc_monitor extends uvm_monitor;
     `uvm_component_utils(intc_monitor)
     `NEW_COMP
     
-    uvm_event                           irq_event;
     intc_seq_item                       pkt;
     intc_config_obj                     cfg;
 

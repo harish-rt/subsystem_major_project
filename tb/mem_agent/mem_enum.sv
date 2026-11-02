@@ -1,4 +1,4 @@
-typedef logic [6:0]       id_t;
+typedef logic [7:0]       id_t;
 typedef enum logic [1:0] {
 	FIXED = 2'b00,
 	INCR  = 2'b01,

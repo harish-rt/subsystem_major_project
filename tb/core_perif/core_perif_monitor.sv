@@ -36,7 +36,7 @@ class core_perif_monitor extends uvm_monitor;
              rst_pkt = core_perif_lite_seq_item::type_id::create("rst_pkt");
              rst_pkt.reset_op = RESET_DEASSERTED;
              rst_pkt.reset_deasserted = $realtime();
-             `uvm_info("core_perif_monitor::capture_reset","reset_deasserted_pkt to SB",UVM_LOW);
+             `uvm_info("core_perif_monitor::capture_reset","reset_deasserted_pkt to SB",UVM_LOW)
              mon_ap.write(rst_pkt);
           end
           forever begin
@@ -44,7 +44,7 @@ class core_perif_monitor extends uvm_monitor;
              rst_pkt = core_perif_lite_seq_item::type_id::create("rst_pkt");
              rst_pkt.reset_op = RESET_ASSERTED;
              rst_pkt.reset_deasserted = $realtime();
-             `uvm_info("core_perif_monitor::capture_reset","reset_asserted_pkt to SB",UVM_LOW);
+             `uvm_info("core_perif_monitor::capture_reset","reset_asserted_pkt to SB",UVM_LOW)
              mon_ap.write(rst_pkt);
           end
        join
@@ -55,7 +55,7 @@ class core_perif_monitor extends uvm_monitor;
        core_perif_lite_seq_item pkt;
        write_address_mbx = new();
        forever begin
-          `uvm_info("core_perif_monitor::capture_write_address","Triggered",UVM_LOW);
+          `uvm_info("core_perif_monitor::capture_write_address","Triggered",UVM_LOW)
           wait(cp_mon_intf.axil_mon_cb.AWVALID && cp_mon_intf.axil_mon_cb.AWREADY && cp_mon_intf.ARESETn);
           pkt = core_perif_lite_seq_item::type_id::create("pkt");
           pkt.wadd_hndshk = $realtime();
@@ -72,7 +72,7 @@ class core_perif_monitor extends uvm_monitor;
        int i;
        write_data_mbx = new();
        forever begin
-          `uvm_info("core_perif_monitor::capture_write_data","Triggered",UVM_LOW);
+          `uvm_info("core_perif_monitor::capture_write_data","Triggered",UVM_LOW)
           i=0;
           wait(cp_mon_intf.axil_mon_cb.WVALID && cp_mon_intf.axil_mon_cb.WREADY && cp_mon_intf.ARESETn);
           pkt = core_perif_lite_seq_item::type_id::create("pkt");
@@ -88,7 +88,7 @@ class core_perif_monitor extends uvm_monitor;
     task capture_write_response();
        core_perif_lite_seq_item addr_pkt, data_pkt, merged_pkt;
        forever begin
-          `uvm_info("core_perif_monitor::capture_write_response","Triggered",UVM_LOW);
+          `uvm_info("core_perif_monitor::capture_write_response","Triggered",UVM_LOW)
           wait(cp_mon_intf.axil_mon_cb.BVALID && cp_mon_intf.axil_mon_cb.BREADY && cp_mon_intf.ARESETn);
           if (write_address_mbx.num() > 0 && write_data_mbx.num() > 0) begin
              write_address_mbx.get(addr_pkt);
@@ -102,9 +102,9 @@ class core_perif_monitor extends uvm_monitor;
              merged_pkt.wdata_hndshk= data_pkt.wdata_hndshk;
              merged_pkt.BRESP       = response_t'(cp_mon_intf.axil_mon_cb.BRESP);
              merged_pkt.wresp_hndshk= $realtime();
-             `uvm_info("core_perif_monitor::capture_write_response","Sending pkt to SB",UVM_LOW);
+             `uvm_info("core_perif_monitor::capture_write_response","Sending pkt to SB",UVM_LOW)
              mon_ap.write(merged_pkt);
-             `uvm_info("core_perif_monitor_write_mon",merged_pkt.sprint(),UVM_LOW);
+             `uvm_info("core_perif_monitor_write_mon",merged_pkt.sprint(),UVM_LOW)
           end
           @(cp_mon_intf.axil_mon_cb);
        end
@@ -115,7 +115,7 @@ class core_perif_monitor extends uvm_monitor;
        core_perif_lite_seq_item pkt;
        read_address_mbx = new();
        forever begin
-          `uvm_info("core_perif_monitor::capture_read_address","Triggered",UVM_LOW);
+          `uvm_info("core_perif_monitor::capture_read_address","Triggered",UVM_LOW)
           wait(cp_mon_intf.axil_mon_cb.ARVALID && cp_mon_intf.axil_mon_cb.ARREADY && cp_mon_intf.ARESETn);
           pkt = core_perif_lite_seq_item::type_id::create("pkt");
           pkt.radd_hndshk = $realtime();
@@ -132,7 +132,7 @@ class core_perif_monitor extends uvm_monitor;
        int i;
        read_data_mbx = new();
        forever begin
-          `uvm_info("core_perif_monitor::capture_read_data","Triggered",UVM_LOW);
+          `uvm_info("core_perif_monitor::capture_read_data","Triggered",UVM_LOW)
           i=0;
           wait(cp_mon_intf.axil_mon_cb.RVALID && cp_mon_intf.axil_mon_cb.RREADY && cp_mon_intf.ARESETn);
           if (read_address_mbx.num() > 0) begin
@@ -144,9 +144,9 @@ class core_perif_monitor extends uvm_monitor;
              data_pkt.RDATA       = cp_mon_intf.axil_mon_cb.RDATA;
              data_pkt.RRESP       = response_t'(cp_mon_intf.axil_mon_cb.RRESP);
              data_pkt.rdata_hndshk[i]= $realtime();
-             `uvm_info("core_perif_monitor::capture_read_data","Sending READ pkt to SB",UVM_LOW);
+             `uvm_info("core_perif_monitor::capture_read_data","Sending READ pkt to SB",UVM_LOW)
              mon_ap.write(data_pkt);
-             `uvm_info("core_perif_monitor_read_mon",data_pkt.sprint(),UVM_LOW);
+             `uvm_info("core_perif_monitor_read_mon",data_pkt.sprint(),UVM_LOW)
           end
           @(cp_mon_intf.axil_mon_cb);
        end

@@ -28,7 +28,7 @@ class axi_lite_intc_env extends uvm_env;
             lite_intc_agt.mon.mon_if    = obj.lite_intc_intf;
             if (obj.axi_lite_is_active == UVM_ACTIVE) begin
             end
-            intc_agt.mon.irq_event      = obj.irq_event;
+            //intc_agt.mon.irq_event      = obj.irq_event;
             intc_agt.mon.mon_intc_intf  = obj.intc_if;            
             if (obj.intc_is_active == UVM_ACTIVE) begin
             end

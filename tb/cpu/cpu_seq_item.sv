@@ -34,6 +34,11 @@ class cpu_seq_item extends axi_base_sequence_item;
     `NEW_OBJ
 
     // Constraints
+
+        constraint c_axi4_lite_32bit_addr {
+            AWADDR[1:0] == 2'b00;
+            ARADDR[1:0] == 2'b00;
+        }
         constraint c_simple_exclusion {
         if (operation == WRITE) {
             ARADDR == 32'h0;

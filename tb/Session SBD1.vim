@@ -61,7 +61,7 @@ badd +1 cpu/cpu_sequencer.sv
 badd +19 cpu/s04_sequence.sv
 badd +47 /mnt/d/VLSI/7\ Protocol/RISCV/subsystem_major_project/sim/questa/compiletb.log
 badd +505 /mnt/d/VLSI/7\ Protocol/RISCV/subsystem_major_project/sim/questa/sim_txt.log
-badd +4 top/tb_top.sv
+badd +161 top/tb_top.sv
 badd +15 common/config_tb.sv
 badd +1 top/base_test.sv
 badd +1 top/soc_virtual_sequence.sv
@@ -76,16 +76,16 @@ badd +23 cpu/parameters.sv
 badd +1 ips_core/axi_intc/lite_intc_seq_item.sv
 badd +20 top/axi_parameters.sv
 badd +11 top/cpu_package.sv
-badd +9 /mnt/d/VLSI/7\ Protocol/RISCV/subsystem_major_project/sim/questa/compiletb.do
+badd +7 /mnt/d/VLSI/7\ Protocol/RISCV/subsystem_major_project/sim/questa/compiletb.do
 badd +273 common/ss_sbd2.sv
 badd +1 mem_agent/bram_seq_item.sv
-badd +12 mem_agent/bram_monitor.sv
+badd +87 mem_agent/bram_monitor.sv
 badd +1 mem_agent/mem_env.sv
 badd +22 mem_agent/mem_agent.sv
 badd +2 mem_agent/mem_config_obj.sv
-badd +19 cpu/s04_agent.sv
-badd +19 cpu/s04_monitor.sv
-badd +40 cpu/s04_driver.sv
+badd +17 cpu/s04_agent.sv
+badd +1 cpu/s04_monitor.sv
+badd +136 cpu/s04_driver.sv
 badd +62 mem_agent/mem_seq_item.sv
 badd +1 mem_agent/mem_monitor.sv
 badd +25 mem_agent/mem_enum.sv
@@ -105,7 +105,7 @@ badd +23 ips_core/axi_cdma_env/top/axi_parameters.sv
 badd +90 cpu/s04_seq_item.sv
 badd +2 cpu/cpu_seq_item.sv
 badd +72 cpu/cpu_driver.sv
-badd +41 /mnt/d/VLSI/7\ Protocol/RISCV/subsystem_major_project/sim/questa/../../tb/common/../cpu/cpu_env.sv
+badd +31 /mnt/d/VLSI/7\ Protocol/RISCV/subsystem_major_project/sim/questa/../../tb/common/../cpu/cpu_env.sv
 badd +1 cpu/s04_sequencer.sv
 badd +1 ips_core/axi_intc/\*env
 badd +15 ips_core/axi_intc/lite_intc_env.sv
@@ -116,15 +116,18 @@ badd +6 core_perif/core_perif_monitor.sv
 badd +30 ips_core/axi_cdma_env/top/axi_cdma_env_pkg.sv
 badd +277 ips_core/axi_cdma_env/axi_cdma_master_agent/master_driver.sv
 badd +5 cpu/cpu_config_obj.sv
-badd +44 ../sim/questa/simulate.do
+badd +5 ../sim/questa/simulate.do
 badd +178 /mnt/d/VLSI/7\ Protocol/RISCV/subsystem_major_project/sim/questa/wave.do
 badd +12 top/soc_virtual_sequencer.sv
 badd +1 cpu/cpu_agent.sv
 badd +270 top/axi4_lite_tb_intf.sv
 badd +1 common/ss_sbd.sv
 badd +2705 ../../SS/core_ip_wraps/rtl/core_ip_wraps.srcs/sources_1/bd/core_ip_wraps/sim/core_ip_wraps.v
-badd +0 ../rtl/core_wrapper.sv
-badd +253 top/axi4_tb_intf.sv
+badd +86 ../rtl/core_wrapper.sv
+badd +9 top/axi4_tb_intf.sv
+badd +0 ../sim/questa/compilexilinx.do
+badd +258 ../rtl/sub_ips/axi_intf/rtl/axi_intf.sv
+badd +30 ../rtl/sub_ips/axi_intf/rtl/axi_lite_intf.sv
 argglobal
 %argdel
 set stal=2
@@ -289,12 +292,12 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 77 - ((10 * winheight(0) + 11) / 22)
+let s:l = 309 - ((10 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 77
-normal! 012|
+keepjumps 309
+normal! 030|
 wincmd w
 argglobal
 if bufexists(fnamemodify("top/tb_top.sv", ":p")) | buffer top/tb_top.sv | else | edit top/tb_top.sv | endif
@@ -432,12 +435,12 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 553 - ((11 * winheight(0) + 11) / 22)
+let s:l = 447 - ((13 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 553
-normal! 064|
+keepjumps 447
+normal! 048|
 wincmd w
 exe 'vert 1resize ' . ((&columns * 0 + 52) / 104)
 exe 'vert 2resize ' . ((&columns * 103 + 52) / 104)
@@ -1046,12 +1049,12 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 137 - ((0 * winheight(0) + 11) / 22)
+let s:l = 256 - ((2 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 137
-normal! 024|
+keepjumps 256
+normal! 040|
 wincmd w
 argglobal
 if bufexists(fnamemodify("top/base_test.sv", ":p")) | buffer top/base_test.sv | else | edit top/base_test.sv | endif
@@ -1189,13 +1192,14 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 137 - ((5 * winheight(0) + 11) / 22)
+let s:l = 313 - ((1 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 137
-normal! 011|
+keepjumps 313
+normal! 08|
 wincmd w
+2wincmd w
 exe 'vert 1resize ' . ((&columns * 20 + 52) / 104)
 exe 'vert 2resize ' . ((&columns * 83 + 52) / 104)
 tabnext
@@ -1216,8 +1220,8 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 0 + 52) / 104)
-exe 'vert 2resize ' . ((&columns * 103 + 52) / 104)
+exe 'vert 1resize ' . ((&columns * 103 + 52) / 104)
+exe 'vert 2resize ' . ((&columns * 0 + 52) / 104)
 argglobal
 balt cpu/s04_sequence.sv
 setlocal keymap=
@@ -1353,12 +1357,12 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 814 - ((21 * winheight(0) + 11) / 22)
+let s:l = 718 - ((0 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 814
-normal! 023|
+keepjumps 718
+normal! 07|
 wincmd w
 argglobal
 if bufexists(fnamemodify("cpu/s04_sequence.sv", ":p")) | buffer cpu/s04_sequence.sv | else | edit cpu/s04_sequence.sv | endif
@@ -1503,8 +1507,8 @@ normal! zt
 keepjumps 108
 normal! 030|
 wincmd w
-exe 'vert 1resize ' . ((&columns * 0 + 52) / 104)
-exe 'vert 2resize ' . ((&columns * 103 + 52) / 104)
+exe 'vert 1resize ' . ((&columns * 103 + 52) / 104)
+exe 'vert 2resize ' . ((&columns * 0 + 52) / 104)
 tabnext
 edit /mnt/d/VLSI/7\ Protocol/RISCV/subsystem_major_project/sim/questa/compiletb.log
 argglobal
@@ -1785,13 +1789,13 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1505 - ((5 * winheight(0) + 11) / 23)
+let s:l = 1716 - ((10 * winheight(0) + 11) / 23)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 1505
-normal! 046|
-tabnext 6
+keepjumps 1716
+normal! 089|
+tabnext 4
 set stal=1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0
   silent exe 'bwipe ' . s:wipebuf

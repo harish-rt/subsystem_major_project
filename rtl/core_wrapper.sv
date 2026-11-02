@@ -89,9 +89,9 @@ module core_wrapper
   //S02
   interface         data_bridge2axi_int,
   //S04
-  interface         ext_axi4_slave,
+  interface         ext_axi4_slave
   //M05
-  interface         ext_axi4_master
+  //interface         ext_axi4_master
 );
 
   wire cdma_irq, core_perif_irq, intr_ctrl_irq;
@@ -106,6 +106,7 @@ module core_wrapper
 
   axi4_lite_intf	axi_int2core_peri 	();
   axi4_lite_intf 	axi_int2main_mem	();
+  axi4_intf 	    ext_axi4_master	    ();
 
 
 //peripheral intr to intr cntrl
@@ -115,12 +116,14 @@ module core_wrapper
   //ACLK
   assign axi_int2core_peri.ACLK   = clk_i;
   assign axi_int2main_mem.ACLK    = clk_i;
+  assign ext_axi4_master.ACLK     = clk_i;
 
   //RESETn
   wire   core_perif_rst;                                            // core peripheral reset
-  assign core_perif_rst             = ~axi_int2core_peri.ARESETn;   // to core peripheral
   assign axi_int2core_peri.ARESETn  = internal_rst_n;               // to core peripheral
+  assign core_perif_rst             = ~axi_int2core_peri.ARESETn;   // to core peripheral
   assign axi_int2main_mem.ARESETn   = internal_rst_n_2;             // Main Memory Unit
+  assign ext_axi4_master.ARESETn    = internal_rst_n_2;             // Main 4 Memory Unit
   
   always @(negedge rst_n_i) begin
     rst_count <= 'd0;
@@ -365,7 +368,6 @@ module core_wrapper
            ) 
            CORE_PERIF_CTRL  (
               .clk_i		        (axi_int2core_peri.ACLK	    ),
-              //.rst_i		        (axi_int2core_peri.ARESETn  ),
               .rst_i		        (core_perif_rst  ),
               .inport_awvalid_i	    (axi_int2core_peri.AWVALID  ),
               .inport_awaddr_i	    (axi_int2core_peri.AWADDR	),

@@ -158,11 +158,15 @@ module top;
         .data_bridge2axi_int(axil_riscv_if[1]),
         //.data_bridge2axi_int(lite_data_if),
         //M05
-        .ext_axi4_master(master_if),
+        //.ext_axi4_master(master_if),
         //S04
         .ext_axi4_slave(slave_if)
     );
 
+    // M05
+    assign master_if.ACLK            = aclk;
+    assign master_if.ARESETn         = areset_n;
+    
     // S04
     assign slave_if.ACLK            = aclk;
     assign slave_if.ARESETn         = areset_n;
@@ -441,14 +445,20 @@ module top;
     assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
 
     initial begin
-        //run_test("load_bram_256_test");             //find the interconnect issue
+        run_test("timer_reg_access_test");
+        //run_test("masters_load_lite_mem_test");
+        //run_test("masters_load_bram_test");
+        //run_test("concurrent_diff_slaves_test");        //`SET_CPU_FORK_DISABLE(1) in test
+        //run_test("intc_stress_lite_test");
+        //run_test("intc_stress_test");
+        //run_test("load_bram_256_test");               //find the interconnect issue from local
         //run_test("core_perif_master_test");
         //run_test("spi_write_data_test");
-        run_test("perif_gap_interconnect_test");
+        //run_test("perif_gap_interconnect_test");
         //run_test("interconnect_gaps_test");
         //run_test("gap_pre_system_test");
-        //run_test("uart_write_data_test");         //`SET_CPU_FORK_DISABLE(1) in test
-        //run_test("perif_reg_read_test");          //`SET_CPU_FORK_DISABLE(1) in test
+        //run_test("uart_write_data_test");             //`SET_CPU_FORK_DISABLE(1) in test
+        //run_test("perif_reg_read_test");              //`SET_CPU_FORK_DISABLE(1) in test
         //run_test("cdma_boundary_check_test");
         //run_test("intc_sw_irq_test");
         //run_test("intc_reg_write_read_test");
@@ -508,25 +518,21 @@ module top;
     initial begin
         //$value$plusargs("DISABLE_CPU_FORK=%b", disable_cpu_fork);
 
-    `ifdef SBD_COMPONENTS
-        sb_config sb_cfg;
-        sb_cfg = sb_config::type_id::create("sb_cfg");
-        sb_cfg.perif_addr    = new[8];
-        sb_cfg.perif_addr[0] = '{BRAM, BRAM_BASE, BRAM_END};
-        sb_cfg.perif_addr[1] = '{LITE_MEM, LITE_MEM_BASE, LITE_MEM_END};
-        sb_cfg.perif_addr[2] = '{CDMA, CDMA_BASE, CDMA_END};
-        sb_cfg.perif_addr[3] = '{INTC, INTC_BASE, INTC_END};
-        sb_cfg.perif_addr[4] = '{CORE_INTC, IRQ_BASE, IRQ_END};
-        sb_cfg.perif_addr[5] = '{UART, UART_BASE, UART_END};
-        sb_cfg.perif_addr[6] = '{SPI, SPI_BASE, SPI_END};
-        sb_cfg.perif_addr[7] = '{GPIO, GPIO_BASE, GPIO_END};
-	    uvm_config_db #(sb_config)::set(null,"*","SB_CFG",sb_cfg);
-    `endif
-        //sb_cfg.perif_addr[0] = '{BRAM, 32'h7100_0000, 32'h713F_FFFF};
-        //sb_cfg.perif_addr[1] = '{LITE_MEM, 32'h8000_0000, 32'h9FFF_FFFF};
-        //sb_cfg.perif_addr[2] = '{CDMA, 32'h7000_0000, 32'h7000_0FFF};
-        //sb_cfg.perif_addr[3] = '{INTC, 32'h7000_1000, 32'h7000_1FFF};
-        //sb_cfg.perif_addr[4] = '{CORE_PERIF, 32'hA000_0000, 32'hBFFF_FFFF};
+        `ifdef SBD_COMPONENTS
+            sb_config               sb_cfg;
+            sb_cfg = sb_config::type_id::create("sb_cfg");
+            sb_cfg.perif_addr    = new[9];
+            sb_cfg.perif_addr[0] = '{BRAM, BRAM_BASE, BRAM_END};
+            sb_cfg.perif_addr[1] = '{LITE_MEM, LITE_MEM_BASE, LITE_MEM_END};
+            sb_cfg.perif_addr[2] = '{CDMA, CDMA_BASE, CDMA_END};
+            sb_cfg.perif_addr[3] = '{INTC, INTC_BASE, INTC_END};
+            sb_cfg.perif_addr[4] = '{CORE_INTC, IRQ_BASE, IRQ_END};
+            sb_cfg.perif_addr[5] = '{UART, UART_BASE, UART_END};
+            sb_cfg.perif_addr[6] = '{SPI, SPI_BASE, SPI_END};
+            sb_cfg.perif_addr[7] = '{GPIO, GPIO_BASE, GPIO_END};
+            sb_cfg.perif_addr[8] = '{TIMER, TIMER_BASE, TIMER_END};
+	        uvm_config_db #(sb_config)::set(null,"*","SB_CFG",sb_cfg);
+        `endif
     end
 
     soc_config     soc_config_obj;

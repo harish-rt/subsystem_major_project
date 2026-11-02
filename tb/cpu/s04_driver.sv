@@ -127,7 +127,7 @@ task s04_driver::main_phase(uvm_phase phase);
         end
 
         `uvm_do_callbacks(s04_driver, master_driver_callback, post_drive(pkt));
-        seq_item_port.item_done();
+        seq_item_port.item_done(pkt);
     end
 endtask : main_phase
 

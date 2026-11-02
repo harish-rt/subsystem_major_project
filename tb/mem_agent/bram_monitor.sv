@@ -25,14 +25,14 @@ endclass :bram_monitor
    function void bram_monitor :: build_phase (uvm_phase phase);
      super.build_phase (phase);
      mon_ap = new ("mon_ap",this);
-     `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
+     `uvm_info (get_full_name() , phase.get_name() , UVM_LOW)
     //if(!uvm_config_db#(virtual axi4_tb_intf.MONITOR_MOD)::get(this,"","BRAM_MON",bram_if)) begin
 	//	`uvm_fatal("NO_VIF",{"virtual interface is not set for monitor"})
 	//end
    endfunction : build_phase
 
 task bram_monitor :: main_phase (uvm_phase phase);
- `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
+ `uvm_info (get_full_name() , phase.get_name() , UVM_LOW)
  fork
   //capture_reset();
   capture_write_address();
@@ -62,7 +62,7 @@ task  bram_monitor :: capture_write_address();
     pkt.AWSIZE   = bram_if.axi4_mon_cb.AWSIZE;
     pkt.operation= bram_seq_item::WRITE;
     `uvm_info("bram_monitor :: capture_write_address","captured address pkt put to write_address_mbx",UVM_LOW);
-    `uvm_info("MASTER_MONITOR_capture_write_address",pkt.sprint(),UVM_MEDIUM)
+    `uvm_info("BRAM_MONITOR_capture_write_address",pkt.sprint(),UVM_LOW)
     write_address_mbx.put(pkt);
     @(bram_if.axi4_mon_cb); //wait for a clk
   end
@@ -91,14 +91,14 @@ task  bram_monitor ::  capture_write_data();
       @(bram_if.axi4_mon_cb);       //wait till next clk posedge
       end while(last==0);           //keeps sampling till last indicates end of data phase.
       `uvm_info("bram_monitor :: capture_write_data","captured data pkt put to write_data_mbx",UVM_LOW);
-      `uvm_info("MASTER_MONITOR_capture_write_data",pkt.sprint(),UVM_MEDIUM)
+      `uvm_info("BRAM_MONITOR_capture_write_data",pkt.sprint(),UVM_LOW)
       write_data_mbx.put(pkt);
  end
 endtask
 
 task bram_monitor :: capture_write_response();
     bram_seq_item pkt;
-    bit [3:0] t_bid;
+    bit [8:0] t_bid;
     
     forever begin
         @(bram_if.axi4_mon_cb);
@@ -119,7 +119,7 @@ task bram_monitor :: capture_write_response();
             pkt.BRESP = bram_seq_item::response_t'(bram_if.axi4_mon_cb.BRESP);
             
             mon_ap.write(pkt); 
-            `uvm_info("MASTER_MONITOR_capture_write_resp",pkt.sprint(),UVM_MEDIUM)
+            `uvm_info("BRAM_MONITOR_capture_write_resp",pkt.sprint(),UVM_LOW)
         end
     end
 endtask:capture_write_response
@@ -142,7 +142,7 @@ task bram_monitor :: capture_write_response();
                 pkt.BID   = bram_if.axi4_mon_cb.BID;
                 pkt.BRESP = bram_seq_item::response_t'(bram_if.axi4_mon_cb.BRESP);
                 mon_ap.write(pkt); 
-                `uvm_info("MASTER_MONITOR_capture_write_resp",pkt.sprint(),UVM_MEDIUM)
+                `uvm_info("BRAM_MONITOR_capture_write_resp",pkt.sprint(),UVM_LOW)
             end else begin
                 `uvm_error("Master_monitor :: capture_write_response", 
                     $sformatf("unexpected write response, BID not found. Sampled BID=%b. Total unique IDs tracked in array=%0d", 
@@ -202,7 +202,7 @@ task  bram_monitor :: capture_read_address();
     pkt.operation= bram_seq_item::READ;
     //`uvm_info("bram_monitor :: capture_read_address","captured address pkt put to read_address_array",UVM_LOW);
     if(!read_address_array.exists(pkt.ARID)) read_address_array[pkt.ARID]=new();
-    //`uvm_info("BRAM_MONITOR:: capture_read_address",pkt.sprint(),UVM_MEDIUM)
+    //`uvm_info("BRAM_MONITOR:: capture_read_address",pkt.sprint(),UVM_LOW)
     read_address_array[pkt.ARID].put(pkt);
     @(bram_if.axi4_mon_cb); //wait till next clk posedge
   end
@@ -242,11 +242,11 @@ task  bram_monitor ::  capture_read_data();
       pkt2sb.RRESP[i] = pkt.RRESP[0];
    end
     `uvm_info("bram_monitor :: capture_read_data","Sending pkt to SB",UVM_LOW);
-    //`uvm_info("BRAM_MONITOR:: capture_read_address: pkt",pkt.sprint(),UVM_MEDIUM)
-    //`uvm_info("BRAM_MONITOR:: capture_read_address",pkt2sb.sprint(),UVM_MEDIUM)
+    //`uvm_info("BRAM_MONITOR:: capture_read_address: pkt",pkt.sprint(),UVM_LOW)
+    //`uvm_info("BRAM_MONITOR:: capture_read_address",pkt2sb.sprint(),UVM_LOW)
     //pkt2sb.print_read_txn(pkt2sb);
     mon_ap.write(pkt2sb); //write pkt to sb
     `uvm_info("bram_mon_READ",pkt2sb.sprint(),UVM_LOW)
-    //`uvm_info("BRAM_MONITOR:: capture_read_data",pkt2sb.sprint(),UVM_MEDIUM)
+    //`uvm_info("BRAM_MONITOR:: capture_read_data",pkt2sb.sprint(),UVM_LOW)
  end
 endtask

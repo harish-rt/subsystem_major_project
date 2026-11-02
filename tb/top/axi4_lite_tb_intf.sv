@@ -102,6 +102,12 @@ interface axi4_lite_tb_intf();
       output RREADY
    );
 
+    property awvalid_stable;
+        @(posedge ACLK) disable iff (!ARESETn)
+        (AWVALID && !AWREADY) |=> AWVALID;
+    endproperty
+    assert property (awvalid_stable)
+        else $error("AWVALID deasserted before AWREADY");
 endinterface
 
 /*

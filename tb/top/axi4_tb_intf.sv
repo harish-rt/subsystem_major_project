@@ -2,7 +2,7 @@
 interface axi4_tb_intf();
    parameter ADDR_WIDTH 	    = 32;
    parameter DATA_WIDTH 	    = 32;
-   parameter ID_WIDTH 		    = 4	;
+   parameter ID_WIDTH 		    = 8	;
    parameter USER_SIGNAL_WIDTH 	= 8	;
 
    //Global signals
@@ -14,8 +14,8 @@ interface axi4_tb_intf();
    wire [ADDR_WIDTH-1:0]	ARADDR	;
    wire [7:0]			    ARLEN	;
    wire [2:0]			    ARSIZE	;
-   wire [1:0]  		    ARBURST	;
-   wire			        ARVALID	;
+   wire [1:0]  		        ARBURST	;
+   wire			            ARVALID	;
    wire 			        ARREADY	;
    wire [3:0] 			    ARCACHE	;
    wire 			        ARLOCK	;
@@ -29,7 +29,7 @@ interface axi4_tb_intf();
    wire [ADDR_WIDTH-1:0]	AWADDR	;
    wire [7:0]			    AWLEN	;
    wire [2:0]			    AWSIZE	;
-   wire [1:0]  		    AWBURST	;
+   wire [1:0]  		        AWBURST	;
    wire  			        AWVALID	;
    wire  			        AWREADY	;
    wire [3:0] 			    AWCACHE	;
@@ -43,7 +43,7 @@ interface axi4_tb_intf();
    wire [ID_WIDTH-1:0]		BID	;
    wire [1:0]			    BRESP	;
    wire 			        BVALID	;
-   wire			        BREADY	;
+   wire			            BREADY	;
    wire [USER_SIGNAL_WIDTH-1:0]BUSER	;
    
    //Read data channel signals
@@ -57,7 +57,7 @@ interface axi4_tb_intf();
 
    //Write data channel signals
    wire [DATA_WIDTH-1:0]	WDATA	;
-   wire [DATA_WIDTH>>3-1:0]WSTRB	;
+   wire [DATA_WIDTH>>3-1:0] WSTRB	;
    wire 			        WLAST	;
    wire  			        WVALID	;
    wire  			        WREADY	;
@@ -109,7 +109,19 @@ interface axi4_tb_intf();
     modport MONITOR_MOD (clocking axi4_mon_cb, input ACLK, input ARESETn);
     modport DRIVER_MOD (clocking axi4_drv_cb, input ACLK, input ARESETn);
 
+    property awvalid_assert;
+        logic[ID_WIDTH-1:0] id;
+    
+        @(posedge ACLK) disable iff (!ARESETn)
+        ((AWVALID && !AWREADY),id = AWID) |=> (AWVALID && (AWID == id));
+    endproperty
+    assert property (awvalid_assert)
+        else $error("AWVALID deasserted before AWREADY");
 endinterface
+
+
+
+
 /*interface axi_intf();
    parameter ADDR_WIDTH 	= 32	;
    parameter DATA_WIDTH 	= 32	;

@@ -83,6 +83,7 @@ class cpu_driver extends uvm_driver #(cpu_seq_item);
 
    task drive_write_resp(cpu_seq_item pkt);
       `uvm_info(get_full_name(),"AXI-Lite drive_write_resp -- task triggered", UVM_LOW);
+      //repeat(60)@(cpu_drv_intf.axil_drv_cb);
       cpu_drv_intf.axil_drv_cb.BREADY <= 1;
       wait(cpu_drv_intf.axil_drv_cb.BVALID);
       pkt.BRESP = response_t'(cpu_drv_intf.axil_drv_cb.BRESP);

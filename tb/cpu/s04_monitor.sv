@@ -4,9 +4,9 @@ class s04_monitor extends uvm_monitor;
    //uvm_analysis_port #(axi_base_sequence_item)    mon_ap;
    uvm_analysis_port #(s04_seq_item)    mon_ap;
    uvm_analysis_port #(s04_seq_item)    resp_ap;
-   virtual axi4_tb_intf                 mon_intf;
-   mailbox #(s04_seq_item)  write_address_mbx ,write_data_mbx;      //to capture transactions on write address channel // Preserve ordering
-   mailbox #(s04_seq_item) wresp_array [id_t];    //associative array of mailboxes. Will hold packets waiting for write response.Mailboxes will preserve ordering based on ID.
+   virtual axi4_tb_intf.MONITOR_MOD                 mon_intf;
+   mailbox #(s04_seq_item) write_address_mbx ,write_data_mbx;
+   mailbox #(s04_seq_item) wresp_array [id_t];
    mailbox #(s04_seq_item) read_address_array [id_t];
    mailbox #(s04_seq_item) read_data_array[id_t];
 
@@ -42,11 +42,12 @@ task s04_monitor :: main_phase (uvm_phase phase);
   capture_write_response();
   capture_read_address();
   capture_read_data();
+  merge_write_info();
  join
 endtask
 
 task  s04_monitor :: capture_write_address();
- s04_seq_item     pkt;
+ s04_seq_item           pkt;
  write_address_mbx = new ();
  forever begin
     `uvm_info("s04_monitor :: capture_write_address","Triggred",UVM_LOW);
@@ -62,11 +63,12 @@ task  s04_monitor :: capture_write_address();
     pkt.AWQOS    = mon_intf.axi4_mon_cb.AWQOS;
     pkt.AWREGION = mon_intf.axi4_mon_cb.AWREGION;
     pkt.AWSIZE   = mon_intf.axi4_mon_cb.AWSIZE;
-    pkt.operation= command_t'(WRITE);
+    //pkt.operation= command_t'(WRITE);
+    pkt.operation   = WRITE;
     resp_ap.write(pkt); //write pkt to sequencer for response
     wait( mon_intf.axi4_mon_cb.AWREADY && mon_intf.axi4_mon_cb.AWVALID && mon_intf.ARESETn==1); //wait for handshake
     pkt.wadd_hndshk = $realtime();  //capturing timestamp for handshake.
-    `uvm_info("s04_monitor :: capture_write_address",pkt.sprint(),UVM_LOW);
+    `uvm_info("s04_monitor_capture_write_address",pkt.sprint(),UVM_LOW);
     write_address_mbx.put(pkt);
     @(mon_intf.axi4_mon_cb); //wait till next clk posedge
   end
@@ -96,8 +98,7 @@ task  s04_monitor ::  capture_write_data();
       last = mon_intf.axi4_mon_cb.WLAST;
       i=i+1;
       end while( last==0); //keeps sampling till last indicates end of data phase.
-      //`uvm_info("s04_monitor :: capture_write_data","captured data pkt put to write_data_mbx",UVM_LOW);
-    `uvm_info("s04_monitor:: capture_write_data",pkt.sprint(),UVM_MEDIUM)
+    `uvm_info("s04_monitor_capture_write_data",pkt.sprint(),UVM_LOW)
     write_data_mbx.put(pkt);
  end
 endtask
@@ -113,7 +114,6 @@ task s04_monitor :: capture_write_response();
             
             t_bid = mon_intf.axi4_mon_cb.BID;
 
-            // Ensure the mailbox for this ID exists so we don't hit a null pointer
             if (!wresp_array.exists(t_bid)) begin
                 wresp_array[t_bid] = new();
             end
@@ -122,10 +122,11 @@ task s04_monitor :: capture_write_response();
             wresp_array[t_bid].get(pkt);
             
             pkt.BID   = mon_intf.axi4_mon_cb.BID;
-            pkt.BRESP = mon_intf.axi4_mon_cb.BRESP;
+            pkt.BRESP = response_t'(mon_intf.axi4_mon_cb.BRESP);
             
+            pkt.master_p = MST_S04;
             mon_ap.write(pkt); 
-            `uvm_info("MASTER_MONITOR_capture_write_resp",pkt.sprint(),UVM_MEDIUM)
+            `uvm_info("s04_monitor_capture_write_resp",pkt.sprint(),UVM_LOW)
         end
     end
 endtask:capture_write_response
@@ -146,10 +147,12 @@ task  s04_monitor :: capture_read_address();
     pkt.ARQOS    = mon_intf.axi4_mon_cb.ARQOS;
     pkt.ARREGION = mon_intf.axi4_mon_cb.ARREGION;
     pkt.ARSIZE   = mon_intf.axi4_mon_cb.ARSIZE;
-    pkt.operation= command_t'(READ);
+    //pkt.operation= command_t'(READ);
+    pkt.operation   = READ;
     resp_ap.write(pkt); //write pkt to sequencer for response
     wait( mon_intf.axi4_mon_cb.ARREADY==1 && mon_intf.axi4_mon_cb.ARVALID==1 && mon_intf.ARESETn==1); //handshake
     pkt.radd_hndshk = $realtime();  //capturing timestamp for handshake.
+    `uvm_info("s04_monitor_capture_read_address",pkt.sprint(),UVM_LOW);
     //`uvm_info("s04_monitor :: capture_read_address",$sformatf("captured address pkt put to read_address_array arid=%d",pkt.ARID),UVM_LOW);
     if(!read_address_array.exists(pkt.ARID)) read_address_array[pkt.ARID]=new();
     read_address_array[pkt.ARID].put(pkt);
@@ -174,6 +177,7 @@ task  s04_monitor ::  capture_read_data();
       pkt.RID       = mon_intf.axi4_mon_cb.RID;
       pkt.RDATA[0]  = mon_intf.axi4_mon_cb.RDATA;
       pkt.RRESP[0]  = response_t'(mon_intf.axi4_mon_cb.RRESP);
+      pkt.operation   = READ;
       if(!read_data_array.exists(pkt.RID)) read_data_array[pkt.RID] = new();
       read_data_array[pkt.RID].put(pkt);
       i=i+1;
@@ -199,10 +203,12 @@ task  s04_monitor ::  capture_read_data();
     //`uvm_info("s04_monitor :: capture_read_data","Sending pkt to SB",UVM_LOW);
     //pkt2sb.print_read_txn(pkt2sb);
       pkt2sb.master_p = MST_S04;
+    `uvm_info("s04_monitor_capture_read_data",pkt2sb.sprint(),UVM_LOW);
     mon_ap.write(pkt2sb); //write pkt to sb
  end
 endtask
 
+/*
 task s04_monitor :: merge_write_info();
 s04_seq_item addr_pkt,data_pkt,merged_pkt;
 int x ,no_addr, no_data; //indicates number of completed write transactions waiting for response.
@@ -232,13 +238,50 @@ int x ,no_addr, no_data; //indicates number of completed write transactions wait
    merged_pkt.wdata_hndshk =data_pkt.wdata_hndshk;
    merged_pkt.WDATA    = data_pkt.WDATA;
    merged_pkt.WSTRB  = data_pkt.WSTRB;
+    `uvm_info("s04_monitor_capture_merged_pkt",merged_pkt.sprint(),UVM_LOW);
   //adding packets to array waiting for response
     //`uvm_info("s04_monitor :: merge_write_info",$sformatf("putting merged pkt to wresp_array AWID = %b",merged_pkt.AWID),UVM_LOW);
     if(!wresp_array.exists(merged_pkt.AWID)) wresp_array[merged_pkt.AWID] = new();
     wresp_array[merged_pkt.AWID].put(merged_pkt);
   end
 endtask
+*/
 
+task s04_monitor :: merge_write_info();
+  s04_seq_item addr_pkt, data_pkt, merged_pkt;
+  `uvm_info("s04_monitor :: merge_write_info","Triggered",UVM_LOW);
+  
+  forever begin
+    write_address_mbx.get(addr_pkt); 
+    write_data_mbx.get(data_pkt);
+    
+    merged_pkt = s04_seq_item::type_id::create("merged_pkt");
+    
+    merged_pkt.wadd_hndshk = addr_pkt.wadd_hndshk;
+    merged_pkt.AWBURST     = addr_pkt.AWBURST;
+    merged_pkt.AWADDR      = addr_pkt.AWADDR;
+    merged_pkt.AWSIZE      = addr_pkt.AWSIZE;
+    merged_pkt.AWID        = addr_pkt.AWID;
+    merged_pkt.AWLEN       = addr_pkt.AWLEN;
+    merged_pkt.AWLOCK      = addr_pkt.AWLOCK;
+    merged_pkt.AWPROT      = addr_pkt.AWPROT;
+    merged_pkt.AWQOS       = addr_pkt.AWQOS;
+    merged_pkt.AWCACHE     = addr_pkt.AWCACHE;
+    merged_pkt.AWREGION    = addr_pkt.AWREGION;
+    
+    merged_pkt.wdata_hndshk = data_pkt.wdata_hndshk;
+    merged_pkt.WDATA        = data_pkt.WDATA;
+    merged_pkt.WSTRB        = data_pkt.WSTRB;
+    merged_pkt.operation    = WRITE;
+    
+    `uvm_info("s04_monitor_capture_merged_pkt", merged_pkt.sprint(), UVM_LOW);
+    
+    if(!wresp_array.exists(merged_pkt.AWID)) 
+      wresp_array[merged_pkt.AWID] = new();
+      
+    wresp_array[merged_pkt.AWID].put(merged_pkt);
+  end
+endtask:merge_write_info
 
 task s04_monitor :: capture_reset();
  s04_seq_item     rst_pkt;

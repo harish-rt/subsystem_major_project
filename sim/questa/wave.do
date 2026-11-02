@@ -92,7 +92,6 @@ add wave -noupdate -group AXI_S04 /top/slave_if/axi4_drv_cb/ARREGION
 add wave -noupdate -group AXI_S04 /top/slave_if/axi4_drv_cb/ARSIZE
 add wave -noupdate -group AXI_S04 /top/slave_if/axi4_drv_cb/ARVALID
 add wave -noupdate -group AXI_S04 /top/slave_if/axi4_drv_cb/ARUSER
-add wave -noupdate -group AXI_S04 /top/slave_if/axi4_drv_cb/axi4_drv_cb_event
 add wave -noupdate -group AXI_S04 /top/slave_if/axi4_mon_cb/RID
 add wave -noupdate -group AXI_S04 /top/slave_if/axi4_mon_cb/RDATA
 add wave -noupdate -group AXI_S04 /top/slave_if/axi4_mon_cb/RRESP
@@ -137,7 +136,6 @@ add wave -noupdate -group AXI_S04 /top/slave_if/axi4_mon_cb/ARREGION
 add wave -noupdate -group AXI_S04 /top/slave_if/axi4_mon_cb/ARSIZE
 add wave -noupdate -group AXI_S04 /top/slave_if/axi4_mon_cb/ARVALID
 add wave -noupdate -group AXI_S04 /top/slave_if/axi4_mon_cb/ARUSER
-add wave -noupdate -group AXI_S04 /top/slave_if/axi4_mon_cb/axi4_mon_cb_event
 add wave -noupdate -group BRAM /top/axi4_bram_if/ACLK
 add wave -noupdate -group BRAM /top/axi4_bram_if/ARESETn
 add wave -noupdate -group BRAM /top/axi4_bram_if/ARID
@@ -228,7 +226,6 @@ add wave -noupdate -group BRAM /top/axi4_bram_if/axi4_mon_cb/ARREGION
 add wave -noupdate -group BRAM /top/axi4_bram_if/axi4_mon_cb/ARSIZE
 add wave -noupdate -group BRAM /top/axi4_bram_if/axi4_mon_cb/ARVALID
 add wave -noupdate -group BRAM /top/axi4_bram_if/axi4_mon_cb/ARUSER
-add wave -noupdate -group BRAM /top/axi4_bram_if/axi4_mon_cb/axi4_mon_cb_event
 add wave -noupdate -group LITE_MEM /top/mem_intf/ACLK
 add wave -noupdate -group LITE_MEM /top/mem_intf/ARESETn
 add wave -noupdate -group LITE_MEM /top/mem_intf/AWADDR
@@ -270,7 +267,6 @@ add wave -noupdate -group LITE_MEM /top/mem_intf/axil_drv_cb/AWVALID
 add wave -noupdate -group LITE_MEM /top/mem_intf/axil_drv_cb/ARADDR
 add wave -noupdate -group LITE_MEM /top/mem_intf/axil_drv_cb/ARPROT
 add wave -noupdate -group LITE_MEM /top/mem_intf/axil_drv_cb/ARVALID
-add wave -noupdate -group LITE_MEM /top/mem_intf/axil_drv_cb/axil_drv_cb_event
 add wave -noupdate -group LITE_MEM /top/mem_intf/axil_mon_cb/RDATA
 add wave -noupdate -group LITE_MEM /top/mem_intf/axil_mon_cb/RRESP
 add wave -noupdate -group LITE_MEM /top/mem_intf/axil_mon_cb/RVALID
@@ -291,7 +287,6 @@ add wave -noupdate -group LITE_MEM /top/mem_intf/axil_mon_cb/ARPROT
 add wave -noupdate -group LITE_MEM /top/mem_intf/axil_mon_cb/ARVALID
 add wave -noupdate -group LITE_MEM /top/mem_intf/axil_mon_cb/ARREADY
 add wave -noupdate -group LITE_MEM /top/mem_intf/axil_mon_cb/ARESETn
-add wave -noupdate -group LITE_MEM /top/mem_intf/axil_mon_cb/axil_mon_cb_event
 add wave -noupdate -group LITE_INTC /top/lite_intc_if/ACLK
 add wave -noupdate -group LITE_INTC /top/lite_intc_if/ARESETn
 add wave -noupdate -group LITE_INTC /top/lite_intc_if/AWADDR
@@ -328,7 +323,6 @@ add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_drv_cb/WDATA
 add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_drv_cb/AWREADY
 add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_drv_cb/AWVALID
 add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_drv_cb/AWADDR
-add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_drv_cb/axi4_lite_drv_cb_event
 add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_mon_cb/RREADY
 add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_mon_cb/RVALID
 add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_mon_cb/RRESP
@@ -346,7 +340,6 @@ add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_mon_cb/WDATA
 add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_mon_cb/AWREADY
 add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_mon_cb/AWVALID
 add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_mon_cb/AWADDR
-add wave -noupdate -group LITE_INTC /top/lite_intc_if/axil_mon_cb/axi4_lite_mon_cb_event
 add wave -noupdate -group cdma_introut /top/dut/IPS_CORE/cdma_introut_0
 add wave -noupdate -group INTC /top/intc_if/intc_procss_clk
 add wave -noupdate -group INTC /top/intc_if/intc_procss_rst
@@ -354,10 +347,8 @@ add wave -noupdate -group INTC /top/intc_if/intc_intr
 add wave -noupdate -group INTC /top/intc_if/intc_irq
 add wave -noupdate -group INTC /top/intc_if/intc_interface_driver_cb/intc_irq
 add wave -noupdate -group INTC /top/intc_if/intc_interface_driver_cb/intc_intr
-add wave -noupdate -group INTC /top/intc_if/intc_interface_driver_cb/intc_interface_driver_cb_event
 add wave -noupdate -group INTC /top/intc_if/intc_interface_monitor_cb/intc_irq
 add wave -noupdate -group INTC /top/intc_if/intc_interface_monitor_cb/intc_intr
-add wave -noupdate -group INTC /top/intc_if/intc_interface_monitor_cb/intc_interface_monitor_cb_event
 add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/aclk
 add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/areset_n
 add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/awid
@@ -439,7 +430,6 @@ add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_drv_cb/awid
 add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_drv_cb/awcache
 add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_drv_cb/awburst
 add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_drv_cb/awaddr
-add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_drv_cb/mas_drv_cb_event
 add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_mon_cb/arcache
 add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_mon_cb/arregion
 add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_mon_cb/arqos
@@ -479,11 +469,9 @@ add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_mon_cb/awburst
 add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_mon_cb/awlen
 add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_mon_cb/awaddr
 add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_mon_cb/awid
-add wave -noupdate -group CDMA_REG /top/cdma_reg_intf/mas_mon_cb/mas_mon_cb_event
 add wave -noupdate -group cdma_intr /top/cdma_interrupt_intf/aclk
 add wave -noupdate -group cdma_intr /top/cdma_interrupt_intf/interrupt_out
 add wave -noupdate -group cdma_intr /top/cdma_interrupt_intf/int_mon_cb/interrupt_out
-add wave -noupdate -group cdma_intr /top/cdma_interrupt_intf/int_mon_cb/int_mon_cb_event
 add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/aclk
 add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/areset_n
 add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/awid
@@ -564,7 +552,6 @@ add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_drv_cb/arlen
 add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_drv_cb/arcache
 add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_drv_cb/arburst
 add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_drv_cb/araddr
-add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_drv_cb/slv_drv_cb_event
 add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_mon_cb/awcache
 add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_mon_cb/awregion
 add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_mon_cb/awqos
@@ -604,7 +591,6 @@ add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_mon_cb/arburst
 add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_mon_cb/arlen
 add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_mon_cb/araddr
 add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_mon_cb/arid
-add wave -noupdate -group CDMA_DM /top/cdma_data_mov_intf/slv_mon_cb/slv_mon_cb_event
 add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/aclk
 add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/areset_n
 add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/awid
@@ -685,7 +671,6 @@ add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_drv_cb/arlen
 add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_drv_cb/arcache
 add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_drv_cb/arburst
 add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_drv_cb/araddr
-add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_drv_cb/slv_drv_cb_event
 add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_mon_cb/awcache
 add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_mon_cb/awregion
 add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_mon_cb/awqos
@@ -725,7 +710,14 @@ add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_mon_cb/arburst
 add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_mon_cb/arlen
 add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_mon_cb/araddr
 add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_mon_cb/arid
-add wave -noupdate -group CDMA_SG /top/cdma_sg_intf/slv_mon_cb/slv_mon_cb_event
+add wave -noupdate -group UART_TB {/top/uart_if/*}
+add wave -noupdate -group SPI_TB {/top/spi_if/*}
+add wave -noupdate -group GPIO_TB {/top/gpio_if/*}
+add wave -noupdate -group UART_RTL {/top/dut/CORE_PERIF_CTRL/u_uart/*}
+add wave -noupdate -group SPI_RTL {/top/dut/CORE_PERIF_CTRL/u_spi/*}
+add wave -noupdate -group GPIO_RTL {/top/dut/CORE_PERIF_CTRL/u_gpio/*}
+add wave -noupdate -group TIMER_RTL {/top/dut/CORE_PERIF_CTRL/u_timer/*}
+add wave -noupdate -group INTC_RTL {/top/dut/CORE_PERIF_CTRL/u_intc/*}
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {608543 ps} 0}
 quietly wave cursor active 1

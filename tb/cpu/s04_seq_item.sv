@@ -85,6 +85,12 @@ class s04_seq_item extends axi_base_sequence_item;
         }
     }
 
+    constraint c_bresp {
+        if(operation == WRITE){
+            BRESP   ==  OKAY;
+        }
+    }
+
     constraint c_axi_size {
         if (operation == WRITE) {
             AWSIZE == 3'b010;
