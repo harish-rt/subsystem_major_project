@@ -1,11 +1,14 @@
-echo "--- Compiling Xilinx IPs ---"
+echo "--- Compiling_XP ---"
+source compilexp.do
+
+echo "--- Compiling_Xilinx_IPs ---"
 source compilexilinx.do
 
-echo "--- Compiling Peripheral IPs ---"
+echo "--- Compiling_Peripheral_IPs ---"
 source compileperi.do
 
-echo "--- Compiling Testbench and Top Level ---"
+echo "--- Compiling_Testbench_and_Top_Level ---"
 source compiletb.do
 
-#echo "--- Elaborating Design and Printing Topology ---"
+#echo "--- Elaborating_Design_and_Printing_Topology ---"
 #vsim -c top glbl

@@ -1,3 +1,4 @@
+//class base_s04_sequence extends uvm_sequence#(axi_base_sequence_item);
 class base_s04_sequence extends uvm_sequence#(s04_seq_item);
     `uvm_object_utils(base_s04_sequence)
     `NEW_OBJ
@@ -35,6 +36,7 @@ class base_s04_sequence extends uvm_sequence#(s04_seq_item);
     task body ();
         `uvm_info(get_full_name(),"inside base_s04_sequence body", UVM_LOW)
 
+        //pkt = axi_base_sequence_item::type_id::create("pkt");
         pkt = s04_seq_item::type_id::create("pkt");
     endtask
 
@@ -47,7 +49,7 @@ class base_s04_sequence extends uvm_sequence#(s04_seq_item);
                 WDATA[0]    == data;
             }
             WSTRB[0]    == 'hf;
-            write   == WRITE;
+            operation   == WRITE;
         })begin
             `uvm_fatal("REG_ACCESS", "write_reg randomization failed!")        
         end
@@ -60,13 +62,15 @@ class base_s04_sequence extends uvm_sequence#(s04_seq_item);
         start_item(r_pkt);
         if(!r_pkt.randomize() with {
             ARADDR      == reg_addr;
-            write   == READ;
+            operation   == READ;
         })begin
             `uvm_fatal("REG_ACCESS", "read_reg randomization failed!")        
         end
         finish_item(r_pkt);
         get_response(r_pkt);
-        data            = r_pkt.RDATA;
+        foreach(r_pkt.RDATA[i])begin
+            data    = r_pkt.RDATA[i];
+        end
     endtask
 endclass : base_s04_sequence
 
@@ -79,15 +83,17 @@ class load_bram_256_seq extends base_s04_sequence;
         start_item(pkt);
         if(!pkt.randomize() with{
             AWADDR  == 'h7100_0100;
-            AWLEN   == 'hf;
+            AWLEN   == 'h3;
             AWBURST == INCR;
-            AWID    == 'h2;
-            write   == WRITE;
+            //AWID    == 'h4;
+            AWCACHE == 'h0;
+            AWQOS   == 'h0;
+            operation   == WRITE;
             }) begin
             `uvm_error(get_full_name(), "randomization_failed")
         end
         finish_item(pkt);
-        //get_response(pkt);
+        get_response(pkt);
     endtask
 endclass : load_bram_256_seq
 
@@ -100,14 +106,51 @@ class read_bram_256_seq extends base_s04_sequence;
         start_item(pkt);
         if(!pkt.randomize() with{
             ARADDR  == 'h7100_0100;
-            ARLEN   == 'h7;
+            ARLEN   == 'h0;
             ARBURST == INCR;
             ARID    == 'h1;
-            write   == READ;
+            operation   == READ;
             }) begin
             `uvm_error(get_full_name(), "randomization_failed")
         end
         finish_item(pkt);
-        //get_response(pkt);
+        get_response(pkt);
     endtask
 endclass : read_bram_256_seq
+
+
+class load_mem_seq extends base_s04_sequence;
+    `uvm_object_utils(load_mem_seq)
+    `NEW_OBJ
+
+    rand bit [31:0] addr;
+    rand bit [7:0]  len;
+    rand bit [1:0]  burst;
+    rand bit        is_write;
+
+    constraint default_config_c {
+        soft addr inside {[LITE_MEM_BASE : LITE_MEM_BASE+'h1000]};
+        soft len        == 8'hf;
+        soft burst      == INCR;
+        soft is_write   == 1'b1;
+    }
+
+    task body();
+        super.body();
+        
+        `uvm_info(get_type_name(), $sformatf("Driving stress pkt: ADDR=0x%0h, LEN=0x%0h", addr, len), UVM_LOW)
+
+        start_item(pkt);
+            if(!pkt.randomize() with {
+                AWADDR      == local::addr;
+                AWLEN       == local::len;
+                AWBURST     == local::burst;
+                AWID        != 0;
+                operation   == (local::is_write ? WRITE : READ); 
+            }) begin
+                `uvm_error(get_full_name(), "load_mem_seq randomization failed")
+            end
+        finish_item(pkt);
+        get_response(pkt);
+    endtask
+endclass : load_mem_seq

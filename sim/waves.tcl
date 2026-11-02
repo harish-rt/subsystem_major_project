@@ -1,6 +1,8 @@
 #view wave -title ss_waves
 #view wave -title riscv_axi
 do ./waves/riscv_waves.do
+#view wave -title s04_intf
+do ./waves/s04_intf.do
 #view wave -title bram_mem
 do ./waves/bram_mem.do
 #view wave -title lite_mem
@@ -17,8 +19,6 @@ do ./waves/cdma_sg.do
 do ./waves/cdma_intr.do
 #view wave -title intc
 do ./waves/intc.do
-#view wave -title s04_intf
-do ./waves/s04_intf.do
 #view wave -title uart_intf
 do ./waves/uart_intf.do
 #view wave -title gpio_intf

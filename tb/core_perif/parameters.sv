@@ -14,7 +14,7 @@ typedef logic [3:0]       qos_t;
 typedef logic [0:0]       lock_t;
 typedef enum {FIXED,INCR,WRAP}              burst_type_t;
 typedef enum {OKAY,EXOKAY,SLVERR,DECERR}    response_t;
-typedef enum {WRITE,READ}                   command_t;
+typedef enum {READ,WRITE}                   command_t;
 typedef int  delay_t;
 typedef enum {NO_RESET,RESET_ASSERTED,RESET_DEASSERTED}    reset_info_t;
 typedef enum {s0,s1,s2,s3}    slave_type;

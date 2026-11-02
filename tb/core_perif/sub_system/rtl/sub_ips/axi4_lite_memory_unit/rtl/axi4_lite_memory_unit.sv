@@ -6,7 +6,7 @@ parameter           AXI_SW         = AXI_DW >> 3 , // strobe width - 1 bit for e
 parameter           MEM_BASE_ADDR  = 'h800     	 , //base address for this mem
 parameter           MEM_BYTES      = 20     	   //2**MEM_BYTES will be the address space for this mem(with base address)
 )
-(axi4_lite_intf s_axi_intf);
+(axi4_lite_tb_intf s_axi_intf);
 //read/write channel reg signals
 reg                  sys_ack_wr_i    ;  //!< system wr acknowledge signal.
 reg                  sys_ack_rd_i    ;  //!< system rd acknowledge signal.

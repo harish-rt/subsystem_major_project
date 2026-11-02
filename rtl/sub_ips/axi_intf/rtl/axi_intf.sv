@@ -1,21 +1,21 @@
 //default param config to AXI
 interface axi4_intf();
-   parameter ADDR_WIDTH 	= 32	;
-   parameter DATA_WIDTH 	= 32	;
-   parameter ID_WIDTH 		= 4	;
+   parameter ADDR_WIDTH 	    = 32;
+   parameter DATA_WIDTH 	    = 32;
+   parameter ID_WIDTH 		    = 4	;
    parameter USER_SIGNAL_WIDTH 	= 8	;
 
    //Global signals
-   wire			ACLK	;
-   wire 			ARESETn	;
+   wire			            ACLK	;
+   wire 		            ARESETn	;
 
    //Read address channel signals
    wire [ID_WIDTH-1:0]		ARID	;
    wire [ADDR_WIDTH-1:0]	ARADDR	;
    wire [7:0]			    ARLEN	;
    wire [2:0]			    ARSIZE	;
-   wire [1:0]  		    ARBURST	;
-   wire			        ARVALID	;
+   wire [1:0]  		        ARBURST	;
+   wire			            ARVALID	;
    wire 			        ARREADY	;
    wire [3:0] 			    ARCACHE	;
    wire 			        ARLOCK	;
@@ -29,7 +29,7 @@ interface axi4_intf();
    wire [ADDR_WIDTH-1:0]	AWADDR	;
    wire [7:0]			    AWLEN	;
    wire [2:0]			    AWSIZE	;
-   wire [1:0]  		    AWBURST	;
+   wire [1:0]  		        AWBURST	;
    wire  			        AWVALID	;
    wire  			        AWREADY	;
    wire [3:0] 			    AWCACHE	;
@@ -43,7 +43,7 @@ interface axi4_intf();
    wire [ID_WIDTH-1:0]		BID	;
    wire [1:0]			    BRESP	;
    wire 			        BVALID	;
-   wire			        BREADY	;
+   wire			            BREADY	;
    wire [USER_SIGNAL_WIDTH-1:0]BUSER	;
    
    //Read data channel signals
@@ -57,7 +57,7 @@ interface axi4_intf();
 
    //Write data channel signals
    wire [DATA_WIDTH-1:0]	WDATA	;
-   wire [DATA_WIDTH>>3-1:0]WSTRB	;
+   wire [DATA_WIDTH>>3-1:0] WSTRB	;
    wire 			        WLAST	;
    wire  			        WVALID	;
    wire  			        WREADY	;

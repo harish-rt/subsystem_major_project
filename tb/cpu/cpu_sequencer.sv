@@ -1,3 +1,4 @@
+//class cpu_sequencer extends uvm_sequencer #(axi_base_sequence_item,axi_base_sequence_item);
 class cpu_sequencer extends uvm_sequencer #(cpu_seq_item,cpu_seq_item);
    `uvm_component_utils (cpu_sequencer)
 

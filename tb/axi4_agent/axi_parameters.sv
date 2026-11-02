@@ -36,7 +36,7 @@ typedef logic [2:0]       prot_t;
 typedef logic [3:0]       qos_t;
 typedef logic [0:0]       lock_t;
 
-parameter ID_WIDTH = 7;
+parameter ID_WIDTH = 4;
 parameter ADDR_WIDTH = 32
 parameter BURST_LENGTH = 8;
 parameter BURST_SIZE = 3;
@@ -50,7 +50,7 @@ parameter QOS_WIDTH = 4;
 
 typedef enum {FIXED,INCR,WRAP}              burst_type_t;
 typedef enum {OKAY,EXOKAY,SLVERR,DECERR}    response_t;
-typedef enum {WRITE,READ}                   command_t;
+typedef enum {READ,WRITE}                   command_t;
 typedef int  delay_t;
 typedef enum {NO_RESET,RESET_ASSERTED,RESET_DEASSERTED}    reset_info_t;
 typedef enum bit {SIMPLE_DMA,SG_DMA}dma_mode_t;
