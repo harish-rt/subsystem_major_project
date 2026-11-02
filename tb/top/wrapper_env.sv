@@ -38,6 +38,7 @@ class wrapper_env extends uvm_env;
         vsqr.s04_sqr    =   c_env.s04_agt.sqr;
         vsqr.uart_sqr   =   cp_env.uart_agt.sequencer;
         vsqr.spi_sqr    =   cp_env.spi_agt.sequencer;
+        vsqr.gpio_sqr   =   cp_env.gpio_agt.sequencer;
         
         ips_env.intc_env.intc_agt.mon.resp_ap.connect(vsqr.intc_af.analysis_export);
 

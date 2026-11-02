@@ -9,6 +9,7 @@ class soc_virtual_sequencer extends uvm_sequencer;
     s04_sequencer               s04_sqr;
     uart_slave_sequencer        uart_sqr;
     spi_slave_sequencer         spi_sqr;
+    gpio_slave_sequencer        gpio_sqr;
 
    function new (string name = "soc_virtual_sequencer" , uvm_component parent);
       super.new(name,parent);

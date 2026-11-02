@@ -445,10 +445,14 @@ module top;
     assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
 
     initial begin
-        run_test("timer_reg_access_test");
+        run_test("s04_master_bram_4kb_test");
+        //run_test("s04_master_bram_test");             //run in Aldec
+        //run_test("s02_masters_load_bram_test");
+        //run_test("gpio_reg_access_test");
+        //run_test("timer_reg_access_test");
         //run_test("masters_load_lite_mem_test");
         //run_test("masters_load_bram_test");
-        //run_test("concurrent_diff_slaves_test");        //`SET_CPU_FORK_DISABLE(1) in test
+        //run_test("concurrent_diff_slaves_test");      //`SET_CPU_FORK_DISABLE(1) in test
         //run_test("intc_stress_lite_test");
         //run_test("intc_stress_test");
         //run_test("load_bram_256_test");               //find the interconnect issue from local

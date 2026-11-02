@@ -8,6 +8,7 @@ class base_cpu_sequence extends uvm_sequence#(cpu_seq_item);
     cpu_seq_item        pkt,w_pkt,r_pkt;
 
     bit [31:0]          reg_data;
+    bit [31:0]          bram_data;
     bit [31:0]          isr_data;
     bit [31:0]          ipr_data;
     bit [31:0]          c_ipr_data;
@@ -997,6 +998,34 @@ class load_mem_lite_seq extends base_cpu_sequence;
      endtask
 endclass : load_mem_lite_seq
 
+class read_mem_lite_seq extends base_cpu_sequence;
+    `uvm_object_utils(read_mem_lite_seq)
+    `NEW_OBJ
+
+    rand bit [31:0] addr;
+    rand int        beats = 1;
+
+    constraint default_config_c {
+        soft addr == LITE_MEM_BASE;
+        soft beats == 2;
+        beats inside {[1:1024]};
+    }
+
+    task body();
+        bit [31:0] current_addr;
+        super.body();
+
+        `uvm_info(get_type_name(), $sformatf("Starting Memory Read: Base ADDR=0x%0h, BEATS=%0d", addr, beats), UVM_LOW)
+
+        for (int i = 0; i < beats; i++) begin
+            current_addr = addr + (i * 4);
+            read_reg(current_addr,bram_data);
+        end
+
+        `uvm_info(get_type_name(), "End of Memory Read Sequence", UVM_LOW)
+    endtask
+endclass : read_mem_lite_seq
+
 class timer_reg_access_seq  extends base_cpu_sequence;
     `uvm_object_utils(timer_reg_access_seq)
     `NEW_OBJ
@@ -1015,5 +1044,71 @@ class timer_reg_access_seq  extends base_cpu_sequence;
         write_reg(TIMER_BASE + 'h14,'h6);        // timer_ctrl
         read_reg(TIMER_BASE + 'h1c,timer_data); // timer_curr
         `uvm_info("TIMER_SEQ", $sformatf("Timer current value = %0d", timer_data), UVM_LOW)
+    endtask
+endclass
+
+class gpio_reg_access_seq extends base_cpu_sequence;
+    `uvm_object_utils(gpio_reg_access_seq)
+    `NEW_OBJ
+
+    // Base addresses & offsets
+    localparam bit [31:0] GPIO_DIR_REG       = GPIO_BASE + 'h00;
+    localparam bit [31:0] GPIO_IN_REG        = GPIO_BASE + 'h04;
+    localparam bit [31:0] GPIO_OUT_REG       = GPIO_BASE + 'h08;
+    localparam bit [31:0] GPIO_MASK_REG      = GPIO_BASE + 'h14;
+    localparam bit [31:0] GPIO_CLR_REG       = GPIO_BASE + 'h1C;
+    localparam bit [31:0] GPIO_STATUS_REG    = GPIO_BASE + 'h20;
+    localparam bit [31:0] GPIO_LEVEL_REG     = GPIO_BASE + 'h24;
+    localparam bit [31:0] GPIO_MODE_REG      = GPIO_BASE + 'h28;
+
+    localparam bit [31:0] INTC_IER_REG       = IRQ_BASE  + 'h08;
+    localparam bit [31:0] INTC_IAR_REG       = IRQ_BASE  + 'h0C;
+    localparam bit [31:0] INTC_MER_REG       = IRQ_BASE  + 'h1C;
+
+    bit [31:0] rd_data;
+
+    task body();
+        super.body();
+
+        // 1. Config Interrupt Controller (u_intc)
+        `uvm_info("GPIO_SEQ", "Step 1: Enabling u_intc channel 3 (GPIO) and Master Enable", UVM_LOW)
+        write_reg(INTC_IER_REG, 'h4);       // Enable channel 3 for GPIO
+        write_reg(INTC_MER_REG, 32'h3);     // Master Enable ME
+
+        // 2. Config Direction of GPIO (Bit 0 as Output, Bit 1 as Input)
+        `uvm_info("GPIO_SEQ", "Step 2: Config GPIO Direction (Pin 0 = Out, Pin 1 = In)", UVM_LOW)
+        write_reg(GPIO_DIR_REG, 32'h0000_0001); // Bit 0 output ('1'), Bit 1 input ('0')
+
+        // 3. Config IRQ Enables in GPIO (Edge & Rising on Bit 1)
+        `uvm_info("GPIO_SEQ", "Step 3: Config GPIO IRQ (Pin 1 Edge-triggered, Rising)", UVM_LOW)
+        write_reg(GPIO_MODE_REG,  (1 << 1)); // Edge-sensitive mode
+        write_reg(GPIO_LEVEL_REG, (1 << 1)); // Rising-edge polarity
+        write_reg(GPIO_CLR_REG,   (1 << 1)); // Clear any residual flags
+        write_reg(GPIO_MASK_REG,  (1 << 1)); // Unmask interrupt for pin 1
+
+        // 4. I/O Test 1: Drive Bit 0 HIGH and verify Output
+        `uvm_info("GPIO_SEQ", "Step 4: Writing '1' to Pin 0 Output", UVM_LOW)
+        write_reg(GPIO_OUT_REG, 32'h0000_0001);
+        read_reg(GPIO_OUT_REG, rd_data);
+        `uvm_info("GPIO_SEQ", $sformatf("GPIO Output Readback = 0x%08x (Expect Bit 0 = 1)", rd_data), UVM_LOW)
+
+        // 5. Read Status Register 1
+        read_reg(GPIO_STATUS_REG, rd_data);
+        `uvm_info("GPIO_SEQ", $sformatf("Step 5: GPIO_INT_STATUS = 0x%08x", rd_data), UVM_LOW)
+        read_reg(GPIO_IN_REG, rd_data); // Read live input pin states
+        `uvm_info("GPIO_SEQ", $sformatf("Live GPIO_INPUT = 0x%08x", rd_data), UVM_LOW)
+
+        // 6. I/O Test 2: Drive Bit 0 LOW and verify Output
+        `uvm_info("GPIO_SEQ", "Step 6: Writing '0' to Pin 0 Output", UVM_LOW)
+        write_reg(GPIO_OUT_REG, 32'h0000_0000);
+        read_reg(GPIO_OUT_REG, rd_data);
+        `uvm_info("GPIO_SEQ", $sformatf("GPIO Output Readback = 0x%08x (Expect Bit 0 = 0)", rd_data), UVM_LOW)
+
+        // 7. Read Status Register 2
+        read_reg(GPIO_STATUS_REG, rd_data);
+        `uvm_info("GPIO_SEQ", $sformatf("Step 7: GPIO_INT_STATUS = 0x%08x", rd_data), UVM_LOW)
+        read_reg(GPIO_IN_REG, rd_data);
+        `uvm_info("GPIO_SEQ", $sformatf("Live GPIO_INPUT = 0x%08x", rd_data), UVM_LOW)
+
     endtask
 endclass

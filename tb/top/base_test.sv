@@ -502,3 +502,23 @@ class timer_reg_access_test extends cpu_base_test;
         phase.drop_objection(this);
     endtask
 endclass
+
+class gpio_reg_access_test extends cpu_base_test;
+    `uvm_component_utils(gpio_reg_access_test)
+    `NEW_COMP
+
+    gpio_reg_access_vseq    gpio_seq;
+
+    task main_phase(uvm_phase phase);
+        `SET_S00_FORK_DISABLE(1);
+        gpio_seq = gpio_reg_access_vseq::type_id::create("gpio_seq");
+        phase.raise_objection(this);
+            gpio_seq.start(w_env.vsqr);
+        phase.phase_done.set_drain_time(this,3000ns);
+        phase.drop_objection(this);
+    endtask
+endclass : gpio_reg_access_test
+
+`GAPS_TEST(s02_masters_load_bram_test, s02_masters_load_bram_vseq,0)
+`GAPS_TEST(s04_master_bram_test, s04_master_bram_vseq,0)
+`GAPS_TEST(s04_master_bram_4kb_test, s04_master_bram_4kb_vseq,0)

@@ -569,3 +569,100 @@ class timer_reg_access_vseq extends soc_base_virtual_sequence;
         isr_clear();
     endtask
 endclass
+
+class gpio_reg_access_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(gpio_reg_access_vseq)
+    `NEW_OBJ
+
+    gpio_reg_access_seq         m_gpio_seq;
+    gpio_slave_responder_seq    s_gpio_seq;
+    cpu_config_intc_seq         intc_seq;   // s02
+    cpu_isr_vseq                isr_vseq;   // s00
+
+    task body();
+        m_gpio_seq = gpio_reg_access_seq::type_id::create("m_gpio_seq");
+        s_gpio_seq = gpio_slave_responder_seq::type_id::create("s_gpio_seq");
+        intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
+        intc_seq.core_en = 1;
+
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+        fork
+            intc_seq.start(p_sequencer.s02_sqr);
+            m_gpio_seq.start(p_sequencer.s00_sqr);
+            s_gpio_seq.start(p_sequencer.gpio_sqr);
+        join
+        isr_clear();
+    endtask
+endclass : gpio_reg_access_vseq
+
+
+class s02_masters_load_bram_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(s02_masters_load_bram_vseq)
+    `NEW_OBJ
+
+    load_mem_lite_seq       w_s02_seq;    // s02
+    read_mem_lite_seq       r_s02_seq;    // s02
+
+    task body();
+        w_s02_seq  = load_mem_lite_seq::type_id::create("w_s02_seq");
+        r_s02_seq  = read_mem_lite_seq::type_id::create("r_s02_seq");
+
+        assert(w_s02_seq.randomize() with {
+            //addr    == {BRAM_END-'d3};
+            addr    == {BRAM_BASE};
+            beats   == 10;
+        });
+        assert(r_s02_seq.randomize() with {
+            //addr    == {BRAM_END-'d3};
+            addr    == {BRAM_BASE};
+            beats   == 10;
+        });
+        w_s02_seq.start(p_sequencer.s02_sqr);
+        r_s02_seq.start(p_sequencer.s02_sqr);
+    endtask
+endclass : s02_masters_load_bram_vseq
+
+class s04_master_bram_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(s04_master_bram_vseq)
+    `NEW_OBJ
+
+    load_mem_seq            s04_seq;
+
+    task body();
+        s04_seq = load_mem_seq::type_id::create("s04_seq");
+
+        forever begin
+            assert(s04_seq.randomize()with{
+                addr  == {BRAM_END - 'd3};
+                len   == 'hff;
+                burst == INCR;
+                is_write == 1;
+            });
+            s04_seq.start(p_sequencer.s04_sqr);
+        end
+    endtask
+endclass : s04_master_bram_vseq
+
+class s04_master_bram_4kb_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(s04_master_bram_4kb_vseq)
+    `NEW_OBJ
+
+    load_mem_seq s04_seq;
+
+    task body();
+        s04_seq = load_mem_seq::type_id::create("s04_seq");
+
+        assert(s04_seq.randomize() with {
+            addr     == (BRAM_BASE + 'hFFC);
+            len      == 'h1;
+            burst    == INCR;
+            is_write == 1;
+        });
+
+        s04_seq.start(p_sequencer.s04_sqr);
+
+    endtask
+endclass : s04_master_bram_4kb_vseq

@@ -7,7 +7,7 @@ class bram_monitor extends uvm_monitor;
 	//virtual axi4_tb_intf.MONITOR_MOD            bram_if;
    mailbox #(bram_seq_item)  write_address_mbx ,write_data_mbx;      //to capture transactions on write address channel // Preserve ordering
    mailbox #(bram_seq_item) wresp_array [id_t];    //associative array of mailboxes. Will hold packets waiting for write response.Mailboxes will preserve ordering based on ID.
-   mailbox #(bram_seq_item) read_address_array [id_t];
+   mailbox #(bram_seq_item) read_address_array[id_t];
    mailbox #(bram_seq_item) read_data_array[id_t];
 
    extern task main_phase (uvm_phase phase);
