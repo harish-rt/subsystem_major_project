@@ -657,7 +657,7 @@ class s04_master_bram_4kb_vseq extends soc_base_virtual_sequence;
 
         assert(s04_seq.randomize() with {
             addr     == (BRAM_BASE + 'hFFC);
-            len      == 'h1;
+            len      == 'hf;
             burst    == INCR;
             is_write == 1;
         });

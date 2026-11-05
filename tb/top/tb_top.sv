@@ -445,9 +445,9 @@ module top;
     assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
 
     initial begin
-        run_test("s04_master_bram_4kb_test");
+        //run_test("s04_master_bram_4kb_test");
         //run_test("s04_master_bram_test");             //run in Aldec
-        //run_test("s02_masters_load_bram_test");
+        run_test("s02_masters_load_bram_test");
         //run_test("gpio_reg_access_test");
         //run_test("timer_reg_access_test");
         //run_test("masters_load_lite_mem_test");
