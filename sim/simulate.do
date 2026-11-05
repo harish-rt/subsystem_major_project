@@ -54,7 +54,6 @@ run -all
 
 
 #add wave -recursive /top/dut/IPS_CORE/cdma_introut_0
-#add wave -recursive /top/dut/IPS_CORE/axi_interconnect_0_M02_AXI_*
 #add wave -recursive /top/dut2/*
 #add wave -recursive /top/dut/IPS_CORE/intr*
 #add wave -recursive /top/dut/IPS_CORE/*irq

@@ -1,271 +1,213 @@
-//==========================================================
-// File        : axi_memory_slave.sv
-// Author      : Raveem
-// Created     : 2026-03-08
-// Description : RTL of the AXI memory slave
-//==========================================================
-
-module axi_memory_slave #(
-    parameter ADDR_WIDTH = 32,
-    parameter DATA_WIDTH = 32,
-    parameter ID_WIDTH   = 4,
-    parameter MEM_DEPTH  = 1024
+// -----------------------------------------------------------------------------
+// axi4_memory_unit
+// Simple AXI4 (full) slave memory model / RTL.
+//  - Independent read and write FSMs (concurrent read + write supported)
+//  - FIXED / INCR / WRAP bursts, any AxLEN (0..255), any AxSIZE <= bus width
+//  - Narrow and unaligned transfers handled via WSTRB / byte lanes
+//  - Out-of-window accesses return SLVERR (writes are dropped)
+//  - One outstanding transaction per channel (AWREADY/ARREADY low while busy)
+//  - Optional preload with $readmemh (INIT_FILE)
+// Expects interface signals: ACLK, ARESETn,
+//   AW{ID,ADDR,LEN,SIZE,BURST,VALID,READY}, W{DATA,STRB,LAST,VALID,READY},
+//   B{ID,RESP,VALID,READY}, AR{ID,ADDR,LEN,SIZE,BURST,VALID,READY},
+//   R{ID,DATA,RESP,LAST,VALID,READY}
+// -----------------------------------------------------------------------------
+module axi4_memory_unit #(
+    parameter                 AXI_ID_WIDTH  = 7,
+    parameter                 AXI_AW        = 32,
+    parameter                 AXI_DW        = 32,
+    parameter                 AXI_SW        = AXI_DW/8,
+    parameter                 MEM_ADDR_BITS = 20,            // memory size = 2**MEM_ADDR_BITS bytes
+    parameter [AXI_AW-1:0]    MEM_BASE      = 32'hC000_0000,
+    parameter                 INIT_FILE     = ""             // optional $readmemh file (byte per line)
 )(
-    axi4_intf axi4_mem
+    axi4_intf s_axi4_intf
 );
-    //---------- Internal signals ----------    
-    logic [ADDR_WIDTH-1: 0] waddr_index, raddr_index;
-    logic [ID_WIDTH-1:0]    awid_reg, ARID_reg;
-    logic [7:0]   awlen_reg;
-    logic [3:0]   wstrb_reg;
-    logic [2:0]   awsize_reg;
 
-    //========== Internal Memory ==========
-    logic [DATA_WIDTH-1:0] mem [0:MEM_DEPTH-1];
+    localparam integer LSB       = $clog2(AXI_SW);
+    localparam integer MEM_DEPTH = 1 << MEM_ADDR_BITS;
+
+    localparam [1:0] BURST_FIXED = 2'b00, BURST_INCR = 2'b01, BURST_WRAP = 2'b10;
+    localparam [1:0] RESP_OKAY   = 2'b00, RESP_SLVERR = 2'b10;
+
+    // Byte-addressable memory
+    logic [7:0] mem [0:MEM_DEPTH-1];
 
     initial begin
-        for (int i=0; i<MEM_DEPTH; ++i) begin
-            mem[i] = 0; // initialize memory
-        end
+        for (int k = 0; k < MEM_DEPTH; k++) mem[k] = 8'h00;
+        if (INIT_FILE != "") $readmemh(INIT_FILE, mem);
     end
 
-    //========== initialization ==========
-    //initial begin
-    //    axi4_mem.ARREADY = 0;
-    //    axi4_mem.RVALID  = 0;
-    //    axi4_mem.RDATA   = 0;
-    //    axi4_mem.RID     = 0;
-    //    axi4_mem.RRESP   = 0;
-    //    axi4_mem.RLAST   = 0;
-    //
-    //    axi4_mem.AWREADY = 0;
-    //    axi4_mem.WREADY  = 0;
-    //    axi4_mem.BVALID  = 0;
-    //    axi4_mem.BID     = 0;
-    //    axi4_mem.BRESP   = 0;
-    //end
+    // -------------------------------------------------------------------------
+    // Helper functions
+    // -------------------------------------------------------------------------
+    function automatic logic in_range(input logic [AXI_AW-1:0] a);
+        return (a >= MEM_BASE) && ((a - MEM_BASE) < MEM_DEPTH);
+    endfunction
 
-    //========== Write FSM ==========
+    // Memory index of the bus-width-aligned word containing address a
+    function automatic logic [MEM_ADDR_BITS-1:0] bus_base(input logic [AXI_AW-1:0] a);
+        logic [AXI_AW-1:0] off;
+        off = (a - MEM_BASE) & ({AXI_AW{1'b1}} << LSB);
+        return off[MEM_ADDR_BITS-1:0];
+    endfunction
 
-    typedef enum {
-        W_IDLE,
-        W_DATA,
-        W_RESP
-    } wstate_t;
-
-    wstate_t wstate, next_wstate;
-
-    //---------- state register logic ----------
-    always @(posedge axi4_mem.ACLK or negedge axi4_mem.ARESETn) begin
-        if (!axi4_mem.ARESETn) begin
-            wstate <= W_IDLE;
-        end else begin
-            wstate <= next_wstate;
-        end
-    end
-    
-    //---------- next state logic ----------
-    always @(posedge axi4_mem.ACLK) begin
-
-        next_wstate = wstate;
-
-        case (wstate)
-            W_IDLE : begin
-                if (axi4_mem.AWVALID && axi4_mem.AWREADY)
-                    next_wstate = W_DATA;
+    // Next beat address (AXI4 spec A3.4.1)
+    function automatic logic [AXI_AW-1:0] next_addr(
+        input logic [AXI_AW-1:0] addr,
+        input logic [7:0]        len,
+        input logic [2:0]        size,
+        input logic [1:0]        burst);
+        logic [AXI_AW-1:0] nb, aligned, inc, wmask;
+        nb      = AXI_AW'(1) << size;
+        aligned = addr & ~(nb - 1);
+        inc     = aligned + nb;
+        case (burst)
+            BURST_FIXED: return addr;
+            BURST_WRAP : begin
+                wmask = (nb * (AXI_AW'(len) + 1)) - 1;      // total bytes - 1 (power of 2)
+                return (addr & ~wmask) | (inc & wmask);
             end
-
-            W_DATA : begin
-                if (axi4_mem.WLAST && axi4_mem.WVALID && axi4_mem.WREADY)
-                    next_wstate = W_RESP;
-            end
-
-            W_RESP : begin
-                if (axi4_mem.BREADY && axi4_mem.BVALID)
-                    next_wstate = W_IDLE;
-            end
+            default    : return inc;
         endcase
-    end
+    endfunction
 
-    //---------- Output logic ----------
-    logic [31:0] curr_word;
-    logic [1:0] bresp_reg;
-    logic [7:0] wbeat_count;
+    // -------------------------------------------------------------------------
+    // Write channel
+    // -------------------------------------------------------------------------
+    typedef enum logic [1:0] {W_IDLE, W_DATA, W_RESP} w_state_t;
+    w_state_t                w_state;
+    logic [AXI_AW-1:0]       w_addr;
+    logic [7:0]              w_len;
+    logic [2:0]              w_size;
+    logic [1:0]              w_burst;
+    logic [AXI_ID_WIDTH-1:0] w_id;
+    logic                    w_err;
 
-    always @(posedge axi4_mem.ACLK or negedge axi4_mem.ARESETn) begin
-        if (!axi4_mem.ARESETn) begin
+    assign s_axi4_intf.AWREADY = (w_state == W_IDLE);
+    assign s_axi4_intf.WREADY  = (w_state == W_DATA);
+    assign s_axi4_intf.BVALID  = (w_state == W_RESP);
+    assign s_axi4_intf.BID     = w_id;
+    assign s_axi4_intf.BRESP   = w_err ? RESP_SLVERR : RESP_OKAY;
 
-            axi4_mem.AWREADY <= 0;
-            axi4_mem.WREADY  <= 0;
-            axi4_mem.BVALID  <= 0;
-            axi4_mem.BID     <= 0;
-            axi4_mem.BRESP   <= 0;
-        end
-        else begin
-            case (wstate)
-                W_IDLE  : begin
-                    axi4_mem.AWREADY <= 1;
-                    axi4_mem.WREADY  <= 0;
-                    axi4_mem.BVALID  <= 0;
-                    wbeat_count <= 0;
-                    if (axi4_mem.AWVALID && axi4_mem.AWREADY) begin
-                        waddr_index <= axi4_mem.AWADDR >> 2;
-                        awid_reg    <= axi4_mem.AWID;
-                        awlen_reg   <= axi4_mem.AWLEN;
-                        awsize_reg  <= axi4_mem.AWSIZE;
-                        bresp_reg   <= (axi4_mem.AWADDR < MEM_DEPTH * 4) ? 2'b00 : 2'b10;    // RESP OKAY -> 00, SLVERR -> 10
-                    end
-                end
-                
-                W_DATA  : begin
-                    axi4_mem.AWREADY <= 0;
-                    axi4_mem.WREADY  <= 1;
-                    axi4_mem.BVALID  <= 0;
-                    if (axi4_mem.WVALID && axi4_mem.WREADY) begin
-                        curr_word = mem[waddr_index];
+    wire                       w_beat   = (w_state == W_DATA) && s_axi4_intf.WVALID;
+    wire                       w_ok     = in_range(w_addr);
+    wire [MEM_ADDR_BITS-1:0]   w_base   = bus_base(w_addr);
 
-                        for (int i=0; i<4; ++i) begin
-                            if (axi4_mem.WSTRB[i])
-                                curr_word[8*i +: 8]  = axi4_mem.WDATA[8*i +: 8];
-                        end
-                        mem[waddr_index] <= curr_word;
-                        
-                        // $display("%t WRITE addr=%0h data=%h strb=%b result=%h WLAST=%0b wbeat_count=%0d / AWLEN=%0d",
-                        //         $time, waddr_index, axi4_mem.WDATA, axi4_mem.WSTRB, curr_word, axi4_mem.WLAST, wbeat_count, awlen_reg);
-                        
-                        waddr_index <= waddr_index + 1;
-                        wbeat_count <= wbeat_count + 1;
-                    end
-                end
-
-                W_RESP  : begin
-                    axi4_mem.AWREADY <= 0;
-                    axi4_mem.WREADY  <= 0;
-                    axi4_mem.BVALID  <= 1;
-                    axi4_mem.BID     <= awid_reg;
-                    axi4_mem.BRESP   <= bresp_reg;
-                end
-
-            endcase
-        end 
-    end
-
-    // gated log
-    // always @(posedge axi4_mem.ACLK or negedge axi4_mem.ARESETn) begin
-    //     $display("%t [DUT-I/f] %s AWREADY=%0d AWVALID=%0b AWADDR=%0h AWID=%0h", $time, wstate.name(), axi4_mem.AWREADY, axi4_mem.AWVALID, axi4_mem.AWADDR, axi4_mem.AWID);
-    //     $display("%t [DUT-I/f] %s WREADY=%0d WVALID=%0b WDATA=%0h WSTRB=%0d WLAST=%0b", $time, wstate.name(), axi4_mem.WREADY, axi4_mem.WVALID, axi4_mem.WDATA, axi4_mem.WSTRB, axi4_mem.WLAST);
-    //     $display("%t [DUT] %s BVALID=%0b BRESP=%0d BID=%0h", $time, wstate.name(), axi4_mem.BVALID, axi4_mem.BRESP, axi4_mem.BID);
-    //     // $display("address AWADDR=%0h waddr_reg=%0h", axi4_mem.AWADDR, addr_index);
-    //     // $strobe("%t mem[%0h] = %h", $time, addr_index-1, mem[addr_index-1]);
-    // end
-
-    //========== Read FSM ==========
-
-    logic [7:0] ARLEN_reg, rbeat_count;
-    logic [31:0] mem_data;
-
-    typedef enum {
-        R_IDLE,
-        R_DATA
-    } rstate_t;
-
-    rstate_t rstate, next_rstate;
-
-    //---------- state register logic ----------
-    always @(posedge axi4_mem.ACLK or negedge axi4_mem.ARESETn) begin
-        if (!axi4_mem.ARESETn) begin
-            rstate <= R_IDLE;
+    always @(posedge s_axi4_intf.ACLK) begin
+        if (!s_axi4_intf.ARESETn) begin
+            w_state <= W_IDLE;
+            w_addr  <= '0;
+            w_len   <= '0;
+            w_size  <= '0;
+            w_burst <= BURST_INCR;
+            w_id    <= '0;
+            w_err   <= 1'b0;
         end else begin
-            rstate <= next_rstate;
-        end
-    end
-
-    //---------- next state logic ----------
-    always @(posedge axi4_mem.ACLK) begin
-        
-        next_rstate = rstate;
-
-        case (rstate)
-            R_IDLE  : begin
-                if (axi4_mem.ARVALID && axi4_mem.ARREADY) begin
-                    next_rstate = R_DATA;
-                end
-            end
-
-            R_DATA  : begin
-                if (axi4_mem.RLAST && axi4_mem.RVALID && axi4_mem.RREADY) begin
-                    next_rstate = R_IDLE;
-                end
-            end
-        endcase
-    end
-
-    //---------- Output logic ----------
-    logic [31:0] curr_data;
-
-    always @(posedge axi4_mem.ACLK or negedge axi4_mem.ARESETn) begin
-        if (!axi4_mem.ARESETn) begin
-            axi4_mem.ARREADY <= 0;
-            axi4_mem.RVALID  <= 0;
-            rbeat_count  <= 0;
-            axi4_mem.RLAST   <= 0;
-            axi4_mem.RDATA   <= 0;
-            axi4_mem.RID     <= 0;
-            axi4_mem.RRESP   <= 0;
-        end else begin
-            case (rstate)
-                R_IDLE: begin
-                    axi4_mem.ARREADY <= 1;
-                    axi4_mem.RVALID  <= 0;
-                    rbeat_count <= 0;
-                    axi4_mem.RLAST   <= 0;   
-                    if (axi4_mem.ARVALID && axi4_mem.ARREADY) begin
-                        raddr_index <= axi4_mem.ARADDR >> 2;
-                        ARID_reg    <= axi4_mem.ARID;    
-                        ARLEN_reg   <= axi4_mem.ARLEN;
-                        
-                    end
+            case (w_state)
+                W_IDLE: if (s_axi4_intf.AWVALID) begin
+                    w_addr  <= s_axi4_intf.AWADDR;
+                    w_len   <= s_axi4_intf.AWLEN;
+                    w_size  <= s_axi4_intf.AWSIZE;
+                    w_burst <= s_axi4_intf.AWBURST;
+                    w_id    <= s_axi4_intf.AWID;
+                    w_err   <= 1'b0;
+                    w_state <= W_DATA;
                 end
 
-                R_DATA: begin
-
-                    if (!axi4_mem.RVALID || axi4_mem.RREADY) begin
-                        curr_data = mem[raddr_index];
-
-                        axi4_mem.RDATA  <= curr_data;
-                        axi4_mem.RRESP  <= (curr_data !== 'x) ? 2'b00 : 2'b10;
-                        axi4_mem.RID    <= ARID_reg;
-                        axi4_mem.RLAST  <= (rbeat_count == ARLEN_reg);
-                        axi4_mem.RVALID <= 1;
-
-                        raddr_index <= raddr_index + 1;
-                        rbeat_count <= rbeat_count + 1;
-                    end
-                    // else HOLD when backpressure
-                    
+                W_DATA: if (s_axi4_intf.WVALID) begin
+                    if (!w_ok) w_err <= 1'b1;
+                    w_addr <= next_addr(w_addr, w_len, w_size, w_burst);
+                    if (s_axi4_intf.WLAST) w_state <= W_RESP;
                 end
+
+                W_RESP: if (s_axi4_intf.BREADY) w_state <= W_IDLE;
+
+                default: w_state <= W_IDLE;
             endcase
         end
     end
 
-    // assign axi4_mem.RDATA = mem_data;
+    // Memory write (no reset, kept separate from control FSM)
+    always @(posedge s_axi4_intf.ACLK) begin
+        if (w_beat && w_ok) begin
+            for (int b = 0; b < AXI_SW; b++) begin
+                if (s_axi4_intf.WSTRB[b])
+                    mem[w_base + b] <= s_axi4_intf.WDATA[b*8 +: 8];
+            end
+        end
+    end
 
-    // Log
-    // always @(posedge axi4_mem.ACLK or negedge axi4_mem.ARESETn) begin
-    //     // $display("%t [DUT] %s ARREADY=%0d ARVALID=%0b ARADDR=%0h ARID=%0h", $time, rstate.name(), axi4_mem.ARREADY, axi4_mem.ARVALID, axi4_mem.ARADDR, axi4_mem.ARID);
-    //     // $display("%t [DUT] %s RREADY=%0d RVALID=%0b RDATA=%0h RLAST=%0b", $time, rstate.name(), axi4_mem.RREADY, axi4_mem.RVALID, axi4_mem.RDATA, axi4_mem.RLAST);
-    //     // $display("%t [DUT] %s ARADDR=%0h raddr_index=%0h beat_count=%0d", $time, rstate.name(), axi4_mem.ARADDR, raddr_index, beat_count);
-        
-    //     if (rstate inside {R_IDLE, R_DATA}) begin
-    //         $display("%t [DUT] %s beat_count=%0d RLAST=%0b", $time, rstate.name(), beat_count, axi4_mem.RLAST);
-    //     end
-    // end
-    
-    //========== Assertions ==========
-    // WLAST burst counter validation
-    assert property (@(posedge axi4_mem.ACLK)
-        (wstate == W_DATA && axi4_mem.WVALID && axi4_mem.WREADY && axi4_mem.WLAST)
-        |-> (wbeat_count == awlen_reg)
-    ) else $error("%t [DUT] WLAST/AWLEN mismatch %0d != %0d", $time, wbeat_count, awlen_reg);
+    // -------------------------------------------------------------------------
+    // Read channel
+    // -------------------------------------------------------------------------
+    typedef enum logic {R_IDLE, R_DATA} r_state_t;
+    r_state_t                r_state;
+    logic [AXI_AW-1:0]       r_addr;
+    logic [7:0]              r_len;      // remaining beats - 1
+    logic [2:0]              r_size;
+    logic [1:0]              r_burst;
+    logic [7:0]              r_total_len;
+    logic [AXI_ID_WIDTH-1:0] r_id;
+
+    wire                     r_ok   = in_range(r_addr);
+    wire [MEM_ADDR_BITS-1:0] r_base = bus_base(r_addr);
+
+    logic [AXI_DW-1:0] rdata_c;
+    always @(posedge s_axi4_intf.ACLK) begin
+        rdata_c = '0;
+        if (r_ok) begin
+            for (int b = 0; b < AXI_SW; b++)
+                rdata_c[b*8 +: 8] = mem[r_base + b];
+        end
+    end
+
+    assign s_axi4_intf.ARREADY = (r_state == R_IDLE);
+    assign s_axi4_intf.RVALID  = (r_state == R_DATA);
+    assign s_axi4_intf.RID     = r_id;
+    assign s_axi4_intf.RDATA   = rdata_c;
+    assign s_axi4_intf.RRESP   = r_ok ? RESP_OKAY : RESP_SLVERR;
+    assign s_axi4_intf.RLAST   = (r_state == R_DATA) && (r_len == 8'd0);
+
+    always @(posedge s_axi4_intf.ACLK) begin
+        if (!s_axi4_intf.ARESETn) begin
+            r_state     <= R_IDLE;
+            r_addr      <= '0;
+            r_len       <= '0;
+            r_total_len <= '0;
+            r_size      <= '0;
+            r_burst     <= BURST_INCR;
+            r_id        <= '0;
+        end else begin
+            case (r_state)
+                R_IDLE: if (s_axi4_intf.ARVALID) begin
+                    r_addr      <= s_axi4_intf.ARADDR;
+                    r_len       <= s_axi4_intf.ARLEN;
+                    r_total_len <= s_axi4_intf.ARLEN;
+                    r_size      <= s_axi4_intf.ARSIZE;
+                    r_burst     <= s_axi4_intf.ARBURST;
+                    r_id        <= s_axi4_intf.ARID;
+                    r_state     <= R_DATA;
+                end
+
+                R_DATA: if (s_axi4_intf.RREADY) begin
+                    if (r_len == 8'd0) begin
+                        r_state <= R_IDLE;
+                    end else begin
+                        r_len  <= r_len - 8'd1;
+                        r_addr <= next_addr(r_addr, r_total_len, r_size, r_burst);
+                    end
+                end
+
+                default: r_state <= R_IDLE;
+            endcase
+        end
+    end
+
+    initial begin
+        $display("%m: AXI_ID_WIDTH=%0d  bits(AWID)=%0d bits(BID)=%0d bits(ARID)=%0d bits(RID)=%0d",AXI_ID_WIDTH, $bits(s_axi4_intf.AWID), $bits(s_axi4_intf.BID),$bits(s_axi4_intf.ARID), $bits(s_axi4_intf.RID));
+        if($bits(s_axi4_intf.BID) != AXI_ID_WIDTH || $bits(s_axi4_intf.AWID) != AXI_ID_WIDTH)
+            $error("ID width mismatch between module and interface");
+    end
 
 endmodule

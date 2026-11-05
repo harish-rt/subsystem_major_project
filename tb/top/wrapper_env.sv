@@ -42,16 +42,16 @@ class wrapper_env extends uvm_env;
         
         ips_env.intc_env.intc_agt.mon.resp_ap.connect(vsqr.intc_af.analysis_export);
 
-        //foreach(vsqr[i])begin
-        //    ips_env.intc_env.intc_agt.mon.resp_ap.connect(vsqr[i].intc_af.analysis_export);
-        //end
-
     // Scoreboard af connections with Monitor ap
         foreach(c_env.cpu_agt[i])begin
             c_env.cpu_agt[i].mon.mon_ap.connect(sbd.master_af[i].analysis_export);
         end
+        foreach(m_env.mem_agt.axi4_mon[i])begin
+            m_env.mem_agt.axi4_mon[i].mon_ap.connect(sbd.bram_af[i].analysis_export);
+        end
         c_env.s04_agt.mon.mon_ap.connect(sbd.s04_af.analysis_export);
-        m_env.mem_agt.bram_mon.mon_ap.connect(sbd.bram_af.analysis_export);
+        //m_env.mem_agt.axi4_mon[0].mon_ap.connect(sbd.bram_af.analysis_export);
+        //m_env.mem_agt.axi4_mon[1].mon_ap.connect(sbd.mem4_af.analysis_export);
         m_env.mem_agt.mem_mon.mon_ap.connect(sbd.mem_af.analysis_export);
         ips_env.cdma_env.m_agt[0].mon.mon_ap.connect(sbd.cdma_af.analysis_export);
         ips_env.intc_env.lite_intc_agt.mon.mon_ap.connect(sbd.intc_af.analysis_export);

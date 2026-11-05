@@ -1,4 +1,4 @@
-//class base_s04_sequence extends uvm_sequence#(axi_base_sequence_item);
+typedef enum {BRAM_M, LITE_M, AXI4_M} slave_t;
 class base_s04_sequence extends uvm_sequence#(s04_seq_item);
     `uvm_object_utils(base_s04_sequence)
     `NEW_OBJ
@@ -7,6 +7,8 @@ class base_s04_sequence extends uvm_sequence#(s04_seq_item);
     uvm_status_e        status;
     uvm_reg_data_t      tdata;
     s04_seq_item        pkt,w_pkt,r_pkt;
+    rand slave_t        slave;
+    bit                 wait_req;
 
     bit [31:0]          reg_data;
     bit [31:0]          isr_data;
@@ -82,8 +84,10 @@ class load_bram_256_seq extends base_s04_sequence;
         super.body();
         start_item(pkt);
         if(!pkt.randomize() with{
-            AWADDR  == 'h7100_0100;
-            AWLEN   == 'h3;
+            solve AWLEN before AWADDR;
+            AWLEN   == 'hff;
+            AWADDR  >= BRAM_BASE;
+            AWADDR  <= (BRAM_END - (AWLEN * 4));
             AWBURST == INCR;
             //AWID    == 'h4;
             AWCACHE == 'h0;
@@ -118,7 +122,6 @@ class read_bram_256_seq extends base_s04_sequence;
     endtask
 endclass : read_bram_256_seq
 
-
 class load_mem_seq extends base_s04_sequence;
     `uvm_object_utils(load_mem_seq)
     `NEW_OBJ
@@ -126,13 +129,26 @@ class load_mem_seq extends base_s04_sequence;
     rand bit [31:0] addr;
     rand bit [7:0]  len;
     rand bit [1:0]  burst;
-    rand bit        is_write;
+    rand bit [3:0]  aw_id;
 
     constraint default_config_c {
-        soft addr inside {[LITE_MEM_BASE : LITE_MEM_BASE+'h1000]};
-        soft len        == 8'hf;
-        soft burst      == INCR;
-        soft is_write   == 1'b1;
+        solve len before addr;
+
+        soft len inside {[1 : 56]};
+        if (slave == LITE_M) {
+            soft addr >= LITE_MEM_BASE;
+            soft addr <= LITE_MEM_END - (len * 4);
+        } 
+        else if (slave == BRAM_M) {
+            soft addr >= BRAM_BASE;
+            soft addr <= BRAM_END - (len * 4);
+        }
+        else if (slave == AXI4_M) {
+            soft addr >= AXI4_MEM_BASE;
+            soft addr <= AXI4_MEM_END - (len * 4);
+        }
+        soft burst == INCR;
+        soft aw_id inside {[1 : 15]};
     }
 
     task body();
@@ -145,12 +161,53 @@ class load_mem_seq extends base_s04_sequence;
                 AWADDR      == local::addr;
                 AWLEN       == local::len;
                 AWBURST     == local::burst;
-                AWID        != 0;
-                operation   == (local::is_write ? WRITE : READ); 
+                AWID        == aw_id;
+                AWCACHE     == 0;
+                operation   == WRITE; 
             }) begin
                 `uvm_error(get_full_name(), "load_mem_seq randomization failed")
             end
+            pkt.wait_req = wait_req;
         finish_item(pkt);
         get_response(pkt);
     endtask
 endclass : load_mem_seq
+
+class read_mem_seq extends base_s04_sequence;
+    `uvm_object_utils(read_mem_seq)
+    `NEW_OBJ
+
+    rand bit [31:0] addr;
+    rand bit [7:0]  len;
+    rand bit [1:0]  burst;
+    rand bit [3:0]  ar_id;
+    bit wait_req;
+
+    constraint default_config_c {
+        soft addr inside {[LITE_MEM_BASE : LITE_MEM_END]};
+        soft len        == 8'hf;
+        soft burst      == INCR;
+        soft ar_id inside {[1 : 15]};
+    }
+
+    task body();
+        super.body();
+        
+        `uvm_info(get_type_name(), $sformatf("Driving stress pkt: ADDR=0x%0h, LEN=0x%0h", addr, len), UVM_LOW)
+
+        start_item(pkt);
+            if(!pkt.randomize() with {
+                ARADDR      == local::addr;
+                ARLEN       == local::len;
+                ARBURST     == local::burst;
+                ARID        == ar_id;
+                ARCACHE     == 0;
+                operation   == READ; 
+            }) begin
+                `uvm_error(get_full_name(), "read_mem_seq randomization failed")
+            end
+            pkt.wait_req = wait_req;
+        finish_item(pkt);
+        get_response(pkt);
+    endtask
+endclass : read_mem_seq

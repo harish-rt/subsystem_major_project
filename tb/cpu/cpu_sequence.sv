@@ -207,38 +207,6 @@ class intc_sw_irq_seq extends base_cpu_sequence;
     endtask
 endclass : intc_sw_irq_seq
 
-
-class read_mem_seq extends base_cpu_sequence;
-    `uvm_object_utils(read_mem_seq)
-    `NEW_OBJ
-    
-    int addr;
-    int beats = 2;
-
-    task body();
-        super.body();
-    
-        `uvm_info("read_mem_seq", "start of Memory read Sequence", UVM_LOW)
-
-        for (int i = 0; i < beats; i++) begin        
-            addr = LITE_MEM_BASE + (i*4);
-            start_item(pkt);
-            if(!pkt.randomize() with {
-                ARADDR  == addr;
-                operation   == READ;
-                })begin
-                `uvm_error(get_full_name(), "randomization_failed")
-            end
-            finish_item(pkt);
-            get_response(pkt);             
-        end
-        
-        `uvm_info("read_mem_seq", "end of Memory read Sequence", UVM_LOW)
-
-     endtask
-endclass:read_mem_seq
-
-
 class cdma_read_write_seq extends base_cpu_sequence;
     `uvm_object_utils(cdma_read_write_seq)
     `NEW_OBJ
@@ -981,7 +949,7 @@ class load_mem_lite_seq extends base_cpu_sequence;
     constraint default_config_c {
         soft addr == LITE_MEM_BASE;
         soft beats      == 2;
-        beats inside {[1:1024]};
+        //beats inside {[1:1024]};
     }
 
     task body();

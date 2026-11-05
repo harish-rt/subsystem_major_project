@@ -2,7 +2,7 @@
 interface axi4_intf();
    parameter ADDR_WIDTH 	    = 32;
    parameter DATA_WIDTH 	    = 32;
-   parameter ID_WIDTH 		    = 4	;
+   parameter ID_WIDTH 		    = 7	;
    parameter USER_SIGNAL_WIDTH 	= 8	;
 
    //Global signals
@@ -57,7 +57,7 @@ interface axi4_intf();
 
    //Write data channel signals
    wire [DATA_WIDTH-1:0]	WDATA	;
-   wire [DATA_WIDTH>>3-1:0] WSTRB	;
+   wire [3:0]               WSTRB	;
    wire 			        WLAST	;
    wire  			        WVALID	;
    wire  			        WREADY	;
