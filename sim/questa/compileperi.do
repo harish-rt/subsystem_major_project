@@ -1,12 +1,14 @@
 vlib lib
 vlib lib/axi_intf
 vlib lib/axi4_lite_mem
+vlib lib/axi4_mem
 vlib lib/core_perif
 vlib lib/spi_mem
 vlib lib/core_wrapper
 
 vmap axi_intf lib/axi_intf
 vmap axi4_lite_mem lib/axi4_lite_mem
+vmap axi4_mem lib/axi4_mem
 vmap core_perif lib/core_perif
 vmap spi_mem lib/spi_mem
 vmap core_wrapper lib/core_wrapper
@@ -16,6 +18,8 @@ vlog -work axi_intf "../../rtl/sub_ips/axi_intf/rtl/axi_intf.sv" \
 
 vlog -work axi4_lite_mem "../../rtl/sub_ips/axi4_lite_memory_unit/rtl/axi4_lite_intf.sv" \
 "../../rtl/sub_ips/axi4_lite_memory_unit/rtl/axi4_lite_memory_unit.sv"
+
+vlog -work axi4_mem "../../rtl/sub_ips/m05/rtl/axi_memory_slave.sv"
 
 vlog -work core_perif "../../rtl/sub_ips/core_perif/rtl/src_v/uart_lite_defs.v" \
 "../../rtl/sub_ips/core_perif/rtl/src_v/uart_lite.v" \
@@ -33,10 +37,23 @@ vlog -work core_perif "../../rtl/sub_ips/core_perif/rtl/src_v/uart_lite_defs.v" 
 vlog -work core_wrapper \
      -L axi_intf \
      -L axi4_lite_mem \
+     -L axi4_mem \
      -L core_perif \
      -L spi_mem \
      -L core_ip_wraps \
      "../../rtl/core_wrapper.sv"
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

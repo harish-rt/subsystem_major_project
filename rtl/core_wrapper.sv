@@ -1,7 +1,7 @@
 module core_wrapper 
 (
-  input logic clk_i,
-  input logic rst_n_i,
+  input logic   clk_i,
+  input logic   rst_n_i,
 
   //peripherals
   output         spi_clk_o,
@@ -164,6 +164,17 @@ module core_wrapper
       ) AXI_SLAVE_MEM ( 
 	.s_axi_intf	(axi_int2main_mem)
       );
+
+// memory unit axi4_intf
+axi4_memory_unit #(
+    .AXI_ID_WIDTH (7),
+    .AXI_AW       (32),
+    .AXI_DW       (32),
+    .MEM_BASE     (32'hC000_0000),
+    .MEM_ADDR_BITS(30)
+) m05_mem_inst (
+    .s_axi4_intf  (ext_axi4_master) 
+);
 
 //this wrap consist of xilinx integreated ip's interconnect, cdma, irq_ctrl.
  core_ip_wraps IPS_CORE (

@@ -102,25 +102,30 @@ class soc_master_vseq extends soc_base_virtual_sequence;
     `NEW_OBJ
 
     cpu_config_intc_seq     intc_seq;
-    load_bram_seq           bram_seq;
+    load_mem_seq            mem_seq;
     cdma_read_write_seq     cdma_seq;
     cpu_isr_vseq            isr_vseq;
 
     task body();
         super.body();
 
-        isr_vseq = cpu_isr_vseq        ::type_id::create("isr_vseq");
-        bram_seq = load_bram_seq       ::type_id::create("bram_seq");
-        intc_seq = cpu_config_intc_seq ::type_id::create("intc_seq");
-        cdma_seq = cdma_read_write_seq ::type_id::create("cdma_seq");
+        isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
+        mem_seq  = load_mem_seq         ::type_id::create("mem_seq");
+        intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
+        cdma_seq = cdma_read_write_seq  ::type_id::create("cdma_seq");
         
         intc_seq.cdma_en = 1;
+        assert(mem_seq.randomize() with {
+            addr    == AXI4_MEM_BASE;
+            len     == 'hf;
+            burst   == INCR;
+        });
 
         fork
             isr_vseq.start(p_sequencer);
         join_none
 
-        bram_seq.start(p_sequencer.s00_sqr);
+        mem_seq.start(p_sequencer.s04_sqr);
         intc_seq.start(p_sequencer.s00_sqr);
         cdma_seq.start(p_sequencer.s00_sqr);
         isr_clear();    // waits for irq down before ending soc_master_vseq
@@ -369,7 +374,6 @@ class intc_stress_vseq extends soc_base_virtual_sequence;
             addr  == {LITE_MEM_BASE + $urandom_range(100,1000)};
             len   == 'hff;
             burst == INCR;
-            is_write == 1;
         });
         write_seq.start(p_sequencer.s04_sqr);
     endtask
@@ -388,7 +392,6 @@ class wrap_burst_vseq extends soc_base_virtual_sequence;
             addr  == {BRAM_BASE + $urandom_range(100,1000)};
             len   == 'hf;
             burst == WRAP;
-            is_write == 1;
         });
         burst_seq.start(p_sequencer.s04_sqr);
     endtask
@@ -472,7 +475,6 @@ class masters_load_bram_vseq extends soc_base_virtual_sequence;
             addr  == {BRAM_BASE + $urandom_range(2000,3000)};
             len   == 'hf;
             burst == INCR;
-            is_write == 1;
         });
         fork
             s02_seq.start(p_sequencer.s02_sqr);
@@ -506,7 +508,6 @@ class masters_load_lite_mem_vseq extends soc_base_virtual_sequence;
             addr  == {LITE_MEM_BASE + $urandom_range(2000,3000)};
             len   == 'hff;
             burst == INCR;
-            is_write == 1;
         });
         fork
             s02_seq.start(p_sequencer.s02_sqr);
@@ -533,7 +534,6 @@ class master_starve_vseq extends soc_base_virtual_sequence;
                 addr inside {[BRAM_BASE : BRAM_BASE+'h1000]};
                 len   == 'hff;
                 burst == INCR;
-                is_write == 1;
             });
             s04_seq.start(p_sequencer.s04_sqr);
         end
@@ -570,17 +570,17 @@ class timer_reg_access_vseq extends soc_base_virtual_sequence;
     endtask
 endclass
 
-class gpio_reg_access_vseq extends soc_base_virtual_sequence;
-    `uvm_object_utils(gpio_reg_access_vseq)
+class gpio_check_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(gpio_check_vseq)
     `NEW_OBJ
 
-    gpio_reg_access_seq         m_gpio_seq;
+    gpio_check_seq              m_gpio_seq;
     gpio_slave_responder_seq    s_gpio_seq;
     cpu_config_intc_seq         intc_seq;   // s02
     cpu_isr_vseq                isr_vseq;   // s00
 
     task body();
-        m_gpio_seq = gpio_reg_access_seq::type_id::create("m_gpio_seq");
+        m_gpio_seq = gpio_check_seq     ::type_id::create("m_gpio_seq");
         s_gpio_seq = gpio_slave_responder_seq::type_id::create("s_gpio_seq");
         intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
         isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
@@ -592,11 +592,11 @@ class gpio_reg_access_vseq extends soc_base_virtual_sequence;
         fork
             intc_seq.start(p_sequencer.s02_sqr);
             m_gpio_seq.start(p_sequencer.s00_sqr);
-            s_gpio_seq.start(p_sequencer.gpio_sqr);
+            //s_gpio_seq.start(p_sequencer.gpio_sqr);
         join
         isr_clear();
     endtask
-endclass : gpio_reg_access_vseq
+endclass : gpio_check_vseq
 
 
 class s02_masters_load_bram_vseq extends soc_base_virtual_sequence;
@@ -634,15 +634,13 @@ class s04_master_bram_vseq extends soc_base_virtual_sequence;
     task body();
         s04_seq = load_mem_seq::type_id::create("s04_seq");
 
-        forever begin
-            assert(s04_seq.randomize()with{
-                addr  == {BRAM_END - 'd3};
-                len   == 'hff;
-                burst == INCR;
-                is_write == 1;
-            });
-            s04_seq.start(p_sequencer.s04_sqr);
-        end
+        assert(s04_seq.randomize()with{
+            slave == BRAM;
+            len   == 'hf;
+            //addr  == {BRAM_END - 'd3};
+            //burst == INCR;
+        });
+        s04_seq.start(p_sequencer.s04_sqr);
     endtask
 endclass : s04_master_bram_vseq
 
@@ -650,19 +648,246 @@ class s04_master_bram_4kb_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(s04_master_bram_4kb_vseq)
     `NEW_OBJ
 
-    load_mem_seq s04_seq;
+    load_mem_seq    s04_seq;
+    read_mem_seq    r_s04_seq;
 
     task body();
         s04_seq = load_mem_seq::type_id::create("s04_seq");
+        r_s04_seq = read_mem_seq::type_id::create("r_s04_seq");
 
         assert(s04_seq.randomize() with {
-            addr     == (BRAM_BASE + 'hFFC);
-            len      == 'hf;
-            burst    == INCR;
-            is_write == 1;
-        });
+            addr     == (BRAM_BASE + 'h40);
+            len      == 'hFF;
+            burst    == INCR;});
+
+        assert(r_s04_seq.randomize() with {
+            addr     == (BRAM_BASE + 'h40);
+            len      == 'hFF;
+            burst    == INCR;});
 
         s04_seq.start(p_sequencer.s04_sqr);
-
+        r_s04_seq.start(p_sequencer.s04_sqr);
     endtask
 endclass : s04_master_bram_4kb_vseq
+
+class s04_master_outstanding_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(s04_master_outstanding_vseq)
+    `NEW_OBJ
+
+    load_mem_seq s04_ff_seq;
+    load_mem_seq s04_b_seq;
+    
+    task body();
+        s04_ff_seq = load_mem_seq::type_id::create("s04_ff_seq");
+        s04_b_seq  = load_mem_seq::type_id::create("s04_b_seq");
+
+        for (int i = 0; i < 64; i++) begin
+            if (!s04_b_seq.randomize() with {
+                len   == 'h1F;
+                slave == AXI4_M;
+                //slave == BRAM_M;
+                aw_id == ((i % 15) + 1);                    
+            }) begin
+                `uvm_error("OST_SEQ_RND_FAIL","Failed to randomize s04_b_seq")
+            end
+            s04_b_seq.start(p_sequencer.s04_sqr);
+        end
+    endtask
+endclass : s04_master_outstanding_vseq
+
+class s04_master_axi4_mem_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(s04_master_axi4_mem_vseq)
+    `NEW_OBJ
+
+    load_mem_seq    s04_seq;
+    load_mem_seq    s04_seq2;
+
+    task body();
+        s04_seq = load_mem_seq::type_id::create("s04_seq");
+        s04_seq2 = load_mem_seq::type_id::create("s04_seq2");
+
+        assert(s04_seq2.randomize()with{
+            addr  == {AXI4_MEM_BASE + 'h1f};
+            len   == 'hf;
+            burst == INCR;
+        });
+        assert(s04_seq.randomize()with{
+            addr  == {AXI4_MEM_BASE};
+            len   == 'hf;
+            burst == INCR;
+        });
+        s04_seq.start(p_sequencer.s04_sqr);
+        s04_seq2.start(p_sequencer.s04_sqr);
+    endtask
+endclass : s04_master_axi4_mem_vseq
+
+class s04_master_out_of_order_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(s04_master_out_of_order_vseq)
+    `NEW_OBJ
+
+    load_mem_seq    l_bram_seq;
+    load_mem_seq    l_m05_seq;
+
+    read_mem_seq    bram_seq;
+    read_mem_seq    m05_seq;
+
+    rand int bram_addr;
+    rand int m05_addr;
+    rand bit [7:0] burst_len;
+
+    task body();
+        assert(this.randomize()with{
+            bram_addr inside {[BRAM_BASE : BRAM_END]};
+            m05_addr  inside {[AXI4_MEM_BASE : AXI4_MEM_END]};
+            bram_addr % 4 == 0;
+            m05_addr  % 4 == 0;
+        });
+        l_bram_seq = load_mem_seq::type_id::create("l_bram_seq");
+        l_m05_seq  = load_mem_seq::type_id::create("l_m05_seq");
+
+        bram_seq = read_mem_seq::type_id::create("bram_seq");
+        m05_seq  = read_mem_seq::type_id::create("m05_seq");
+
+    //  load BRAM and AXI4 mem
+        assert(l_bram_seq.randomize()with{
+            addr  == bram_addr;
+            len   == 'h1f;
+            burst == INCR;
+        });
+        assert(l_m05_seq.randomize()with{
+            addr  == m05_addr;
+            len   == 'hf;
+            burst == INCR;
+        });
+    //  read BRAM and AXI4 mem
+        assert(bram_seq.randomize()with{
+            addr  == bram_addr;
+            len   == 'h1f;
+            burst == INCR;
+        });
+        assert(m05_seq.randomize()with{
+            addr  == m05_addr;
+            len   == 'hf;
+            burst == INCR;
+        });
+    //  load BRAM and AXI4 mem
+        l_bram_seq.wait_req = 1;
+        l_m05_seq.wait_req  = 1;
+        fork
+            l_bram_seq.start(p_sequencer.s04_sqr);
+            l_m05_seq.start(p_sequencer.s04_sqr);
+        join
+    //  read BRAM and AXI4 mem
+        bram_seq.wait_req = 0;
+        m05_seq.wait_req  = 0;
+        fork
+            bram_seq.start(p_sequencer.s04_sqr);
+            m05_seq.start(p_sequencer.s04_sqr);
+        join
+    endtask
+endclass : s04_master_out_of_order_vseq
+
+class s04_master_interleaving_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(s04_master_interleaving_vseq)
+    `NEW_OBJ
+
+    load_mem_seq    l_bram_seq;
+    load_mem_seq    l_m05_seq;
+
+    read_mem_seq    bram_seq;
+    read_mem_seq    m05_seq;
+
+    rand int bram_addr;
+    rand int m05_addr;
+    rand bit [7:0] burst_len;
+    rand bit [3:0] id;
+
+    task body();
+        assert(this.randomize()with{
+            solve burst_len before bram_addr;
+            solve burst_len before m05_addr;
+
+            burst_len inside {[1 : 56]};
+            bram_addr % 4 == 0;
+            m05_addr  % 4 == 0;
+
+            bram_addr >= BRAM_BASE;
+            bram_addr <= BRAM_END - (burst_len * 4);
+            
+            m05_addr >= AXI4_MEM_BASE;
+            m05_addr <= AXI4_MEM_END - (burst_len * 4);
+        });
+        l_bram_seq = load_mem_seq::type_id::create("l_bram_seq");
+        l_m05_seq  = load_mem_seq::type_id::create("l_m05_seq");
+
+        bram_seq = read_mem_seq::type_id::create("bram_seq");
+        m05_seq  = read_mem_seq::type_id::create("m05_seq");
+
+    //  load BRAM and AXI4 mem
+        assert(l_bram_seq.randomize()with{
+            addr    == bram_addr;
+            len     == burst_len;
+            burst   == INCR;
+            aw_id   == id;
+        });
+        assert(l_m05_seq.randomize()with{
+            addr    == m05_addr;
+            len     == burst_len;
+            burst   == INCR;
+            aw_id   == id+1;
+        });
+    //  read BRAM and AXI4 mem
+        assert(bram_seq.randomize()with{
+            addr    == bram_addr;
+            len     == burst_len;
+            burst   == INCR;
+            ar_id   == id+2;
+        });
+        assert(m05_seq.randomize()with{
+            addr    == m05_addr;
+            len     == burst_len;
+            burst   == INCR;
+            ar_id   == id+3;
+        });
+    //  load BRAM and AXI4 mem
+        l_bram_seq.wait_req = 1;
+        l_m05_seq.wait_req  = 1;
+        fork
+            l_bram_seq.start(p_sequencer.s04_sqr);
+            l_m05_seq.start(p_sequencer.s04_sqr);
+        join
+    //  read BRAM and AXI4 mem
+        bram_seq.wait_req = 0;
+        m05_seq.wait_req  = 0;
+        fork
+            bram_seq.start(p_sequencer.s04_sqr);
+            m05_seq.start(p_sequencer.s04_sqr);
+        join
+    endtask
+endclass : s04_master_interleaving_vseq
+
+class s04_master_axi_wrap_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(s04_master_axi_wrap_vseq)
+    `NEW_OBJ
+
+    load_mem_seq    s04_seq;
+    read_mem_seq    s04_seq_r;
+
+    task body();
+        s04_seq = load_mem_seq::type_id::create("s04_seq");
+        s04_seq_r = read_mem_seq::type_id::create("s04_seq_r");
+
+        assert(s04_seq.randomize()with{
+            addr  == LITE_MEM_BASE + 'h108;
+            len   == 'hf;
+            burst == WRAP;
+        });
+        assert(s04_seq_r.randomize()with{
+            addr  == LITE_MEM_BASE + 'h108;
+            len   == 'hf;
+            burst == WRAP;
+        });
+        s04_seq.start(p_sequencer.s04_sqr);
+        s04_seq_r.start(p_sequencer.s04_sqr);
+    endtask
+endclass : s04_master_axi_wrap_vseq

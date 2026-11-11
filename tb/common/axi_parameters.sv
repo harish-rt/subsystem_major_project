@@ -15,7 +15,7 @@ typedef logic [0:0]       lock_t;
 
 typedef enum {MST_UNKNOWN, MST_S00, MST_S02, MST_S04} master_e;
 
-parameter ID_WIDTH = 4;
+parameter ID_WIDTH = 7;
 parameter ADDR_WIDTH = 32;
 parameter BURST_LENGTH = 8;
 parameter BURST_SIZE = 3;

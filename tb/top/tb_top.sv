@@ -44,7 +44,9 @@ module top;
 //    axi4_lite_tb_intf  lite_data_if();
 
 // memory interface
-    axi4_lite_tb_intf  mem_intf();
+    axi4_lite_tb_intf   mem_intf();
+// axi4 memory interface
+    axi4_tb_intf        mem4_intf();
 
 // core peripherals monitor
     axi4_lite_tb_intf              core_perif_if();
@@ -170,7 +172,12 @@ module top;
     // S04
     assign slave_if.ACLK            = aclk;
     assign slave_if.ARESETn         = areset_n;
-    
+    // tie off to 0 to avoid z for MSB 3 bits from interconnect
+    assign slave_if.AWID[6:4]       = 0;
+    assign slave_if.BID[6:4]        = 0;
+    assign slave_if.ARID[6:4]       = 0;
+    assign slave_if.RID[6:4]        = 0;
+
     //// S02
     //assign lite_data_if.ACLK       = aclk;
     //assign lite_data_if.ARESETn    = areset_n;
@@ -421,6 +428,61 @@ module top;
     assign axi4_bram_if.RVALID   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_rvalid;
     assign axi4_bram_if.RREADY   = dut.IPS_CORE.axi_bram_ctrl_0.s_axi_rready;
 
+
+    // M05_AXI4_SLAVE_MEM 
+    // Global Signals
+    assign mem4_intf.ACLK     = aclk;
+    assign mem4_intf.ARESETn  = areset_n;
+    // Write Address Channel (AW)
+    assign mem4_intf.AWID     = dut.m05_mem_inst.s_axi4_intf.AWID;
+    assign mem4_intf.AWADDR   = dut.m05_mem_inst.s_axi4_intf.AWADDR;
+    assign mem4_intf.AWLEN    = dut.m05_mem_inst.s_axi4_intf.AWLEN;
+    assign mem4_intf.AWSIZE   = dut.m05_mem_inst.s_axi4_intf.AWSIZE;
+    assign mem4_intf.AWBURST  = dut.m05_mem_inst.s_axi4_intf.AWBURST;
+    assign mem4_intf.AWVALID  = dut.m05_mem_inst.s_axi4_intf.AWVALID;
+    assign mem4_intf.AWREADY  = dut.m05_mem_inst.s_axi4_intf.AWREADY;
+    assign mem4_intf.AWCACHE  = dut.m05_mem_inst.s_axi4_intf.AWCACHE;
+    assign mem4_intf.AWLOCK   = dut.m05_mem_inst.s_axi4_intf.AWLOCK;
+    assign mem4_intf.AWPROT   = dut.m05_mem_inst.s_axi4_intf.AWPROT;
+    assign mem4_intf.AWQOS    = dut.m05_mem_inst.s_axi4_intf.AWQOS;
+    assign mem4_intf.AWREGION = dut.m05_mem_inst.s_axi4_intf.AWREGION;
+    assign mem4_intf.AWUSER   = dut.m05_mem_inst.s_axi4_intf.AWUSER;
+    // Write Data Channel (W)
+    assign mem4_intf.WDATA    = dut.m05_mem_inst.s_axi4_intf.WDATA;
+    assign mem4_intf.WSTRB    = dut.m05_mem_inst.s_axi4_intf.WSTRB;
+    assign mem4_intf.WLAST    = dut.m05_mem_inst.s_axi4_intf.WLAST;
+    assign mem4_intf.WVALID   = dut.m05_mem_inst.s_axi4_intf.WVALID;
+    assign mem4_intf.WREADY   = dut.m05_mem_inst.s_axi4_intf.WREADY;
+    assign mem4_intf.WUSER    = dut.m05_mem_inst.s_axi4_intf.WUSER;
+    // Write Response Channel (B)
+    assign mem4_intf.BID      = dut.m05_mem_inst.s_axi4_intf.BID;
+    assign mem4_intf.BRESP    = dut.m05_mem_inst.s_axi4_intf.BRESP;
+    assign mem4_intf.BVALID   = dut.m05_mem_inst.s_axi4_intf.BVALID;
+    assign mem4_intf.BREADY   = dut.m05_mem_inst.s_axi4_intf.BREADY;
+
+    // Read Address Channel (AR)
+    assign mem4_intf.ARID     = dut.m05_mem_inst.s_axi4_intf.ARID;
+    assign mem4_intf.ARADDR   = dut.m05_mem_inst.s_axi4_intf.ARADDR;
+    assign mem4_intf.ARLEN    = dut.m05_mem_inst.s_axi4_intf.ARLEN;
+    assign mem4_intf.ARSIZE   = dut.m05_mem_inst.s_axi4_intf.ARSIZE;
+    assign mem4_intf.ARBURST  = dut.m05_mem_inst.s_axi4_intf.ARBURST;
+    assign mem4_intf.ARVALID  = dut.m05_mem_inst.s_axi4_intf.ARVALID;
+    assign mem4_intf.ARREADY  = dut.m05_mem_inst.s_axi4_intf.ARREADY;
+    assign mem4_intf.ARCACHE  = dut.m05_mem_inst.s_axi4_intf.ARCACHE;
+    assign mem4_intf.ARLOCK   = dut.m05_mem_inst.s_axi4_intf.ARLOCK;
+    assign mem4_intf.ARPROT   = dut.m05_mem_inst.s_axi4_intf.ARPROT;
+    assign mem4_intf.ARQOS    = dut.m05_mem_inst.s_axi4_intf.ARQOS;
+    assign mem4_intf.ARREGION = dut.m05_mem_inst.s_axi4_intf.ARREGION;
+    assign mem4_intf.ARUSER   = dut.m05_mem_inst.s_axi4_intf.ARUSER;
+    // Read Data Channel (R)
+    assign mem4_intf.RID      = dut.m05_mem_inst.s_axi4_intf.RID;
+    assign mem4_intf.RDATA    = dut.m05_mem_inst.s_axi4_intf.RDATA;
+    assign mem4_intf.RRESP    = dut.m05_mem_inst.s_axi4_intf.RRESP;
+    assign mem4_intf.RLAST    = dut.m05_mem_inst.s_axi4_intf.RLAST;
+    assign mem4_intf.RVALID   = dut.m05_mem_inst.s_axi4_intf.RVALID;
+    assign mem4_intf.RREADY   = dut.m05_mem_inst.s_axi4_intf.RREADY;
+    assign mem4_intf.RUSER    = dut.m05_mem_inst.s_axi4_intf.RUSER;
+
     // SLAVE_MEM 
     assign mem_intf.ACLK    = aclk;
     assign mem_intf.ARESETn = areset_n;
@@ -445,10 +507,15 @@ module top;
     assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
 
     initial begin
+        //run_test("s04_master_axi_wrap_test");
+        //run_test("s04_master_interleaving_test");
+        //run_test("s04_master_out_of_order_test");
+        //run_test("s04_master_axi4_mem_test");
+        //run_test("s04_master_outstanding_test");
         //run_test("s04_master_bram_4kb_test");
-        //run_test("s04_master_bram_test");             //run in Aldec
-        run_test("s02_masters_load_bram_test");
-        //run_test("gpio_reg_access_test");
+        //run_test("s04_master_bram_test");
+        //run_test("s02_masters_load_bram_test");
+        run_test("gpio_check_test");
         //run_test("timer_reg_access_test");
         //run_test("masters_load_lite_mem_test");
         //run_test("masters_load_bram_test");
@@ -493,18 +560,19 @@ module top;
     end
     // checking b channel by bypassing the interconnect
     // find why interconnect not passign these signals
-    //initial begin
+    initial begin
+        //force dut.IPS_CORE.axi_bram_ctrl_0.U0.gext_inst.abcv4_0_ext_inst.GEN_AXI4.I_FULL_AXI.I_WR_CHNL.bid_fifo_rd_en = 1;
     //    force slave_if.BID      = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BID;
     //    force slave_if.BVALID   = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BVALID;
     //    force slave_if.BREADY   = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BREADY;
     //    force slave_if.BRESP    = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BRESP;
-    //end
+    end
 
     always @(posedge aclk) begin
         if (dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWVALID && dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWREADY)
-        $display("%t M03 AWID=%b (width %0d)", $time, dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWID, $bits(dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWID));
+        $display("%t M03 AWID = %b | width: %0d", $time, dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWID, $bits(dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWID));
         if (dut.IPS_CORE.axi_interconnect_0_M03_AXI_BVALID && dut.IPS_CORE.axi_interconnect_0_M03_AXI_BREADY)
-        $display("%t M03 BID=%b", $time, dut.IPS_CORE.axi_interconnect_0_M03_AXI_BID);
+        $display("%t M03 BID = %b | width: %0d", $time, dut.IPS_CORE.axi_interconnect_0_M03_AXI_BID,$bits(dut.IPS_CORE.axi_interconnect_0_M03_AXI_BID));
     end
 
     initial begin
@@ -525,7 +593,7 @@ module top;
         `ifdef SBD_COMPONENTS
             sb_config               sb_cfg;
             sb_cfg = sb_config::type_id::create("sb_cfg");
-            sb_cfg.perif_addr    = new[9];
+            sb_cfg.perif_addr    = new[10];
             sb_cfg.perif_addr[0] = '{BRAM, BRAM_BASE, BRAM_END};
             sb_cfg.perif_addr[1] = '{LITE_MEM, LITE_MEM_BASE, LITE_MEM_END};
             sb_cfg.perif_addr[2] = '{CDMA, CDMA_BASE, CDMA_END};
@@ -535,6 +603,7 @@ module top;
             sb_cfg.perif_addr[6] = '{SPI, SPI_BASE, SPI_END};
             sb_cfg.perif_addr[7] = '{GPIO, GPIO_BASE, GPIO_END};
             sb_cfg.perif_addr[8] = '{TIMER, TIMER_BASE, TIMER_END};
+            sb_cfg.perif_addr[9] = '{AXI4_MEM, AXI4_MEM_BASE, AXI4_MEM_END};
 	        uvm_config_db #(sb_config)::set(null,"*","SB_CFG",sb_cfg);
         `endif
     end
@@ -567,6 +636,7 @@ module top;
         soc_config_obj.mem_obj = mem_config_obj :: type_id :: create ("mem_obj");
         soc_config_obj.mem_obj.mem_intf         = mem_intf;
         soc_config_obj.mem_obj.bram_intf        = axi4_bram_if;
+        soc_config_obj.mem_obj.mem4_intf        = mem4_intf;
         soc_config_obj.mem_obj.mem_is_active    = UVM_PASSIVE;
         soc_config_obj.mem_obj.bram_is_active   = UVM_PASSIVE;
         uvm_config_db #(mem_config_obj)::set(null,"*","mem_config_obj",soc_config_obj.mem_obj);

@@ -1,14 +1,20 @@
-class bram_monitor extends uvm_monitor;
-    `uvm_component_utils(bram_monitor)
+class axi4_monitor extends uvm_monitor;
+    `uvm_component_utils(axi4_monitor)
     `NEW_COMP
     
     uvm_analysis_port #(bram_seq_item)          mon_ap;
 	virtual axi4_tb_intf                        bram_if;
-	//virtual axi4_tb_intf.MONITOR_MOD            bram_if;
    mailbox #(bram_seq_item)  write_address_mbx ,write_data_mbx;      //to capture transactions on write address channel // Preserve ordering
    mailbox #(bram_seq_item) wresp_array [id_t];    //associative array of mailboxes. Will hold packets waiting for write response.Mailboxes will preserve ordering based on ID.
    mailbox #(bram_seq_item) read_address_array[id_t];
    mailbox #(bram_seq_item) read_data_array[id_t];
+
+    int outstanding_wr      = 0;
+    int max_outstanding_wr  = 0;
+    int outstanding_rd      = 0;
+    int max_outstanding_rd  = 0;
+    bit aw_hs, b_hs;
+    bit ar_hs, r_end;
 
    extern task main_phase (uvm_phase phase);
    extern function void build_phase (uvm_phase phase);
@@ -20,35 +26,76 @@ class bram_monitor extends uvm_monitor;
    extern task  capture_read_address();
    extern task  capture_read_data();
 
-endclass :bram_monitor
+endclass :axi4_monitor
 
-   function void bram_monitor :: build_phase (uvm_phase phase);
+   function void axi4_monitor :: build_phase (uvm_phase phase);
      super.build_phase (phase);
      mon_ap = new ("mon_ap",this);
      `uvm_info (get_full_name() , phase.get_name() , UVM_LOW)
-    //if(!uvm_config_db#(virtual axi4_tb_intf.MONITOR_MOD)::get(this,"","BRAM_MON",bram_if)) begin
-	//	`uvm_fatal("NO_VIF",{"virtual interface is not set for monitor"})
-	//end
    endfunction : build_phase
 
-task bram_monitor :: main_phase (uvm_phase phase);
- `uvm_info (get_full_name() , phase.get_name() , UVM_LOW)
- fork
-  //capture_reset();
-  capture_write_address();
-  capture_write_data();
-  capture_write_response();
-  capture_read_address();
-  capture_read_data();
-  merge_write_info();
- join
+task axi4_monitor :: main_phase (uvm_phase phase);
+    `uvm_info (get_full_name() , phase.get_name() , UVM_LOW)
+    fork
+    //capture_reset();
+    capture_write_address();
+    capture_write_data();
+    capture_write_response();
+    capture_read_address();
+    capture_read_data();
+    merge_write_info();
+
+    forever begin
+        @(bram_if.axi4_mon_cb);
+
+        if (bram_if.axi4_mon_cb.BVALID && bram_if.axi4_mon_cb.BREADY) begin
+            $display("FROM_BRAM_MON [%0t] AWID=%h BID=%h BRESP=%h",$time,bram_if.axi4_mon_cb.AWID,bram_if.axi4_mon_cb.BID, bram_if.axi4_mon_cb.BRESP);
+        end
+
+        if (!bram_if.ARESETn) begin
+            outstanding_wr     = 0;
+            max_outstanding_wr = 0;
+            outstanding_rd     = 0;
+            max_outstanding_rd = 0;
+        end
+        else begin
+            // write outstanding
+            aw_hs = bram_if.axi4_mon_cb.AWVALID && bram_if.axi4_mon_cb.AWREADY;
+            b_hs  = bram_if.axi4_mon_cb.BVALID  && bram_if.axi4_mon_cb.BREADY;
+            
+            case ({aw_hs,b_hs})
+                2'b10: outstanding_wr++;
+                2'b01: outstanding_wr--;
+                default: ;
+            endcase
+            if (outstanding_wr > max_outstanding_wr)
+                max_outstanding_wr = outstanding_wr;
+
+            `uvm_info("BRAM_WR_OUTSTANDING",$sformatf("Current=%0d Maximum=%0d",outstanding_wr, max_outstanding_wr),UVM_MEDIUM)
+
+            // read outstanding
+            ar_hs = bram_if.axi4_mon_cb.ARVALID && bram_if.axi4_mon_cb.ARREADY;
+            r_end = bram_if.axi4_mon_cb.RVALID  && bram_if.axi4_mon_cb.RREADY && bram_if.axi4_mon_cb.RLAST;
+
+            case({ar_hs,r_end})
+                2'b10: outstanding_rd++;
+                2'b01: outstanding_rd--;
+                default: ;
+            endcase
+            if (outstanding_rd > max_outstanding_rd)
+                max_outstanding_rd = outstanding_rd;
+
+            `uvm_info("BRAM_RD_OUTSTANDING",$sformatf("Current=%0d Maximum=%0d",outstanding_rd, max_outstanding_rd),UVM_MEDIUM)
+        end
+    end
+    join
 endtask
 
-task  bram_monitor :: capture_write_address();
+task  axi4_monitor :: capture_write_address();
  bram_seq_item     pkt;
  write_address_mbx = new ();
  forever begin
-    `uvm_info("bram_monitor :: capture_write_address","Triggred",UVM_LOW);
+    `uvm_info("axi4_monitor :: capture_write_address","Triggred",UVM_LOW);
     pkt = bram_seq_item :: type_id :: create("pkt");
     wait(bram_if.axi4_mon_cb.AWREADY && bram_if.axi4_mon_cb.AWVALID && bram_if.ARESETn==1);
     pkt.AWADDR   = bram_if.axi4_mon_cb.AWADDR;
@@ -61,27 +108,25 @@ task  bram_monitor :: capture_write_address();
     pkt.AWQOS    = bram_if.axi4_mon_cb.AWQOS;
     pkt.AWSIZE   = bram_if.axi4_mon_cb.AWSIZE;
     pkt.operation= bram_seq_item::WRITE;
-    `uvm_info("bram_monitor :: capture_write_address","captured address pkt put to write_address_mbx",UVM_LOW);
+    `uvm_info("axi4_monitor :: capture_write_address","captured address pkt put to write_address_mbx",UVM_LOW);
     `uvm_info("BRAM_MONITOR_capture_write_address",pkt.sprint(),UVM_LOW)
     write_address_mbx.put(pkt);
     @(bram_if.axi4_mon_cb); //wait for a clk
   end
 endtask
 
-task  bram_monitor ::  capture_write_data();
+task  axi4_monitor ::  capture_write_data();
  bram_seq_item     pkt;
  int i;
  bit last;
  write_data_mbx =    new ();
  forever begin
-    `uvm_info("bram_monitor :: capture_write_data","Triggred",UVM_LOW);
+    `uvm_info("axi4_monitor :: capture_write_data","Triggred",UVM_LOW);
     pkt = bram_seq_item :: type_id :: create("pkt");
-    //pkt.WDATA = new[0];
-    //pkt.WSTRB = new[0];
     i = 0;
     do begin
       wait(bram_if.axi4_mon_cb.WREADY==1 && bram_if.axi4_mon_cb.WVALID==1 && bram_if.ARESETn==1); 
-      `uvm_info("bram_monitor :: capture_write_data","Inside dowhile loop",UVM_LOW);
+      `uvm_info("axi4_monitor :: capture_write_data","Inside dowhile loop",UVM_LOW);
       pkt.WDATA =new[pkt.WDATA.size() +1](pkt.WDATA);
       pkt.WSTRB =new[pkt.WSTRB.size() +1](pkt.WSTRB);
       pkt.WDATA[i]  = bram_if.axi4_mon_cb.WDATA;
@@ -90,20 +135,20 @@ task  bram_monitor ::  capture_write_data();
       i=i+1;
       @(bram_if.axi4_mon_cb);       //wait till next clk posedge
       end while(last==0);           //keeps sampling till last indicates end of data phase.
-      `uvm_info("bram_monitor :: capture_write_data","captured data pkt put to write_data_mbx",UVM_LOW);
+      `uvm_info("axi4_monitor :: capture_write_data","captured data pkt put to write_data_mbx",UVM_LOW);
       `uvm_info("BRAM_MONITOR_capture_write_data",pkt.sprint(),UVM_LOW)
       write_data_mbx.put(pkt);
  end
 endtask
 
-task bram_monitor :: capture_write_response();
+task axi4_monitor :: capture_write_response();
     bram_seq_item pkt;
-    bit [8:0] t_bid;
+    bit [6:0] t_bid;
     
     forever begin
         @(bram_if.axi4_mon_cb);
         if (bram_if.axi4_mon_cb.BREADY == 1 && bram_if.axi4_mon_cb.BVALID == 1 && bram_if.ARESETn == 1) begin
-            `uvm_info("bram_monitor :: capture_write_response", "Handshake detected...", UVM_LOW);
+            `uvm_info("axi4_monitor :: capture_write_response","Handshake detected...",UVM_LOW);
             
             t_bid = bram_if.axi4_mon_cb.BID;
 
@@ -125,14 +170,14 @@ task bram_monitor :: capture_write_response();
 endtask:capture_write_response
 
 /*
-task bram_monitor :: capture_write_response();
+task axi4_monitor :: capture_write_response();
     bram_seq_item pkt;
     bit [3:0] t_bid;
     
     forever begin
         @(bram_if.axi4_mon_cb);
         if (bram_if.axi4_mon_cb.BREADY == 1 && bram_if.axi4_mon_cb.BVALID == 1 && bram_if.ARESETn == 1) begin
-            `uvm_info("bram_monitor :: capture_write_response", "Handshake detected, merging channels...", UVM_LOW);
+            `uvm_info("axi4_monitor :: capture_write_response", "Handshake detected, merging channels...", UVM_LOW);
             
             merge_write_info(); 
             t_bid = bram_if.axi4_mon_cb.BID;
@@ -153,7 +198,7 @@ task bram_monitor :: capture_write_response();
 endtask
 */
 
-task bram_monitor::merge_write_info();
+task axi4_monitor::merge_write_info();
     bram_seq_item addr_pkt, data_pkt, merged_pkt;
     
     forever begin
@@ -184,10 +229,10 @@ task bram_monitor::merge_write_info();
     end
 endtask
 
-task  bram_monitor :: capture_read_address();
+task  axi4_monitor :: capture_read_address();
  bram_seq_item     pkt;
  forever begin
-    `uvm_info("bram_monitor :: capture_read_address","Triggred",UVM_LOW);
+    `uvm_info("axi4_monitor :: capture_read_address","Triggred",UVM_LOW);
     pkt = bram_seq_item :: type_id :: create("pkt");
     wait( bram_if.axi4_mon_cb.ARREADY==1 && bram_if.axi4_mon_cb.ARVALID==1 && bram_if.ARESETn==1);
     pkt.ARADDR   = bram_if.axi4_mon_cb.ARADDR;
@@ -200,7 +245,7 @@ task  bram_monitor :: capture_read_address();
     pkt.ARQOS    = bram_if.axi4_mon_cb.ARQOS;
     pkt.ARSIZE   = bram_if.axi4_mon_cb.ARSIZE;
     pkt.operation= bram_seq_item::READ;
-    //`uvm_info("bram_monitor :: capture_read_address","captured address pkt put to read_address_array",UVM_LOW);
+    //`uvm_info("axi4_monitor :: capture_read_address","captured address pkt put to read_address_array",UVM_LOW);
     if(!read_address_array.exists(pkt.ARID)) read_address_array[pkt.ARID]=new();
     //`uvm_info("BRAM_MONITOR:: capture_read_address",pkt.sprint(),UVM_LOW)
     read_address_array[pkt.ARID].put(pkt);
@@ -208,12 +253,12 @@ task  bram_monitor :: capture_read_address();
   end
 endtask
 
-task  bram_monitor ::  capture_read_data();
+task  axi4_monitor ::  capture_read_data();
  bram_seq_item     pkt, pkt2sb;
  int i,no_of_beats;
  bit last;
  forever begin
-    `uvm_info("bram_monitor :: capture_read_data","Triggred",UVM_LOW);
+    `uvm_info("axi4_monitor :: capture_read_data","Triggred",UVM_LOW);
     i = 0;
     do begin
       pkt = bram_seq_item :: type_id :: create("pkt");
@@ -241,7 +286,7 @@ task  bram_monitor ::  capture_read_data();
       pkt2sb.RDATA[i] = pkt.RDATA[0];
       pkt2sb.RRESP[i] = pkt.RRESP[0];
    end
-    `uvm_info("bram_monitor :: capture_read_data","Sending pkt to SB",UVM_LOW);
+    `uvm_info("axi4_monitor :: capture_read_data","Sending pkt to SB",UVM_LOW);
     //`uvm_info("BRAM_MONITOR:: capture_read_address: pkt",pkt.sprint(),UVM_LOW)
     //`uvm_info("BRAM_MONITOR:: capture_read_address",pkt2sb.sprint(),UVM_LOW)
     //pkt2sb.print_read_txn(pkt2sb);

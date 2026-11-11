@@ -202,10 +202,10 @@ class mem_wr_rd_test extends cpu_base_test;
     `NEW_COMP
 
     load_mem_lite_seq mem_seq;
-    read_mem_seq seq;
+    read_mem_lite_seq seq;
 
     task main_phase(uvm_phase phase);
-        seq = read_mem_seq :: type_id :: create("seq");
+        seq = read_mem_lite_seq :: type_id :: create("seq");
         mem_seq = load_mem_lite_seq :: type_id :: create("mem_seq");
 
         phase.raise_objection(this);
@@ -313,6 +313,22 @@ class TESTNAME extends cpu_base_test;\
         phase.raise_objection(this);\
             vseq.start(w_env.vsqr);\
         phase.phase_done.set_drain_time(this, 1000ns);\
+        phase.drop_objection(this);\
+    endtask\
+endclass : TESTNAME
+
+`define AXI_TEST(TESTNAME,VSEQ_NAME,CFG)\
+class TESTNAME extends cpu_base_test;\
+    `uvm_component_utils(TESTNAME)\
+    `NEW_COMP\
+    VSEQ_NAME   vseq;\
+    task main_phase(uvm_phase phase);\
+        vseq = VSEQ_NAME::type_id::create("vseq");\
+        phase.raise_objection(this);\
+            vseq.start(w_env.vsqr);\
+        //wait(w_env.c_env.s04_agt.mon.outstanding_wr == 0 && w_env.c_env.s04_agt.mon.outstanding_rd == 0);\
+        wait(w_env.c_env.s04_agt.tkt.tx_done);\
+        phase.phase_done.set_drain_time(this, CFG);\
         phase.drop_objection(this);\
     endtask\
 endclass : TESTNAME
@@ -503,22 +519,78 @@ class timer_reg_access_test extends cpu_base_test;
     endtask
 endclass
 
-class gpio_reg_access_test extends cpu_base_test;
-    `uvm_component_utils(gpio_reg_access_test)
+class gpio_check_test extends cpu_base_test;
+    `uvm_component_utils(gpio_check_test)
     `NEW_COMP
 
-    gpio_reg_access_vseq    gpio_seq;
+    gpio_check_vseq    gpio_seq;
 
     task main_phase(uvm_phase phase);
         `SET_S00_FORK_DISABLE(1);
-        gpio_seq = gpio_reg_access_vseq::type_id::create("gpio_seq");
+        gpio_seq = gpio_check_vseq::type_id::create("gpio_seq");
         phase.raise_objection(this);
             gpio_seq.start(w_env.vsqr);
-        phase.phase_done.set_drain_time(this,3000ns);
+        phase.phase_done.set_drain_time(this,6000ns);
         phase.drop_objection(this);
     endtask
-endclass : gpio_reg_access_test
+endclass : gpio_check_test
 
 `GAPS_TEST(s02_masters_load_bram_test, s02_masters_load_bram_vseq,0)
 `GAPS_TEST(s04_master_bram_test, s04_master_bram_vseq,0)
-`GAPS_TEST(s04_master_bram_4kb_test, s04_master_bram_4kb_vseq,0)
+//`GAPS_TEST(s04_master_axi4_mem_test, s04_master_axi4_mem_vseq,0)
+//`GAPS_TEST(s04_master_bram_4kb_test, s04_master_bram_4kb_vseq,0)
+//`GAPS_TEST(s04_master_outstanding_test, s04_master_outstanding_vseq,0)
+
+class s04_master_bram_4kb_test extends cpu_base_test;
+    `uvm_component_utils(s04_master_bram_4kb_test)
+    `NEW_COMP
+
+    s04_master_bram_4kb_vseq    bram_seq;
+
+    task main_phase(uvm_phase phase);
+        bram_seq = s04_master_bram_4kb_vseq::type_id::create("bram_seq");
+
+        phase.raise_objection(this);    
+            bram_seq.start(w_env.vsqr);
+        phase.phase_done.set_drain_time(this,6000ns);
+        phase.drop_objection(this);
+    endtask
+endclass : s04_master_bram_4kb_test
+
+class s04_master_outstanding_test extends cpu_base_test;
+    `uvm_component_utils(s04_master_outstanding_test)
+    `NEW_COMP
+
+    s04_master_outstanding_vseq    ost_seq;
+
+    task main_phase(uvm_phase phase);
+        ost_seq = s04_master_outstanding_vseq::type_id::create("ost_seq");
+
+        phase.raise_objection(this);    
+            ost_seq.start(w_env.vsqr);
+        wait(w_env.c_env.s04_agt.tkt.tx_done);
+        phase.phase_done.set_drain_time(this,16000ns);
+        phase.drop_objection(this);
+    endtask
+endclass : s04_master_outstanding_test
+
+class s04_master_axi4_mem_test extends cpu_base_test;
+    `uvm_component_utils(s04_master_axi4_mem_test)
+    `NEW_COMP
+
+    s04_master_axi4_mem_vseq    axi4_seq;
+
+    task main_phase(uvm_phase phase);
+        axi4_seq = s04_master_axi4_mem_vseq::type_id::create("axi4_seq");
+
+        phase.raise_objection(this);    
+            axi4_seq.start(w_env.vsqr);
+        phase.phase_done.set_drain_time(this,3000ns);
+        phase.drop_objection(this);
+    endtask
+endclass : s04_master_axi4_mem_test
+
+// id handling in s04_monitor
+`AXI_TEST(s04_master_out_of_order_test,s04_master_out_of_order_vseq,1000ns)
+`AXI_TEST(s04_master_interleaving_test,s04_master_interleaving_vseq,1000ns)
+`AXI_TEST(s04_master_axi_wrap_test,s04_master_axi_wrap_vseq,1000ns)

@@ -18,9 +18,20 @@ vmap secureip     ./secureip
 
 # 3. Compile unisim (VHDL Packages)
 echo "Compiling UNISIM (VHDL)..."
+
 vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_VPKG.vhd"
 vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_VCOMP.vhd"
+#foreach f [lsort [glob -nocomplain "$XILINX_VIVADO/data/vhdl/src/unisims/primitive/*.vhd"]] {
+#    if {[catch {vcom -work unisim -93 $f} err]} { echo "FAILED: $f" }
+#}
+#foreach f [lsort [glob -nocomplain "$XILINX_VIVADO/data/vhdl/src/unisims/retarget/*.vhd"]] {
+#    if {[catch {vcom -work unisim -93 $f} err]} { echo "FAILED: $f -> $err" }
+#}
 vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_retarget_VCOMP.vhd"
+
+#vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_VPKG.vhd"
+#vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_VCOMP.vhd"
+#vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_retarget_VCOMP.vhd"
 
 # 4. Compile unimacro (VHDL)
 echo "Compiling UNIMACRO (VHDL)..."

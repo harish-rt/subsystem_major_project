@@ -2,7 +2,9 @@ catch {file delete -force "sim_txt.log"}
 
 echo "--- Starting UVM Simulation ---"
 
-vsim -t 1ps -voptargs="+acc" -suppress 12110,3009 -sv_seed random \
+#vsim -t 1ps -voptargs="+acc" -suppress 12110,3009 -sv_seed random
+
+vsim -t 1ps -voptargs="+acc" -suppress 12110 -sv_seed random \
 -sv_lib "D:/Softwares/VLSI/QuestaSimSetup/uvm-1.2/win64/uvm_dpi" \
 +UVM_VERBOSITY=UVM_DEBUG \
 +UVM_OBJECTION_TRACE \
@@ -10,6 +12,7 @@ vsim -t 1ps -voptargs="+acc" -suppress 12110,3009 -sv_seed random \
 -L unisims_ver \
 -L unimacro \
 -L unimacro_ver \
+-L secureip \
 -L xpm \
 -L generic_baseblocks_v2_1_0 \
 -L axi_infrastructure_v1_1_0 \
@@ -32,6 +35,7 @@ vsim -t 1ps -voptargs="+acc" -suppress 12110,3009 -sv_seed random \
 -L axi_protocol_converter_v2_1_20 \
 -L axi_intf \
 -L axi4_lite_mem \
+-L axi4_mem \
 -L core_perif \
 -L spi_mem \
 -L core_wrapper \
@@ -44,6 +48,44 @@ xil_defaultlib.top core_ip_wraps.glbl \
 do wave.do
 run -all
 
+
+
+
+
+
+
+
+
+
+
+
+
+#add wave -r sim:/top/dut/IPS_CORE/axi_cdma_0/*
+#set p /top/dut/IPS_CORE/axi_bram_ctrl_0/U0/gext_inst/abcv4_0_ext_inst/GEN_AXI4/I_FULL_AXI/I_WR_CHNL
+#foreach s {
+#  bram_addr_ld_en bid_fifo_ld_en bid_fifo_not_empty bid_fifo_rst
+#  bid_fifo_ld bid_fifo_rd first_fifo_bid b2b_fifo_bid
+#  bid_gets_fifo_load bid_gets_fifo_load_d1
+#  bvalid_cnt bvalid_cnt_inc bvalid_cnt_dec bvalid_cnt_non_zero
+#  bid_fifo_rd_en axi_bid_int
+#} {
+#  add wave -radix binary $p/$s
+#}
+#add wave -r sim:/top/axi4_bram_if/BID
+#add wave -r sim:/top/axi4_bram_if/BVALID
+#add wave -r sim:/top/axi4_bram_if/BREADY
+#add wave -r sim:/top/axi4_bram_if/AWID
+#add wave -noupdate -group M03 -radix hexadecimal /top/dut/IPS_CORE/axi_interconnect_0_M03_AXI_*
+#add wave -noupdate -group BRAM_CTRL_INT -radix hexadecimal -r -internal /top/dut/IPS_CORE/axi_bram_ctrl_0/*
+#add wave -noupdate -group BRAM_RESPONSE -radix hexadecimal \
+#/top/dut/IPS_CORE/axi_bram_ctrl_0/s_axi_awid \
+#/top/dut/IPS_CORE/axi_bram_ctrl_0/s_axi_awvalid \
+#/top/dut/IPS_CORE/axi_bram_ctrl_0/s_axi_awready \
+#/top/dut/IPS_CORE/axi_bram_ctrl_0/s_axi_bid \
+#/top/dut/IPS_CORE/axi_bram_ctrl_0/s_axi_bvalid \
+#/top/dut/IPS_CORE/axi_bram_ctrl_0/s_axi_bready \
+#/top/dut/IPS_CORE/axi_bram_ctrl_0/s_axi_bresp
+#add wave -recursive /top/mem4_intf/*
 #add wave -noupdate -group BRAM_CTRL -radix hex /top/dut/IPS_CORE/axi_bram_ctrl_0/s_axi_*
 #add wave -noupdate -group BRAM_CTRL_INT -r -internal /top/dut/IPS_CORE/axi_bram_ctrl_0/*
 #add wave -noupdate -group M03 -radix binary /top/dut/IPS_CORE/axi_interconnect_0_M03_AXI_*
