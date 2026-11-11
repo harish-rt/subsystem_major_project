@@ -519,21 +519,21 @@ class timer_reg_access_test extends cpu_base_test;
     endtask
 endclass
 
-class gpio_reg_access_test extends cpu_base_test;
-    `uvm_component_utils(gpio_reg_access_test)
+class gpio_check_test extends cpu_base_test;
+    `uvm_component_utils(gpio_check_test)
     `NEW_COMP
 
-    gpio_reg_access_vseq    gpio_seq;
+    gpio_check_vseq    gpio_seq;
 
     task main_phase(uvm_phase phase);
         `SET_S00_FORK_DISABLE(1);
-        gpio_seq = gpio_reg_access_vseq::type_id::create("gpio_seq");
+        gpio_seq = gpio_check_vseq::type_id::create("gpio_seq");
         phase.raise_objection(this);
             gpio_seq.start(w_env.vsqr);
-        phase.phase_done.set_drain_time(this,3000ns);
+        phase.phase_done.set_drain_time(this,6000ns);
         phase.drop_objection(this);
     endtask
-endclass : gpio_reg_access_test
+endclass : gpio_check_test
 
 `GAPS_TEST(s02_masters_load_bram_test, s02_masters_load_bram_vseq,0)
 `GAPS_TEST(s04_master_bram_test, s04_master_bram_vseq,0)
@@ -568,6 +568,7 @@ class s04_master_outstanding_test extends cpu_base_test;
 
         phase.raise_objection(this);    
             ost_seq.start(w_env.vsqr);
+        wait(w_env.c_env.s04_agt.tkt.tx_done);
         phase.phase_done.set_drain_time(this,16000ns);
         phase.drop_objection(this);
     endtask
@@ -593,7 +594,7 @@ endclass : s04_master_axi4_mem_test
 `AXI_TEST(s04_master_out_of_order_test,s04_master_out_of_order_vseq,1000ns)
 `AXI_TEST(s04_master_interleaving_test,s04_master_interleaving_vseq,1000ns)
 
-/*class cdma_mem2bram_test extends cpu_base_test;
+class cdma_mem2bram_test extends cpu_base_test;
     `uvm_component_utils(cdma_mem2bram_test)
 
     function new(string name="cdma_mem2bram_test",uvm_component parent);
@@ -607,4 +608,5 @@ endclass : s04_master_axi4_mem_test
             phase.phase_done.set_drain_time(this,1000ns);
         phase.drop_objection(this);
     endtask
-endclass*/
+endclass
+`AXI_TEST(s04_master_axi_wrap_test,s04_master_axi_wrap_vseq,1000ns)

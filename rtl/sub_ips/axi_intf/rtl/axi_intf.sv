@@ -1,4 +1,5 @@
 //default param config to AXI
+`timescale 1ns/1ps
 interface axi4_intf();
    parameter ADDR_WIDTH 	    = 32;
    parameter DATA_WIDTH 	    = 32;

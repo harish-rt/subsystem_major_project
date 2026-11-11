@@ -102,25 +102,30 @@ class soc_master_vseq extends soc_base_virtual_sequence;
     `NEW_OBJ
 
     cpu_config_intc_seq     intc_seq;
-    load_bram_seq           bram_seq;
+    load_mem_seq            mem_seq;
     cdma_read_write_seq     cdma_seq;
     cpu_isr_vseq            isr_vseq;
 
     task body();
         super.body();
 
-        isr_vseq = cpu_isr_vseq        ::type_id::create("isr_vseq");
-        bram_seq = load_bram_seq       ::type_id::create("bram_seq");
-        intc_seq = cpu_config_intc_seq ::type_id::create("intc_seq");
-        cdma_seq = cdma_read_write_seq ::type_id::create("cdma_seq");
+        isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
+        mem_seq  = load_mem_seq         ::type_id::create("mem_seq");
+        intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
+        cdma_seq = cdma_read_write_seq  ::type_id::create("cdma_seq");
         
         intc_seq.cdma_en = 1;
+        assert(mem_seq.randomize() with {
+            addr    == AXI4_MEM_BASE;
+            len     == 'hf;
+            burst   == INCR;
+        });
 
         fork
             isr_vseq.start(p_sequencer);
         join_none
 
-        bram_seq.start(p_sequencer.s00_sqr);
+        mem_seq.start(p_sequencer.s04_sqr);
         intc_seq.start(p_sequencer.s00_sqr);
         cdma_seq.start(p_sequencer.s00_sqr);
         isr_clear();    // waits for irq down before ending soc_master_vseq
@@ -565,17 +570,17 @@ class timer_reg_access_vseq extends soc_base_virtual_sequence;
     endtask
 endclass
 
-class gpio_reg_access_vseq extends soc_base_virtual_sequence;
-    `uvm_object_utils(gpio_reg_access_vseq)
+class gpio_check_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(gpio_check_vseq)
     `NEW_OBJ
 
-    gpio_reg_access_seq         m_gpio_seq;
+    gpio_check_seq              m_gpio_seq;
     gpio_slave_responder_seq    s_gpio_seq;
     cpu_config_intc_seq         intc_seq;   // s02
     cpu_isr_vseq                isr_vseq;   // s00
 
     task body();
-        m_gpio_seq = gpio_reg_access_seq::type_id::create("m_gpio_seq");
+        m_gpio_seq = gpio_check_seq     ::type_id::create("m_gpio_seq");
         s_gpio_seq = gpio_slave_responder_seq::type_id::create("s_gpio_seq");
         intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
         isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
@@ -587,11 +592,11 @@ class gpio_reg_access_vseq extends soc_base_virtual_sequence;
         fork
             intc_seq.start(p_sequencer.s02_sqr);
             m_gpio_seq.start(p_sequencer.s00_sqr);
-            s_gpio_seq.start(p_sequencer.gpio_sqr);
+            //s_gpio_seq.start(p_sequencer.gpio_sqr);
         join
         isr_clear();
     endtask
-endclass : gpio_reg_access_vseq
+endclass : gpio_check_vseq
 
 
 class s02_masters_load_bram_vseq extends soc_base_virtual_sequence;
@@ -630,9 +635,10 @@ class s04_master_bram_vseq extends soc_base_virtual_sequence;
         s04_seq = load_mem_seq::type_id::create("s04_seq");
 
         assert(s04_seq.randomize()with{
-            addr  == {BRAM_END - 'd3};
-            len   == 'hff;
-            burst == INCR;
+            slave == BRAM;
+            len   == 'hf;
+            //addr  == {BRAM_END - 'd3};
+            //burst == INCR;
         });
         s04_seq.start(p_sequencer.s04_sqr);
     endtask
@@ -677,13 +683,10 @@ class s04_master_outstanding_vseq extends soc_base_virtual_sequence;
 
         for (int i = 0; i < 64; i++) begin
             if (!s04_b_seq.randomize() with {
-                len   == 'hfF;
-                slave == BRAM_M;
+                len   == 'h1F;
+                slave == AXI4_M;
+                //slave == BRAM_M;
                 aw_id == ((i % 15) + 1);                    
-                //solve len before addr;                
-                //addr  >= BRAM_BASE;
-                //addr  <= (BRAM_END - ((len + 1) * 4) + 1);                
-                //burst == INCR;
             }) begin
                 `uvm_error("OST_SEQ_RND_FAIL","Failed to randomize s04_b_seq")
             end
@@ -862,7 +865,29 @@ class s04_master_interleaving_vseq extends soc_base_virtual_sequence;
     endtask
 endclass : s04_master_interleaving_vseq
 
-class cdma_mem2bram_vseq extends soc_base_virtual_sequence;
-    `uvm_object_utils(cdma_mem2bram_vseq)
+
+class s04_master_axi_wrap_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(s04_master_axi_wrap_vseq)
     `NEW_OBJ
-endclass
+
+    load_mem_seq    s04_seq;
+    read_mem_seq    s04_seq_r;
+
+    task body();
+        s04_seq = load_mem_seq::type_id::create("s04_seq");
+        s04_seq_r = read_mem_seq::type_id::create("s04_seq_r");
+
+        assert(s04_seq.randomize()with{
+            addr  == LITE_MEM_BASE + 'h108;
+            len   == 'hf;
+            burst == WRAP;
+        });
+        assert(s04_seq_r.randomize()with{
+            addr  == LITE_MEM_BASE + 'h108;
+            len   == 'hf;
+            burst == WRAP;
+        });
+        s04_seq.start(p_sequencer.s04_sqr);
+        s04_seq_r.start(p_sequencer.s04_sqr);
+    endtask
+endclass : s04_master_axi_wrap_vseq

@@ -10,7 +10,8 @@ class ss_scoreboard extends uvm_scoreboard;
     uvm_tlm_analysis_fifo #(bram_seq_item)              bram_af[2];
     uvm_tlm_analysis_fifo #(bram_seq_item)              mem4_af;
     uvm_tlm_analysis_fifo #(mem_seq_item)               mem_af;
-    uvm_tlm_analysis_fifo #(master_seq_item)            cdma_af;
+    uvm_tlm_analysis_fifo #(master_seq_item)            cdma_m_af;
+    uvm_tlm_analysis_fifo #(slave_seq_item)             cdma_s_af[2];
     uvm_tlm_analysis_fifo #(lite_intc_seq_item)         intc_af;
     uvm_tlm_analysis_fifo #(core_perif_lite_seq_item)   core_perif_af;
 
@@ -88,6 +89,8 @@ class ss_scoreboard extends uvm_scoreboard;
     extern function void    match_cdma_wr();
     extern function void    match_cdma_rd();
 
+    extern task             cdma_dm_traffic();
+
     extern task             intc_traffic();
     extern function void    match_intc_wr();
     extern function void    match_intc_rd();
@@ -95,6 +98,7 @@ class ss_scoreboard extends uvm_scoreboard;
     extern task             core_perif_traffic();
     extern function void    match_core_wr();
     extern function void    match_core_rd();
+    extern function bit [ADDR_WIDTH-1:0] beat_addr(bit [ADDR_WIDTH-1:0] addr,bit [7:0]len,bit [2:0] size,bit [1:0] burst,int unsigned n);
 endclass
 
 function void ss_scoreboard::build_phase(uvm_phase phase);
@@ -102,17 +106,20 @@ function void ss_scoreboard::build_phase(uvm_phase phase);
 	if(!uvm_config_db #(sb_config)::get(this,"","SB_CFG",sb_cfg))
         `uvm_fatal("SS_SBD_ERR","Failed to get sb_cfg!")
     foreach(master_af[i])begin
-        master_af[i]       = new($sformatf("master_af[%0d]",i),this);
+        master_af[i]    = new($sformatf("master_af[%0d]",i),this);
     end
     foreach(bram_af[i])begin
-        bram_af[i]       = new($sformatf("bram_af[%0d]",i),this);
+        bram_af[i]      = new($sformatf("bram_af[%0d]",i),this);
+    end
+    foreach(cdma_s_af[i])begin
+        cdma_s_af[i]    = new($sformatf("cdma_s_af[%0d]",i),this);
     end
     //master_af       = new("master_af",this);
     s04_af          = new("s04_af",this);
     //bram_af         = new("bram_af",this);
     mem_af          = new("mem_af",this);
     mem4_af         = new("mem4_af",this);
-    cdma_af         = new("cdma_af",this);
+    cdma_m_af       = new("cdma_m_af",this);
     intc_af         = new("intc_af",this);
     core_perif_af   = new("core_perif_af",this);
 endfunction
@@ -126,6 +133,7 @@ task ss_scoreboard::main_phase(uvm_phase phase);
         axi4_traffic();
         mem_traffic();
         cdma_traffic();
+        cdma_dm_traffic();
         intc_traffic();
         core_perif_traffic();
     join
@@ -693,6 +701,7 @@ function void ss_scoreboard::match_lite_wr();
     bit [ADDR_WIDTH-1:0]    aligned_base_addr;
     bit                     is_match;
     int                     exp_beats;
+    int                     strb_w;
 
     while(exp_lite_wr_q.size() > 0) begin
         exp = exp_lite_wr_q[0];
@@ -703,18 +712,20 @@ function void ss_scoreboard::match_lite_wr();
         exp = exp_lite_wr_q.pop_front();
         is_match = 1;
         
-        aligned_base_addr = exp.AWADDR & ~(ADDR_WIDTH'(3));
+        //aligned_base_addr = exp.AWADDR & ~(ADDR_WIDTH'(3));
 
         `uvm_info("SBD_LITE_WR_TRACE", $sformatf("Starting comparison for [%s] LITE_MEM Write (Beats: %0d)", exp.master_p.name(), exp_beats), UVM_LOW)
 
         for(int b = 0; b < exp_beats; b++) begin
             act = act_lite_wr_q.pop_front();
 
-            if (b == 0) begin
-                exp_beat_addr = exp.AWADDR;
-            end else begin
-                exp_beat_addr = aligned_base_addr + (b * 4);
-            end
+            //if (b == 0) begin
+            //    exp_beat_addr = exp.AWADDR;
+            //end else begin
+            //    exp_beat_addr = beat_addr(exp.AWADDR, exp.AWLEN, exp.AWSIZE, exp.AWBURST, b);
+            //    //exp_beat_addr = aligned_base_addr + (b * 4);
+            //end
+            exp_beat_addr = beat_addr(exp.AWADDR,exp.AWLEN,exp.AWSIZE,exp.AWBURST,b);
 
             if(exp_beat_addr !== act.awaddr) begin
                 `uvm_error("SBD_LITE_WR_ERR", $sformatf("[%s] AWADDR mismatch on beat %0d: exp_beat_addr=0x%08h act=0x%08h", exp.master_p.name(), b, exp_beat_addr, act.awaddr))
@@ -726,7 +737,8 @@ function void ss_scoreboard::match_lite_wr();
                 is_match = 0;
             end
             
-            for(int i = 0; i < 4; i++) begin
+            strb_w = $bits(act.wstrb); 
+            for(int i = 0; i < strb_w; i++) begin
                 if(exp.WSTRB[b][i] && (exp.WDATA[b][8*i +: 8] !== act.wdata[8*i +: 8])) begin
                     `uvm_error("SBD_LITE_WR_ERR", $sformatf("[%s] DATA mismatch on beat %0d @0x%08h byte %0d: exp=0x%02h act=0x%02h", exp.master_p.name(), b, exp.AWADDR, i, exp.WDATA[b][8*i +: 8], act.wdata[8*i +: 8]))
                     is_match = 0;
@@ -743,7 +755,7 @@ function void ss_scoreboard::match_lite_wr();
             //lite_wr_mismatch++;
         end
     end
-endfunction
+endfunction : match_lite_wr
 
 function void ss_scoreboard::match_lite_rd();
     axi_base_sequence_item  exp;
@@ -765,7 +777,8 @@ function void ss_scoreboard::match_lite_rd();
 
         for(int b = 0; b < exp_beats; b++) begin
             act = act_lite_rd_q.pop_front();
-            exp_addr = exp.ARADDR + (b * 4); // Calculate the beat-level address
+            exp_addr = beat_addr(exp.ARADDR,exp.ARLEN,exp.ARSIZE,exp.ARBURST,b);
+            //exp_addr = exp.ARADDR + (b * 4); // Calculate the beat-level address
 
             if(exp_addr !== act.araddr) begin
                 `uvm_error("SBD_LITE_RD_ERR", $sformatf("[%s] ARADDR mismatch on beat %0d: exp=0x%08h act=0x%08h", exp.master_p.name(), b, exp_addr, act.araddr))
@@ -787,20 +800,37 @@ function void ss_scoreboard::match_lite_rd();
     end
 endfunction
 
+task ss_scoreboard::cdma_dm_traffic();
+    slave_seq_item pkt;
+    foreach(cdma_s_af[i])begin
+        automatic int id = i;
+
+        fork
+            forever begin
+                cdma_s_af[id].get(pkt);
+
+                if(pkt.operation == WRITE) begin
+                    `uvm_info("SBD_CDMA_DM_W",$sformatf("DM mon saw Write:\n%s",pkt.sprint()),UVM_LOW)
+                end else begin
+                    `uvm_info("SBD_CDMA_DM_R",$sformatf("DM mon saw Read:\n%s",pkt.sprint()),UVM_LOW)
+                end
+            end
+        join_none
+    end
+endtask : cdma_dm_traffic
+
 task ss_scoreboard::cdma_traffic();
     master_seq_item pkt;
     forever begin
-        cdma_af.get(pkt);
+        cdma_m_af.get(pkt);
         
         `uvm_info("SBD_CDMA_ACT", $sformatf("Received packet from CDMA register monitor:\n%s", pkt.sprint()), UVM_LOW)
 
         if(pkt.operation == WRITE) begin
             act_cdma_wr_q.push_back(pkt);
-            //match_cdma_wr();
         end
         else if(pkt.operation == READ) begin
             act_cdma_rd_q.push_back(pkt);
-            //match_cdma_rd();
         end
     end
 endtask : cdma_traffic
@@ -924,7 +954,7 @@ function void ss_scoreboard::match_intc_wr();
             `uvm_info("SBD_INTC_WR_PASS", $sformatf("[%s] INTC Write match SUCCESS at Addr=0x%08h", exp.master_p.name(), exp.AWADDR), UVM_LOW)
         end
     end
-endfunction
+endfunction : match_intc_wr
 
 function void ss_scoreboard::match_intc_rd();
     axi_base_sequence_item      exp;
@@ -955,7 +985,7 @@ function void ss_scoreboard::match_intc_rd();
             `uvm_info("SBD_INTC_RD_PASS", $sformatf("[%s] INTC Read match SUCCESS at Addr=0x%08h", exp.master_p.name(), exp.ARADDR), UVM_LOW)
         end
     end
-endfunction
+endfunction : match_intc_rd
 
 task ss_scoreboard::core_perif_traffic();
     core_perif_lite_seq_item pkt;
@@ -1015,7 +1045,7 @@ function void ss_scoreboard::match_core_wr();
             `uvm_info("SBD_CORE_WR_PASS", $sformatf("[%s] CORE_PERIF Write match SUCCESS at Addr=0x%08h", exp.master_p.name(), exp.AWADDR), UVM_LOW)
         end
     end
-endfunction
+endfunction : match_core_wr
 
 function void ss_scoreboard::match_core_rd();
     axi_base_sequence_item      exp;
@@ -1044,7 +1074,7 @@ function void ss_scoreboard::match_core_rd();
             `uvm_info("SBD_CORE_RD_PASS", $sformatf("[%s] CORE_PERIF Read match SUCCESS at Addr=0x%08h", exp.master_p.name(), exp.ARADDR), UVM_LOW)
         end
     end
-endfunction
+endfunction : match_core_rd
 
 function void ss_scoreboard::report_phase(uvm_phase phase);
     super.report_phase(phase);
@@ -1072,4 +1102,40 @@ function void ss_scoreboard::report_phase(uvm_phase phase);
     end else begin
         `uvm_info("SBD_LITE_MEM_RD_MATCH_REPORT", "Simulation PASSED without Scoreboard mismatches.", UVM_NONE)
     end
-endfunction
+endfunction : report_phase
+
+function bit [ADDR_WIDTH-1:0] ss_scoreboard::beat_addr(
+    bit [ADDR_WIDTH-1:0] addr,
+    bit [7:0]            len,
+    bit [2:0]            size,
+    bit [1:0]            burst,
+    int unsigned         n);
+
+    int unsigned         num_bytes;
+    int unsigned         total;
+    bit [ADDR_WIDTH-1:0] aligned;
+    bit [ADDR_WIDTH-1:0] lower;
+    bit [ADDR_WIDTH-1:0] a;
+
+    num_bytes = 1 << size;
+    total     = num_bytes * (len + 1);
+    aligned   = addr & ~(ADDR_WIDTH'(num_bytes - 1));
+    lower     = (addr / total) * total;
+
+    if (n == 0) return addr;
+
+    case (burst)
+        2'b00 : a = addr;                              // FIXED: same address every beat
+        2'b01 : a = aligned + n * num_bytes;           // INCR
+        2'b10 : begin                                  // WRAP
+                    a = aligned + n * num_bytes;
+                    if(a >= lower + total) a -= total; // went past the top, wrap to the bottom
+                end
+        default: begin
+            `uvm_error("SBD_UNKNOWN_BURST",$sformatf("Reserved/unknown burst=%0b",burst))
+            a = addr;
+        end
+    endcase
+
+    return a;
+endfunction : beat_addr

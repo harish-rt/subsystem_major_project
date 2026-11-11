@@ -154,19 +154,21 @@ module axi4_memory_unit #(
     wire [MEM_ADDR_BITS-1:0] r_base = bus_base(r_addr);
 
     logic [AXI_DW-1:0] rdata_c;
-    always @(posedge s_axi4_intf.ACLK) begin
+
+    always @(*) begin
         rdata_c = '0;
-        if (r_ok) begin
-            for (int b = 0; b < AXI_SW; b++)
+        if (r_state == R_DATA && r_ok) begin
+            for (int b = 0; b < AXI_SW; b++) begin
                 rdata_c[b*8 +: 8] = mem[r_base + b];
+            end
         end
     end
 
     assign s_axi4_intf.ARREADY = (r_state == R_IDLE);
     assign s_axi4_intf.RVALID  = (r_state == R_DATA);
-    assign s_axi4_intf.RID     = r_id;
+    assign s_axi4_intf.RID     = (r_state == R_DATA) ? r_id : '0;
     assign s_axi4_intf.RDATA   = rdata_c;
-    assign s_axi4_intf.RRESP   = r_ok ? RESP_OKAY : RESP_SLVERR;
+    assign s_axi4_intf.RRESP   = (r_state == R_DATA) ? (r_ok ? RESP_OKAY : RESP_SLVERR) : RESP_OKAY;
     assign s_axi4_intf.RLAST   = (r_state == R_DATA) && (r_len == 8'd0);
 
     always @(posedge s_axi4_intf.ACLK) begin
@@ -180,22 +182,26 @@ module axi4_memory_unit #(
             r_id        <= '0;
         end else begin
             case (r_state)
-                R_IDLE: if (s_axi4_intf.ARVALID) begin
-                    r_addr      <= s_axi4_intf.ARADDR;
-                    r_len       <= s_axi4_intf.ARLEN;
-                    r_total_len <= s_axi4_intf.ARLEN;
-                    r_size      <= s_axi4_intf.ARSIZE;
-                    r_burst     <= s_axi4_intf.ARBURST;
-                    r_id        <= s_axi4_intf.ARID;
-                    r_state     <= R_DATA;
+                R_IDLE: begin
+                    if (s_axi4_intf.ARVALID) begin
+                        r_addr      <= s_axi4_intf.ARADDR;
+                        r_len       <= s_axi4_intf.ARLEN;
+                        r_total_len <= s_axi4_intf.ARLEN;
+                        r_size      <= s_axi4_intf.ARSIZE;
+                        r_burst     <= s_axi4_intf.ARBURST;
+                        r_id        <= s_axi4_intf.ARID;
+                        r_state     <= R_DATA;
+                    end
                 end
 
-                R_DATA: if (s_axi4_intf.RREADY) begin
-                    if (r_len == 8'd0) begin
-                        r_state <= R_IDLE;
-                    end else begin
-                        r_len  <= r_len - 8'd1;
-                        r_addr <= next_addr(r_addr, r_total_len, r_size, r_burst);
+                R_DATA: begin
+                    if (s_axi4_intf.RREADY) begin
+                        if (r_len == 8'd0) begin
+                            r_state <= R_IDLE;
+                        end else begin
+                            r_len  <= r_len - 8'd1;
+                            r_addr <= next_addr(r_addr, r_total_len, r_size, r_burst);
+                        end
                     end
                 end
 

@@ -118,8 +118,8 @@ task  s04_monitor :: capture_write_address();
     pkt.AWSIZE   = mon_intf.axi4_mon_cb.AWSIZE;
     //pkt.operation= command_t'(WRITE);
     pkt.operation   = WRITE;
-    resp_ap.write(pkt); //write pkt to sequencer for response
     wait(mon_intf.axi4_mon_cb.AWREADY && mon_intf.axi4_mon_cb.AWVALID && mon_intf.ARESETn==1);
+    resp_ap.write(pkt); //write pkt to sequencer for response
     pkt.wadd_hndshk = $realtime();  //capturing timestamp for handshake.
     `uvm_info("s04_monitor_capture_write_address",pkt.sprint(),UVM_LOW);
     write_address_mbx.put(pkt);

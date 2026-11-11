@@ -32,24 +32,25 @@ endclass :axi4_monitor
      super.build_phase (phase);
      mon_ap = new ("mon_ap",this);
      `uvm_info (get_full_name() , phase.get_name() , UVM_LOW)
-    //if(!uvm_config_db#(virtual axi4_tb_intf.MONITOR_MOD)::get(this,"","BRAM_MON",bram_if)) begin
-	//	`uvm_fatal("NO_VIF",{"virtual interface is not set for monitor"})
-	//end
    endfunction : build_phase
 
 task axi4_monitor :: main_phase (uvm_phase phase);
- `uvm_info (get_full_name() , phase.get_name() , UVM_LOW)
- fork
-  //capture_reset();
-  capture_write_address();
-  capture_write_data();
-  capture_write_response();
-  capture_read_address();
-  capture_read_data();
-  merge_write_info();
+    `uvm_info (get_full_name() , phase.get_name() , UVM_LOW)
+    fork
+    //capture_reset();
+    capture_write_address();
+    capture_write_data();
+    capture_write_response();
+    capture_read_address();
+    capture_read_data();
+    merge_write_info();
 
-  forever begin
+    forever begin
         @(bram_if.axi4_mon_cb);
+
+        if (bram_if.axi4_mon_cb.BVALID && bram_if.axi4_mon_cb.BREADY) begin
+            $display("FROM_BRAM_MON [%0t] AWID=%h BID=%h BRESP=%h",$time,bram_if.axi4_mon_cb.AWID,bram_if.axi4_mon_cb.BID, bram_if.axi4_mon_cb.BRESP);
+        end
 
         if (!bram_if.ARESETn) begin
             outstanding_wr     = 0;
@@ -87,7 +88,7 @@ task axi4_monitor :: main_phase (uvm_phase phase);
             `uvm_info("BRAM_RD_OUTSTANDING",$sformatf("Current=%0d Maximum=%0d",outstanding_rd, max_outstanding_rd),UVM_MEDIUM)
         end
     end
- join
+    join
 endtask
 
 task  axi4_monitor :: capture_write_address();
@@ -142,12 +143,12 @@ endtask
 
 task axi4_monitor :: capture_write_response();
     bram_seq_item pkt;
-    bit [8:0] t_bid;
+    bit [6:0] t_bid;
     
     forever begin
         @(bram_if.axi4_mon_cb);
         if (bram_if.axi4_mon_cb.BREADY == 1 && bram_if.axi4_mon_cb.BVALID == 1 && bram_if.ARESETn == 1) begin
-            `uvm_info("axi4_monitor :: capture_write_response", "Handshake detected...", UVM_LOW);
+            `uvm_info("axi4_monitor :: capture_write_response","Handshake detected...",UVM_LOW);
             
             t_bid = bram_if.axi4_mon_cb.BID;
 

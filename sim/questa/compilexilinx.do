@@ -11,11 +11,12 @@ set INCDIR        "+incdir+$PROJECT_SRC/ipshared/ec67/hdl"
 vlib work
 vlib riviera
 vlib riviera/xpm
-vlib riviera/unisim
+#vlib riviera/unisim
+#
+#vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_VPKG.vhd"
+#vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_VCOMP.vhd"
+#vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_retarget_VCOMP.vhd"
 
-vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_VPKG.vhd"
-vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_VCOMP.vhd"
-vcom -work unisim -93 "$XILINX_VIVADO/data/vhdl/src/unisims/unisim_retarget_VCOMP.vhd"
 # ==============================================================================
 # Create Libraries
 # ==============================================================================
@@ -28,12 +29,12 @@ vlib riviera/axi_crossbar_v2_1_21
 vlib riviera/core_ip_wraps
 vlib riviera/axi_lite_ipif_v3_0_4
 vlib riviera/axi_intc_v4_1_14
-vlib riviera/blk_mem_gen_v8_4_4
-vlib riviera/axi_bram_ctrl_v4_1_2
 vlib riviera/lib_pkg_v1_0_2
 vlib riviera/lib_srl_fifo_v1_0_2
 vlib riviera/lib_fifo_v1_0_14
 vlib riviera/lib_cdc_v1_0_2
+vlib riviera/blk_mem_gen_v8_4_4
+vlib riviera/axi_bram_ctrl_v4_1_2
 vlib riviera/axi_datamover_v5_1_22
 vlib riviera/axi_sg_v4_1_13
 vlib riviera/axi_cdma_v4_1_20
@@ -45,7 +46,7 @@ vlib riviera/xil_defaultlib
 # Map Libraries
 # ==============================================================================
 vmap xpm riviera/xpm
-vmap unisim riviera/unisim
+#vmap unisim riviera/unisim
 vmap generic_baseblocks_v2_1_0 riviera/generic_baseblocks_v2_1_0
 vmap axi_infrastructure_v1_1_0 riviera/axi_infrastructure_v1_1_0
 vmap axi_register_slice_v2_1_20 riviera/axi_register_slice_v2_1_20
@@ -55,12 +56,12 @@ vmap axi_crossbar_v2_1_21 riviera/axi_crossbar_v2_1_21
 vmap core_ip_wraps riviera/core_ip_wraps
 vmap axi_lite_ipif_v3_0_4 riviera/axi_lite_ipif_v3_0_4
 vmap axi_intc_v4_1_14 riviera/axi_intc_v4_1_14
-vmap blk_mem_gen_v8_4_4 riviera/blk_mem_gen_v8_4_4
-vmap axi_bram_ctrl_v4_1_2 riviera/axi_bram_ctrl_v4_1_2
 vmap lib_pkg_v1_0_2 riviera/lib_pkg_v1_0_2
 vmap lib_srl_fifo_v1_0_2 riviera/lib_srl_fifo_v1_0_2
 vmap lib_fifo_v1_0_14 riviera/lib_fifo_v1_0_14
 vmap lib_cdc_v1_0_2 riviera/lib_cdc_v1_0_2
+vmap blk_mem_gen_v8_4_4 riviera/blk_mem_gen_v8_4_4
+vmap axi_bram_ctrl_v4_1_2 riviera/axi_bram_ctrl_v4_1_2
 vmap axi_datamover_v5_1_22 riviera/axi_datamover_v5_1_22
 vmap axi_sg_v4_1_13 riviera/axi_sg_v4_1_13
 vmap axi_cdma_v4_1_20 riviera/axi_cdma_v4_1_20
@@ -121,17 +122,8 @@ vcom -work core_ip_wraps -93 \
 vlog -work core_ip_wraps -vlog01compat $INCDIR \
 "$PROJECT_SRC/sim/core_ip_wraps.v"
 
-vlog -work blk_mem_gen_v8_4_4 -vlog01compat $INCDIR \
-"$PROJECT_SRC/ipshared/2985/simulation/blk_mem_gen_v8_4.v"
-
 vlog -work core_ip_wraps -vlog01compat $INCDIR \
 "$PROJECT_SRC/ip/core_ip_wraps_blk_mem_gen_0_0/sim/core_ip_wraps_blk_mem_gen_0_0.v"
-
-vcom -work axi_bram_ctrl_v4_1_2 -93 \
-"$PROJECT_SRC/ipshared/a002/hdl/axi_bram_ctrl_v4_1_rfs.vhd"
-
-vcom -work core_ip_wraps -93 \
-"$PROJECT_SRC/ip/core_ip_wraps_axi_bram_ctrl_0_1/sim/core_ip_wraps_axi_bram_ctrl_0_1.vhd"
 
 vcom -work lib_pkg_v1_0_2 -93 \
 "$PROJECT_SRC/ipshared/0513/hdl/lib_pkg_v1_0_rfs.vhd"
@@ -144,6 +136,15 @@ vcom -work lib_fifo_v1_0_14 -93 \
 
 vcom -work lib_cdc_v1_0_2 -93 \
 "$PROJECT_SRC/ipshared/ef1e/hdl/lib_cdc_v1_0_rfs.vhd"
+
+vlog -work blk_mem_gen_v8_4_4 -vlog01compat $INCDIR \
+"$PROJECT_SRC/ipshared/2985/simulation/blk_mem_gen_v8_4.v"
+
+vcom -work axi_bram_ctrl_v4_1_2 -93 \
+"$PROJECT_SRC/ipshared/a002/hdl/axi_bram_ctrl_v4_1_rfs.vhd"
+
+vcom -work core_ip_wraps -93 \
+"$PROJECT_SRC/ip/core_ip_wraps_axi_bram_ctrl_0_1/sim/core_ip_wraps_axi_bram_ctrl_0_1.vhd"
 
 vcom -work axi_datamover_v5_1_22 -93 \
 "$PROJECT_SRC/ipshared/1e40/hdl/axi_datamover_v5_1_vh_rfs.vhd"
