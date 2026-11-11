@@ -37,13 +37,13 @@ do waves.tcl
 run -all
 #transcript to
 
-#add wave -recursive /top/dut/CORE_PERIF_CTRL/u_intc/*
+add wave -recursive /top/dut/CORE_PERIF_CTRL/u_intc/*
 #add wave -recursive /top/dut/CORE_PERIF_CTRL/u_spi/*
 #add wave -recursive /top/dut/CORE_PERIF_CTRL/u_gpio/*
 #add wave -recursive /top/dut/CORE_PERIF_CTRL/u_uart/*
 
-#add wave -recursive /top/axi4_bram_if/*
-#add wave -recursive /top/mem_intf/*
+add wave -recursive /top/axi4_bram_if/*
+add wave -recursive /top/mem_intf/*
 #add wave -recursive /top/axil_riscv_if/*
 #add wave -recursive /top/lite_intc_if/*
 #add wave -recursive /top/intc_if/*

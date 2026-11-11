@@ -592,3 +592,19 @@ endclass : s04_master_axi4_mem_test
 // id handling in s04_monitor
 `AXI_TEST(s04_master_out_of_order_test,s04_master_out_of_order_vseq,1000ns)
 `AXI_TEST(s04_master_interleaving_test,s04_master_interleaving_vseq,1000ns)
+
+/*class cdma_mem2bram_test extends cpu_base_test;
+    `uvm_component_utils(cdma_mem2bram_test)
+
+    function new(string name="cdma_mem2bram_test",uvm_component parent);
+        super.new(name,parent);
+    endfunction
+
+    task main_phase(uvm_phase phase);
+        cdma_mem2bram_seq cdma_seq=cdma_mem2bram_seq::type_id::create("cdma_seq");
+        phase.raise_objection(this);
+            cdma_seq.start(w_env.c_env.cpu_agt[0].sqr);
+            phase.phase_done.set_drain_time(this,1000ns);
+        phase.drop_objection(this);
+    endtask
+endclass*/

@@ -837,8 +837,7 @@ class s04_master_interleaving_vseq extends soc_base_virtual_sequence;
         assert(bram_seq.randomize()with{
             addr    == bram_addr;
             len     == burst_len;
-            burst   == INCR;
-            ar_id   == id+2;
+            burst   == INCR;            ar_id   == id+2;
         });
         assert(m05_seq.randomize()with{
             addr    == m05_addr;
@@ -862,3 +861,8 @@ class s04_master_interleaving_vseq extends soc_base_virtual_sequence;
         join
     endtask
 endclass : s04_master_interleaving_vseq
+
+class cdma_mem2bram_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(cdma_mem2bram_vseq)
+    `NEW_OBJ
+endclass

@@ -544,6 +544,7 @@ module top;
         //run_test("cdma_wr_rd_test");
         //run_test("mem_wr_rd_test");
         //run_test("cdma_sg_test");
+        run_test("cdma_mem2bram_test");
     end
 
     initial begin
