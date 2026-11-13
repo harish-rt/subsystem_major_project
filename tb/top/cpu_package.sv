@@ -15,7 +15,8 @@ package cpu_package;
     `include "../cpu/cpu_seq_item.sv"
     `include "../cpu/cpu_sequence.sv"
     `include "../cpu/cpu_sequencer.sv"
-    `include "../cpu/cpu_driver.sv"
+    `include "../cpu/cpu_driver_copy_1.sv"
+    //`include "../cpu/cpu_driver.sv"
     `include "../cpu/cpu_monitor.sv"
     `include "../cpu/cpu_agent.sv"
 

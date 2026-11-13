@@ -507,6 +507,7 @@ module top;
     assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
 
     initial begin
+        //run_test("s00_master_outstanding_test");
         //run_test("s04_master_axi_wrap_test");
         //run_test("s04_master_interleaving_test");
         //run_test("s04_master_out_of_order_test");

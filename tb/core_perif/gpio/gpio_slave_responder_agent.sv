@@ -40,7 +40,6 @@ endclass
 class gpio_slave_responder_seq extends uvm_sequence #(gpio_slave_seq_item);
     `uvm_object_utils(gpio_slave_responder_seq)
 
-    // Optional knobs to override random behaviors from top/test level
     rand bit        random_payload;
     rand bit [31:0] fixed_gpio_out;
     rand bit [31:0] fixed_gpio_oe;
@@ -85,7 +84,7 @@ class gpio_slave_responder_seq extends uvm_sequence #(gpio_slave_seq_item);
             finish_item(resp_item);
         end
     endtask
-endclass
+endclass : gpio_slave_responder_seq
 
 class gpio_slave_driver extends uvm_driver #(gpio_slave_seq_item);
     `uvm_component_utils(gpio_slave_driver)
@@ -106,7 +105,7 @@ class gpio_slave_driver extends uvm_driver #(gpio_slave_seq_item);
     task run_phase(uvm_phase phase);
         gpio_slave_seq_item req;
 
-        vif.ack     = 1'b0;
+        vif.ack      = 1'b0;
         vif.gpio_out = '0;
         vif.gpio_oe  = '0;
 
@@ -129,8 +128,7 @@ class gpio_slave_driver extends uvm_driver #(gpio_slave_seq_item);
             vif.gpio_out = '0;
             vif.gpio_oe  = '0;
 
-            `uvm_info("GPIO_DRV", $sformatf("GPIO request accepted. req=0x%08h out=0x%08h oe=0x%08h",
-                req.req_data, req.gpio_out, req.gpio_oe), UVM_LOW)
+            `uvm_info("GPIO_DRV", $sformatf("GPIO request accepted. req=0x%08h out=0x%08h oe=0x%08h", req.req_data, req.gpio_out, req.gpio_oe), UVM_LOW)
 
             seq_item_port.item_done();
         end

@@ -7,6 +7,13 @@ class cpu_monitor extends uvm_monitor;
     mailbox #(cpu_seq_item) write_address_mbx, write_data_mbx, read_address_mbx, read_data_mbx;
     master_e   port_id;
 
+    int outstanding_wr      = 0;
+    int max_outstanding_wr  = 0;
+    int outstanding_rd      = 0;
+    int max_outstanding_rd  = 0;
+    bit aw_hs, b_hs;
+    bit ar_hs, r_end;
+
     function new(string name="cpu_monitor", uvm_component parent);
         super.new(name, parent);
     endfunction
@@ -27,14 +34,59 @@ class cpu_monitor extends uvm_monitor;
    task main_phase(uvm_phase phase);
       `uvm_info(get_full_name(), phase.get_name(), UVM_MEDIUM)
       fork
-         capture_reset();
-         capture_write_address();
-         capture_write_data();
-         capture_write_response();
-         capture_read_address();
-         capture_read_data();
-      join
-   endtask
+        fork
+           capture_reset();
+           capture_write_address();
+           capture_write_data();
+           capture_write_response();
+           capture_read_address();
+           capture_read_data();
+        join
+        forever begin
+            @(cpu_mon_intf.axil_mon_cb);
+
+            if (!cpu_mon_intf.ARESETn) begin
+                outstanding_wr     = 0;
+                max_outstanding_wr = 0;
+                outstanding_rd     = 0;
+                max_outstanding_rd = 0;
+            end
+            else begin
+                // write outstanding
+                aw_hs = cpu_mon_intf.axil_mon_cb.AWVALID && cpu_mon_intf.axil_mon_cb.AWREADY;
+                b_hs  = cpu_mon_intf.axil_mon_cb.BVALID  && cpu_mon_intf.axil_mon_cb.BREADY;
+
+                //if(b_hs) tkt.write_done++;
+
+                case ({aw_hs,b_hs})
+                    2'b10: outstanding_wr++;
+                    2'b01: outstanding_wr--;
+                    default: ;
+                endcase
+                if (outstanding_wr > max_outstanding_wr)
+                    max_outstanding_wr = outstanding_wr;
+
+                `uvm_info("LITE_CPU_WR_OUTSTANDING",$sformatf("Current=%0d Maximum=%0d",outstanding_wr, max_outstanding_wr),UVM_MEDIUM)
+
+                // read outstanding
+                ar_hs = cpu_mon_intf.axil_mon_cb.ARVALID && cpu_mon_intf.axil_mon_cb.ARREADY;
+                r_end = cpu_mon_intf.axil_mon_cb.RVALID  && cpu_mon_intf.axil_mon_cb.RREADY;
+
+                //if(r_end) tkt.read_done++;
+
+                case({ar_hs,r_end})
+                    2'b10: outstanding_rd++;
+                    2'b01: outstanding_rd--;
+                    default: ;
+                endcase
+                if (outstanding_rd > max_outstanding_rd)
+                    max_outstanding_rd = outstanding_rd;
+
+                `uvm_info("LITE_CPU_RD_OUTSTANDING",$sformatf("Current=%0d Maximum=%0d",outstanding_rd, max_outstanding_rd),UVM_MEDIUM)
+            end
+        end
+    join
+endtask
 
    // ---------------- Reset ----------------
    task capture_reset();

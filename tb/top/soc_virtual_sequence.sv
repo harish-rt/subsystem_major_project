@@ -92,7 +92,7 @@ class cpu_isr_vseq extends soc_base_virtual_sequence;
             `uvm_info("isr_vseq", "Hardware IRQ wait cleared, launching CPU ISR...", UVM_LOW)
             isr_vseq    = cpu_isr_seq::type_id::create("isr_vseq");
             `uvm_info("isr_vseq", "Starting ISR sequence...", UVM_LOW)
-            isr_vseq.start(p_sequencer.s00_sqr);
+            isr_vseq.start(p_sequencer.s02_sqr);
         end
     endtask
 endclass : cpu_isr_vseq
@@ -674,17 +674,16 @@ class s04_master_outstanding_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(s04_master_outstanding_vseq)
     `NEW_OBJ
 
-    load_mem_seq s04_ff_seq;
     load_mem_seq s04_b_seq;
     
     task body();
-        s04_ff_seq = load_mem_seq::type_id::create("s04_ff_seq");
         s04_b_seq  = load_mem_seq::type_id::create("s04_b_seq");
 
         for (int i = 0; i < 64; i++) begin
             if (!s04_b_seq.randomize() with {
-                len   == 'h1F;
-                slave == AXI4_M;
+                len   == 'hF;
+                slave == LITE_M;
+                //slave == AXI4_M;
                 //slave == BRAM_M;
                 aw_id == ((i % 15) + 1);                    
             }) begin
@@ -891,3 +890,22 @@ class s04_master_axi_wrap_vseq extends soc_base_virtual_sequence;
         s04_seq_r.start(p_sequencer.s04_sqr);
     endtask
 endclass : s04_master_axi_wrap_vseq
+
+class s00_master_outstanding_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(s00_master_outstanding_vseq)
+    `NEW_OBJ
+
+    load_mem_lite_seq s00_seq;
+    
+    task body();
+        s00_seq  = load_mem_lite_seq::type_id::create("s00_seq");
+
+        if (!s00_seq.randomize() with {
+            addr    == AXI4_MEM_BASE;
+            beats   == 20;
+        }) begin
+            `uvm_error("OST_SEQ_RND_FAIL","Failed to randomize s00_seq")
+        end
+        s00_seq.start(p_sequencer.s00_sqr);
+    endtask
+endclass : s00_master_outstanding_vseq

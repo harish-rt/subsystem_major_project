@@ -3,6 +3,8 @@ catch {file delete -force "sim_txt.log"}
 echo "--- Starting UVM Simulation ---"
 
 #vsim -t 1ps -voptargs="+acc" -suppress 12110,3009 -sv_seed random
+#vsim -t 1ps -voptargs="+acc" -suppress 12110 -sv_seed random
+#vsim -t 1ps -assertdebug -coverage -voptargs="+acc=a" -suppress 12110 -sv_seed random
 
 vsim -t 1ps -voptargs="+acc" -suppress 12110 -sv_seed random \
 -sv_lib "D:/Softwares/VLSI/QuestaSimSetup/uvm-1.2/win64/uvm_dpi" \
@@ -47,6 +49,8 @@ xil_defaultlib.top core_ip_wraps.glbl \
 
 do wave.do
 run -all
+#coverage save -assert my_assertions.ucdb
+#quit
 
 
 

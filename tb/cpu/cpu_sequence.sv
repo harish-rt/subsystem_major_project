@@ -288,6 +288,7 @@ class cpu_isr_seq extends base_cpu_sequence;
 
         do begin
             read_reg(INTC_BASE + 'h4, ipr_data);
+            `uvm_info("ISR_IPR_DATA",$sformatf("ipr data: %b",ipr_data),UVM_LOW)
             
             if (ipr_data == 0) break;
 
@@ -338,7 +339,7 @@ class cpu_isr_seq extends base_cpu_sequence;
 
         if(ipr_data[1]) begin   //uart
             read_reg(UART_BASE + 'h8, sr_data);
-            `uvm_info("CPF_ISR_SEQ",$sformatf("uart sr data: %b",sr_data),UVM_LOW)
+            `uvm_info("UART_ISR_SEQ",$sformatf("uart sr data: %b",sr_data),UVM_LOW)
 
             if(sr_data[3]) begin    // tx_fifo_full
                 write_reg(UART_BASE + 'hc, 'h1);    // uart control_reg
@@ -362,18 +363,20 @@ class cpu_isr_seq extends base_cpu_sequence;
         end
         if(ipr_data[2]) begin   //spi
             read_reg(SPI_BASE + 'h20, sr_data);
-            `uvm_info("CPF_ISR_SEQ",$sformatf("spi ipisr data: %b",sr_data),UVM_LOW)
+            `uvm_info("SPI_ISR_SEQ",$sformatf("spi ipisr data: %b",sr_data),UVM_LOW)
             write_reg(SPI_BASE + 'h20,sr_data);
             read_reg(SPI_BASE + 'h64, sr_data);
-            `uvm_info("CPF_ISR_SEQ",$sformatf("spi sr data: %b",sr_data),UVM_LOW)
+            `uvm_info("SPI_ISR_SEQ",$sformatf("spi sr data: %b",sr_data),UVM_LOW)
             write_reg(IRQ_BASE + 'hc, 'h4);      // INTC ACK
         end
         if(ipr_data[3]) begin   //gpio
             read_reg(GPIO_BASE + 'h18, sr_data);    // GPIO INT STATUS
-            `uvm_info("CPF_ISR_SEQ",$sformatf("gpio sr data: %b",sr_data),UVM_LOW)
-            write_reg(GPIO_BASE + 'h20, 'h1);    // GPIO ACK
+            `uvm_info("GPIO_ISR_SEQ",$sformatf("gpio sr data: %b",sr_data),UVM_LOW)
+            write_reg(GPIO_BASE + 'h20, sr_data);   // GPIO ACK
             read_reg(GPIO_BASE + 'h18, sr_data);    // GPIO INT STATUS
-            `uvm_info("CPF_ISR_SEQ",$sformatf("gpio sr data: %b",sr_data),UVM_LOW)
+            if(sr_data != 0)
+                `uvm_error("GPIO_ISR_SEQ",$sformatf("GPIO interrupt status not cleared: %h",sr_data))
+            `uvm_info("GPIO_ISR_SEQ",$sformatf("gpio sr data: %b",sr_data),UVM_LOW)
             write_reg(IRQ_BASE + 'hc, 'h8);     // INTC ACK
         end
         write_reg(INTC_BASE + 'hc, 'h800_0000);      // INTC ACK
@@ -951,9 +954,8 @@ class load_mem_lite_seq extends base_cpu_sequence;
     rand int        beats = 1;
 
     constraint default_config_c {
-        soft addr == LITE_MEM_BASE;
-        soft beats      == 2;
-        //beats inside {[1:1024]};
+        soft addr   == LITE_MEM_BASE;
+        soft beats  == 2;
     }
 
     task body();
@@ -1039,15 +1041,65 @@ class gpio_check_seq extends base_cpu_sequence;
 
     task body();
         super.body();
-        write_reg(IRQ_BASE + 'h8,'h8);          // irq en
-        write_reg(IRQ_BASE + 'h1c,'h3);         // irq mer
-        write_reg(GPIO_BASE + 'h28, 'hffff_ffff);       // int trigger mode L/E
-        write_reg(GPIO_BASE + 'h24, 'hffff_ffff);       // int trigger level AL/AH
+        write_reg(IRQ_BASE + 'h8,'h8);              // irq en
+        write_reg(IRQ_BASE + 'h1c,'h3);             // irq mer
+
+        write_reg(GPIO_BASE + 'h28, 'hffff_ffff);   // int trigger mode L/E
+        write_reg(GPIO_BASE + 'h24, 'hffff_ffff);   // int trigger level AL/AH
+        write_reg(GPIO_BASE + 'h20, 'hffff_ffff);   // int_clr
+
         do begin
-            read_reg(GPIO_BASE + 'h18, sr_data);    // int status
+            read_reg(GPIO_BASE + 'h18, sr_data);    // int_status
         end while (sr_data != 0);
-        write_reg(GPIO_BASE + 'h14, 'h1);       // int mask en
-        write_reg(GPIO_BASE, 'hf);              // direction
-        write_reg(GPIO_BASE + 'h8, 'h1);        // output
+        read_reg(GPIO_BASE + 'h18, sr_data);        // INT_STATUS, expect 0
+        if(sr_data != 0)
+            `uvm_error("GPIO_ERR", $sformatf("status not cleared: %h", sr_data))
+
+        write_reg(GPIO_BASE + 'h14, 'h1);           // int_mask
+        write_reg(GPIO_BASE, 'hf);                  // direction
+        write_reg(GPIO_BASE + 'h8, 'h1);            // output
+        write_reg(GPIO_BASE + 'h14, 1<<3);          // int_mask
+        write_reg(GPIO_BASE + 'hc, 1<<3);           // output_set
+        write_reg(GPIO_BASE + 'h10, 1<<3);          // output_clr
+        write_reg(GPIO_BASE + 'h10, 1);             // output_clr
     endtask
+/*
+    task body();
+        super.body();
+        write_reg(IRQ_BASE  + 'h8,  'h8);           // INTC IER
+        write_reg(IRQ_BASE  + 'h1c, 'h3);           // INTC MER
+    
+        write_reg(GPIO_BASE + 'h28, 'hffff_ffff);   // INT_MODE: all pins edge
+        write_reg(GPIO_BASE + 'h24, 'hffff_ffff);   // INT_LEVEL: all rising edge
+        write_reg(GPIO_BASE + 'h20, 'hffff_ffff);   // INT_CLR: flush stale status
+
+        //repeat (5) @(posedge clk);
+        #50;
+        read_reg(GPIO_BASE + 'h18, sr_data);        // INT_STATUS, expect 0
+        if (sr_data != 0)
+            `uvm_error("GPIO", $sformatf("status not cleared: %h", sr_data))
+    
+        write_reg(GPIO_BASE + 'h14, 'hffff_ffff);   // INT_MASK: all enabled
+        write_reg(GPIO_BASE + 'h0,  'h0000_ffff);   // DIRECTION: [15:0] out, [31:16] in
+        write_reg(GPIO_BASE + 'h8,  'habcd_abcd);   // OUTPUT
+        write_reg(GPIO_BASE + 'h8,  'habcd_1bc1);   // OUTPUT
+        write_reg(GPIO_BASE + 'h4,  'h1bc1_abcd);   // INPUT
+    endtask*/
+/*
+task check_pattern(bit [31:0] dir, bit [31:0] p);
+    bit [31:0] rd;
+
+    write_reg(GPIO_BASE + 'h0, dir);          // DIRECTION
+    write_reg(GPIO_BASE + 'h8, p);            // OUTPUT
+endtask
+
+task body();
+    super.body();
+    check_pattern(32'h0000_0000, 32'hABCD_1BC1);
+    check_pattern(32'hFFFF_FFFF, 32'hABCD_1BC1);
+    check_pattern(32'h0000_FFFF, 32'hABCD_ABCD);
+    check_pattern(32'hFFFF_0000, 32'h1BC1_ABCD);
+    check_pattern(32'h5555_5555, 32'hAAAA_5555);
+    check_pattern(32'hAAAA_AAAA, 32'h5555_AAAA);
+endtask*/
 endclass : gpio_check_seq

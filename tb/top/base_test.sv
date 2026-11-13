@@ -594,3 +594,4 @@ endclass : s04_master_axi4_mem_test
 `AXI_TEST(s04_master_out_of_order_test,s04_master_out_of_order_vseq,1000ns)
 `AXI_TEST(s04_master_interleaving_test,s04_master_interleaving_vseq,1000ns)
 `AXI_TEST(s04_master_axi_wrap_test,s04_master_axi_wrap_vseq,1000ns)
+`AXI_TEST(s00_master_outstanding_test,s00_master_outstanding_vseq,1000ns)
