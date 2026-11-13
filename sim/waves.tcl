@@ -11,6 +11,8 @@ do ./waves/axi4_mem.do
 do ./waves/lite_mem.do
 #view wave -title lite_intc
 do ./waves/lite_intc.do
+#view wave -title intc
+do ./waves/intc.do
 #view wave -title cdma_reg
 do ./waves/cdma_reg.do
 #view wave -title cdma_dm
@@ -19,8 +21,6 @@ do ./waves/cdma_dm.do
 do ./waves/cdma_sg.do
 #view wave -title cdma_int
 do ./waves/cdma_intr.do
-#view wave -title intc
-do ./waves/intc.do
 #view wave -title uart_intf
 do ./waves/uart_intf.do
 #view wave -title gpio_intf

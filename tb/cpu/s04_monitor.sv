@@ -43,59 +43,59 @@ endfunction : build_phase
 task s04_monitor :: main_phase (uvm_phase phase);
     `uvm_info (get_full_name() , phase.get_name() , UVM_MEDIUM)
     fork
-    fork
-        capture_reset();
-        capture_write_address();
-        capture_write_data();
-        capture_write_response();
-        capture_read_address();
-        capture_read_data();
-        merge_write_info();
-    join
+        fork
+            capture_reset();
+            capture_write_address();
+            capture_write_data();
+            capture_write_response();
+            capture_read_address();
+            capture_read_data();
+            merge_write_info();
+        join
 
-    forever begin
-        @(mon_intf.axi4_mon_cb);
+        forever begin
+            @(mon_intf.axi4_mon_cb);
 
-        if (!mon_intf.ARESETn) begin
-            outstanding_wr     = 0;
-            max_outstanding_wr = 0;
-            outstanding_rd     = 0;
-            max_outstanding_rd = 0;
+            if (!mon_intf.ARESETn) begin
+                outstanding_wr     = 0;
+                max_outstanding_wr = 0;
+                outstanding_rd     = 0;
+                max_outstanding_rd = 0;
+            end
+            else begin
+                // write outstanding
+                aw_hs = mon_intf.axi4_mon_cb.AWVALID && mon_intf.axi4_mon_cb.AWREADY;
+                b_hs  = mon_intf.axi4_mon_cb.BVALID  && mon_intf.axi4_mon_cb.BREADY;
+
+                if(b_hs) tkt.write_done++;
+
+                case ({aw_hs,b_hs})
+                    2'b10: outstanding_wr++;
+                    2'b01: outstanding_wr--;
+                    default: ;
+                endcase
+                if (outstanding_wr > max_outstanding_wr)
+                    max_outstanding_wr = outstanding_wr;
+
+                `uvm_info("WR_OUTSTANDING",$sformatf("Current=%0d Maximum=%0d",outstanding_wr, max_outstanding_wr),UVM_MEDIUM)
+
+                // read outstanding
+                ar_hs = mon_intf.axi4_mon_cb.ARVALID && mon_intf.axi4_mon_cb.ARREADY;
+                r_end = mon_intf.axi4_mon_cb.RVALID  && mon_intf.axi4_mon_cb.RREADY && mon_intf.axi4_mon_cb.RLAST;
+
+                if(r_end) tkt.read_done++;
+
+                case({ar_hs,r_end})
+                    2'b10: outstanding_rd++;
+                    2'b01: outstanding_rd--;
+                    default: ;
+                endcase
+                if (outstanding_rd > max_outstanding_rd)
+                    max_outstanding_rd = outstanding_rd;
+
+                `uvm_info("RD_OUTSTANDING",$sformatf("Current=%0d Maximum=%0d",outstanding_rd, max_outstanding_rd),UVM_MEDIUM)
+            end
         end
-        else begin
-            // write outstanding
-            aw_hs = mon_intf.axi4_mon_cb.AWVALID && mon_intf.axi4_mon_cb.AWREADY;
-            b_hs  = mon_intf.axi4_mon_cb.BVALID  && mon_intf.axi4_mon_cb.BREADY;
-
-            if(b_hs) tkt.write_done++;
-
-            case ({aw_hs,b_hs})
-                2'b10: outstanding_wr++;
-                2'b01: outstanding_wr--;
-                default: ;
-            endcase
-            if (outstanding_wr > max_outstanding_wr)
-                max_outstanding_wr = outstanding_wr;
-
-            `uvm_info("WR_OUTSTANDING",$sformatf("Current=%0d Maximum=%0d",outstanding_wr, max_outstanding_wr),UVM_MEDIUM)
-
-            // read outstanding
-            ar_hs = mon_intf.axi4_mon_cb.ARVALID && mon_intf.axi4_mon_cb.ARREADY;
-            r_end = mon_intf.axi4_mon_cb.RVALID  && mon_intf.axi4_mon_cb.RREADY && mon_intf.axi4_mon_cb.RLAST;
-
-            if(r_end) tkt.read_done++;
-
-            case({ar_hs,r_end})
-                2'b10: outstanding_rd++;
-                2'b01: outstanding_rd--;
-                default: ;
-            endcase
-            if (outstanding_rd > max_outstanding_rd)
-                max_outstanding_rd = outstanding_rd;
-
-            `uvm_info("RD_OUTSTANDING",$sformatf("Current=%0d Maximum=%0d",outstanding_rd, max_outstanding_rd),UVM_MEDIUM)
-        end
-    end
     join
 endtask
 
@@ -118,8 +118,8 @@ task  s04_monitor :: capture_write_address();
     pkt.AWSIZE   = mon_intf.axi4_mon_cb.AWSIZE;
     //pkt.operation= command_t'(WRITE);
     pkt.operation   = WRITE;
-    resp_ap.write(pkt); //write pkt to sequencer for response
     wait(mon_intf.axi4_mon_cb.AWREADY && mon_intf.axi4_mon_cb.AWVALID && mon_intf.ARESETn==1);
+    resp_ap.write(pkt); //write pkt to sequencer for response
     pkt.wadd_hndshk = $realtime();  //capturing timestamp for handshake.
     `uvm_info("s04_monitor_capture_write_address",pkt.sprint(),UVM_LOW);
     write_address_mbx.put(pkt);

@@ -4,6 +4,8 @@ transcript file compiletb.log
 # Compile UVM and Testbench Packages
 # ==============================================================================
 #vlog -sv -work xil_defaultlib
+#vlog -timescale 1ns/1ps -sv -work xil_defaultlib \
+
 vlog -timescale 1ns/1ps -sv -work xil_defaultlib \
   "+define+SBD_COMPONENTS" \
   "+incdir+C:/UVM/uvm-1.2/src" \

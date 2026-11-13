@@ -507,14 +507,16 @@ module top;
     assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
 
     initial begin
-        run_test("s04_master_interleaving_test");
+        //run_test("s00_master_outstanding_test");
+        //run_test("s04_master_axi_wrap_test");
+        //run_test("s04_master_interleaving_test");
         //run_test("s04_master_out_of_order_test");
         //run_test("s04_master_axi4_mem_test");
         //run_test("s04_master_outstanding_test");
         //run_test("s04_master_bram_4kb_test");
         //run_test("s04_master_bram_test");
         //run_test("s02_masters_load_bram_test");
-        //run_test("gpio_check_test");
+        run_test("gpio_check_test");
         //run_test("timer_reg_access_test");
         //run_test("masters_load_lite_mem_test");
         //run_test("masters_load_bram_test");
@@ -559,18 +561,19 @@ module top;
     end
     // checking b channel by bypassing the interconnect
     // find why interconnect not passign these signals
-    //initial begin
+    initial begin
+        //force dut.IPS_CORE.axi_bram_ctrl_0.U0.gext_inst.abcv4_0_ext_inst.GEN_AXI4.I_FULL_AXI.I_WR_CHNL.bid_fifo_rd_en = 1;
     //    force slave_if.BID      = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BID;
     //    force slave_if.BVALID   = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BVALID;
     //    force slave_if.BREADY   = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BREADY;
     //    force slave_if.BRESP    = dut.IPS_CORE.axi_interconnect_0_M03_AXI_BRESP;
-    //end
+    end
 
     always @(posedge aclk) begin
         if (dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWVALID && dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWREADY)
-        $display("%t M03 AWID=%b (width %0d)", $time, dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWID, $bits(dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWID));
+        $display("%t M03 AWID = %b | width: %0d", $time, dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWID, $bits(dut.IPS_CORE.axi_interconnect_0_M03_AXI_AWID));
         if (dut.IPS_CORE.axi_interconnect_0_M03_AXI_BVALID && dut.IPS_CORE.axi_interconnect_0_M03_AXI_BREADY)
-        $display("%t M03 BID=%b", $time, dut.IPS_CORE.axi_interconnect_0_M03_AXI_BID);
+        $display("%t M03 BID = %b | width: %0d", $time, dut.IPS_CORE.axi_interconnect_0_M03_AXI_BID,$bits(dut.IPS_CORE.axi_interconnect_0_M03_AXI_BID));
     end
 
     initial begin

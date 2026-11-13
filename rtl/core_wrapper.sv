@@ -1,7 +1,7 @@
 module core_wrapper 
 (
-  input logic clk_i,
-  input logic rst_n_i,
+  input logic   clk_i,
+  input logic   rst_n_i,
 
   //peripherals
   output         spi_clk_o,

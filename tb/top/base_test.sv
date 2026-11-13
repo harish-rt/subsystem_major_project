@@ -523,14 +523,14 @@ class gpio_check_test extends cpu_base_test;
     `uvm_component_utils(gpio_check_test)
     `NEW_COMP
 
-    gpio_reg_access_vseq    gpio_seq;
+    gpio_check_vseq    gpio_seq;
 
     task main_phase(uvm_phase phase);
         `SET_S00_FORK_DISABLE(1);
-        gpio_seq = gpio_reg_access_vseq::type_id::create("gpio_seq");
+        gpio_seq = gpio_check_vseq::type_id::create("gpio_seq");
         phase.raise_objection(this);
             gpio_seq.start(w_env.vsqr);
-        phase.phase_done.set_drain_time(this,3000ns);
+        phase.phase_done.set_drain_time(this,6000ns);
         phase.drop_objection(this);
     endtask
 endclass : gpio_check_test
@@ -593,3 +593,5 @@ endclass : s04_master_axi4_mem_test
 // id handling in s04_monitor
 `AXI_TEST(s04_master_out_of_order_test,s04_master_out_of_order_vseq,1000ns)
 `AXI_TEST(s04_master_interleaving_test,s04_master_interleaving_vseq,1000ns)
+`AXI_TEST(s04_master_axi_wrap_test,s04_master_axi_wrap_vseq,1000ns)
+`AXI_TEST(s00_master_outstanding_test,s00_master_outstanding_vseq,1000ns)

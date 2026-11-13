@@ -1,7 +1,7 @@
 add wave /top/intc_if/intc_procss_clk
 add wave /top/intc_if/intc_procss_rst
 
-add wave -vgroup {INTC/AW_Channel} \
+add wave -vgroup {INTC} \
 	/top/intc_if/intc_intr \
 	/top/intc_if/intc_irq
 
