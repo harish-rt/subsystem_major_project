@@ -891,3 +891,484 @@ class s04_master_axi_wrap_vseq extends soc_base_virtual_sequence;
         s04_seq_r.start(p_sequencer.s04_sqr);
     endtask
 endclass : s04_master_axi_wrap_vseq
+
+class cdma_bram2mem_vseq extends soc_base_virtual_sequence;
+
+    `uvm_object_utils(cdma_bram2mem_vseq)
+    `NEW_OBJ
+
+    cdma_bram2mem_seq  cdma_seq;
+    cpu_config_intc_seq intc_seq;
+    cpu_isr_vseq       isr_vseq;
+
+    task body();
+        super.body();
+
+        cdma_seq = cdma_bram2mem_seq::type_id::create("cdma_seq");
+        intc_seq = cpu_config_intc_seq::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq::type_id::create("isr_vseq");
+
+        // Start ISR sequence in background
+        fork
+            //begin
+                isr_vseq.start(p_sequencer);
+           // end
+        join_none
+
+        // Configure interrupt controller
+        intc_seq.cdma_en = 1;
+        intc_seq.core_en = 0;
+        intc_seq.start(p_sequencer.s00_sqr);
+
+        // Start CDMA transfer
+        cdma_seq.start(p_sequencer.s00_sqr);
+
+        // Wait for ISR completion/interrupt clearing
+        isr_clear();
+    endtask
+endclass : cdma_bram2mem_vseq
+
+class cdma_mem2bram_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(cdma_mem2bram_vseq)
+     `NEW_OBJ
+        
+    cdma_bram2mem_seq cdma_seq;    
+    cpu_config_intc_seq intc_seq;
+    cpu_isr_vseq       isr_vseq;
+  
+     task body();
+        super.body();
+
+        cdma_seq =cdma_bram2mem_seq::type_id::create("cdma_seq");
+        intc_seq = cpu_config_intc_seq::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq::type_id::create("isr_vseq");
+
+        // Start ISR sequence in background
+        fork
+            //begin
+                isr_vseq.start(p_sequencer);
+           // end
+        join_none
+
+        // Configure interrupt controller
+        intc_seq.cdma_en = 1;
+        intc_seq.core_en = 0;
+        intc_seq.start(p_sequencer.s00_sqr);
+
+        // Start CDMA transfer
+        cdma_seq.start(p_sequencer.s00_sqr);
+
+        // Wait for ISR completion/interrupt clearing
+        isr_clear();
+    endtask
+endclass:cdma_mem2bram_vseq
+
+
+class cdma_bram2bram_vseq extends soc_base_virtual_sequence;
+
+    `uvm_object_utils(cdma_bram2bram_vseq)
+    `NEW_OBJ
+
+    load_mem_seq        s04_seq;
+    cpu_config_intc_seq intc_seq;
+    cpu_isr_vseq        isr_vseq;
+    config_cdma_seq     cdma_cfg;
+
+    bit [31:0] mem_addr;
+
+    task body();
+        super.body();
+
+        s04_seq  = load_mem_seq::type_id::create("s04_seq");
+        intc_seq = cpu_config_intc_seq::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq::type_id::create("isr_vseq");
+        cdma_cfg = config_cdma_seq::type_id::create("cdma_cfg");
+
+        // Randomize source BRAM address
+        assert(std::randomize(mem_addr) with {
+            mem_addr inside {[BRAM_BASE:BRAM_END/2]};
+            mem_addr[1:0] == 2'b00;
+        });
+
+        assert(s04_seq.randomize() with {
+            addr  == mem_addr;
+            len   == 'hff;
+            burst == INCR;
+        });
+
+        // Start ISR listener in background
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+
+        // Configure interrupt controller
+        intc_seq.cdma_en = 1;
+        intc_seq.core_en = 1;
+        intc_seq.start(p_sequencer.s00_sqr);
+
+        // Load data into source BRAM
+        s04_seq.start(p_sequencer.s04_sqr);
+
+        // Randomize destination address
+        assert(std::randomize(mem_addr) with {
+            mem_addr inside {[BRAM_END/2:BRAM_END]};
+            mem_addr[1:0] == 2'b00;
+        });
+
+        // Configure CDMA registers
+        cdma_cfg.cdma_cr      = 32'h7000;
+        cdma_cfg.src_addr     = s04_seq.addr;
+        cdma_cfg.dest_addr    = mem_addr;
+        cdma_cfg.transfer_len = 32'h400;
+
+        cdma_cfg.start(p_sequencer.s00_sqr);
+        isr_clear();
+    endtask
+endclass:cdma_bram2bram_vseq 
+
+class cdma_mem2mem_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(cdma_mem2mem_vseq)
+    `NEW_OBJ
+    
+     load_mem_seq        s04_seq;
+    cpu_config_intc_seq intc_seq;
+    cpu_isr_vseq        isr_vseq;
+    config_cdma_seq     cdma_cfg;
+
+    bit [31:0] mem_addr;
+
+    task body();
+        super.body();
+
+        s04_seq  = load_mem_seq::type_id::create("s04_seq");
+        intc_seq = cpu_config_intc_seq::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq::type_id::create("isr_vseq");
+        cdma_cfg = config_cdma_seq::type_id::create("cdma_cfg");
+
+        // Randomize source BRAM address
+        assert(std::randomize(mem_addr) with {
+            mem_addr inside {[LITE_MEM_BASE:LITE_MEM_END/2]};
+            mem_addr[1:0] == 2'b00;
+        });
+
+        assert(s04_seq.randomize() with {
+            addr  == mem_addr;
+            len   == 'hff;
+            burst == INCR;
+        });
+
+        // Start ISR listener in background
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+
+        // Configure interrupt controller
+        intc_seq.cdma_en = 1;
+        intc_seq.core_en = 1;
+        intc_seq.start(p_sequencer.s00_sqr);
+
+        // Load data into source LITE_MEMORY
+        s04_seq.start(p_sequencer.s04_sqr);
+
+        // Randomize destination address
+        assert(std::randomize(mem_addr) with {
+            mem_addr inside {[LITE_MEM_END/2:LITE_MEM_END]};
+            mem_addr[1:0] == 2'b00;
+        });
+
+        // Configure CDMA registers
+        cdma_cfg.cdma_cr      = 32'h7000;
+        cdma_cfg.src_addr     = s04_seq.addr;
+        cdma_cfg.dest_addr    = mem_addr;
+        cdma_cfg.transfer_len = 32'h1f;
+
+        cdma_cfg.start(p_sequencer.s00_sqr);
+        isr_clear();
+    endtask   
+endclass:cdma_mem2mem_vseq
+
+class cdma_opif2bram_vseq extends soc_base_virtual_sequence;
+
+    `uvm_object_utils(cdma_opif2bram_vseq)
+    `NEW_OBJ
+    
+     load_mem_seq        s04_seq;
+    cpu_config_intc_seq intc_seq;
+    cpu_isr_vseq        isr_vseq;
+    config_cdma_seq     cdma_cfg;
+
+    bit [31:0] mem_addr;
+
+    task body();
+        super.body();
+
+        s04_seq  = load_mem_seq::type_id::create("s04_seq");
+        intc_seq = cpu_config_intc_seq::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq::type_id::create("isr_vseq");
+        cdma_cfg = config_cdma_seq::type_id::create("cdma_cfg");
+
+        // Randomize source BRAM address
+        assert(std::randomize(mem_addr) with {
+            mem_addr inside {[AXI4_MEM_BASE:AXI4_MEM_END]};
+            mem_addr[1:0] == 2'b00;
+        });
+
+        assert(s04_seq.randomize() with {
+            addr  == mem_addr;
+            len   == 'hff;
+            burst == INCR;
+        });
+
+        // Start ISR listener in background
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+
+        // Configure interrupt controller
+        intc_seq.cdma_en = 1;
+        intc_seq.core_en = 1;
+        intc_seq.start(p_sequencer.s00_sqr);
+
+        // Load data into AXI4 memory
+        s04_seq.start(p_sequencer.s04_sqr);
+
+        // Randomize destination address
+        assert(std::randomize(mem_addr) with {
+            mem_addr inside {[BRAM_BASE:BRAM_END]};
+            mem_addr[1:0] == 2'b00;
+        });
+
+        // Configure CDMA registers
+        cdma_cfg.cdma_cr      = 32'h7000;
+        cdma_cfg.src_addr     = s04_seq.addr;
+        cdma_cfg.dest_addr    = mem_addr;
+        cdma_cfg.transfer_len = 32'h40;
+
+        cdma_cfg.start(p_sequencer.s00_sqr);
+        isr_clear();
+    endtask   
+endclass:cdma_opif2bram_vseq
+
+
+class  cdma_opif2mem_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(cdma_opif2mem_vseq)
+    `NEW_OBJ
+    
+    load_mem_seq        s04_seq;
+    cpu_config_intc_seq intc_seq;
+    cpu_isr_vseq        isr_vseq;
+    config_cdma_seq     cdma_cfg;
+
+    bit [31:0] mem_addr;
+    task body();
+        super.body();
+       s04_seq  = load_mem_seq::type_id::create("s04_seq");
+        intc_seq = cpu_config_intc_seq::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq::type_id::create("isr_vseq");
+        cdma_cfg = config_cdma_seq::type_id::create("cdma_cfg");
+
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+
+        for (int i = 0; i < 4; i++) begin
+            s04_seq = load_mem_seq::type_id::create($sformatf("s04_seq_%0d", i));
+            assert(std::randomize(mem_addr) with {mem_addr inside {[BRAM_BASE:BRAM_END/2]};
+                                                mem_addr[1:0] == 2'b00;});
+             assert(s04_seq.randomize() with {addr  == mem_addr;len== 'hff;burst == INCR;});
+             `uvm_info("BRAM_LOAD",$sformatf("Loading BRAM at address %h", mem_addr),UVM_LOW)
+            s04_seq.start(p_sequencer.s04_sqr);
+        end
+        // Configure interrupt controller
+        intc_seq.cdma_en = 1;
+        intc_seq.core_en = 1;
+        intc_seq.start(p_sequencer.s00_sqr);
+
+        assert(std::randomize(mem_addr) with {
+            mem_addr inside {[LITE_MEM_BASE:LITE_MEM_END]};
+            mem_addr[1:0] == 2'b00;
+        });
+         // Configure CDMA registers
+        cdma_cfg.cdma_cr      = 32'h7000;
+        cdma_cfg.src_addr     = s04_seq.addr;
+        cdma_cfg.dest_addr    = mem_addr;
+        cdma_cfg.transfer_len = 32'hfff;
+
+        cdma_cfg.start(p_sequencer.s00_sqr);
+        isr_clear();
+    endtask
+endclass:cdma_opif2mem_vseq
+
+class cdma_4k_split_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(cdma_4k_split_vseq)
+     `NEW_OBJ
+    load_mem_seq        s04_seq;
+    cpu_config_intc_seq intc_seq;
+    cpu_isr_vseq        isr_vseq;
+    config_cdma_seq     cdma_cfg;
+
+    bit [31:0] mem_addr;
+    task body();
+        super.body();
+       s04_seq  = load_mem_seq::type_id::create("s04_seq");
+        intc_seq = cpu_config_intc_seq::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq::type_id::create("isr_vseq");
+        cdma_cfg = config_cdma_seq::type_id::create("cdma_cfg");
+
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+
+        for (int i = 0; i < 4; i++) begin
+            s04_seq = load_mem_seq::type_id::create($sformatf("s04_seq_%0d", i));
+            assert(std::randomize(mem_addr) with {mem_addr inside {[BRAM_BASE:BRAM_END]};
+                                                mem_addr[1:0] == 2'b00;});
+             assert(s04_seq.randomize() with {addr  == mem_addr;len== 'hff;burst == INCR;});
+            s04_seq.start(p_sequencer.s04_sqr);
+        end
+        // Configure interrupt controller
+        intc_seq.cdma_en = 1;
+        intc_seq.core_en = 1;
+        intc_seq.start(p_sequencer.s00_sqr);
+
+         // Configure CDMA registers
+        cdma_cfg.cdma_cr      = 32'h7000;
+        cdma_cfg.src_addr     = s04_seq.addr;
+        cdma_cfg.dest_addr    = 32'hc000_0fff;
+        cdma_cfg.transfer_len = 32'hff;
+
+        cdma_cfg.start(p_sequencer.s00_sqr);
+        isr_clear();
+    endtask
+endclass:cdma_4k_split_vseq
+
+class cdma_wr_decerr_vseq extends soc_base_virtual_sequence;
+
+    `uvm_object_utils(cdma_wr_decerr_vseq)
+    `NEW_OBJ
+
+    load_mem_seq        s04_seq;
+    cpu_config_intc_seq intc_seq;
+    cpu_isr_vseq        isr_vseq;
+    config_cdma_seq     cdma_cfg;
+    bit [31:0] mem_addr;
+
+    task body();
+        super.body();
+
+        s04_seq  = load_mem_seq::type_id::create("s04_seq");
+        intc_seq = cpu_config_intc_seq::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq::type_id::create("isr_vseq");
+        cdma_cfg = config_cdma_seq::type_id::create("cdma_cfg");
+
+        // Start ISR listener in background
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+
+        // Randomize BRAM source address
+        assert(std::randomize(mem_addr) with {
+            mem_addr inside {[BRAM_BASE:BRAM_END]};
+            mem_addr[1:0] == 2'b00;
+        });
+
+        // Configure memory loading sequence
+        assert(s04_seq.randomize() with {
+            addr  == mem_addr;
+            len   == 'hff;
+            burst == INCR;
+        });
+
+        // Load data into BRAM
+        s04_seq.start(p_sequencer.s04_sqr);
+        // Configure interrupt controller
+        intc_seq.cdma_en = 1;
+        intc_seq.core_en = 1;
+        intc_seq.start(p_sequencer.s00_sqr);
+
+
+        // Configure CDMA registers
+        cdma_cfg.cdma_cr      = 32'h7000;
+        cdma_cfg.src_addr     = s04_seq.addr;
+        cdma_cfg.dest_addr    = 32'h7FF00_0000;
+        cdma_cfg.transfer_len = 32'hff;
+
+        cdma_cfg.start(p_sequencer.s00_sqr);
+        // Wait for interrupt clearing
+        isr_clear();
+    endtask
+endclass : cdma_wr_decerr_vseq
+
+class cdma_rd_decerr_vseq extends soc_base_virtual_sequence;
+    
+    `uvm_object_utils(cdma_rd_decerr_vseq)
+     `NEW_OBJ
+     
+    cpu_config_intc_seq intc_seq;
+    cpu_isr_vseq        isr_vseq;
+    config_cdma_seq     cdma_cfg;
+    bit [31:0] mem_addr;
+
+     task body();
+        super.body();
+        intc_seq = cpu_config_intc_seq::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq::type_id::create("isr_vseq");
+        cdma_cfg = config_cdma_seq::type_id::create("cdma_cfg");
+
+         // Start ISR listener in background
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+
+        // Configure interrupt controller
+        intc_seq.cdma_en = 1;
+        intc_seq.core_en = 1;
+        intc_seq.start(p_sequencer.s00_sqr);
+        
+        // Configure CDMA registers
+        cdma_cfg.cdma_cr      = 32'h7000;
+        cdma_cfg.src_addr     = 32'h7FF00_0FF0;
+        cdma_cfg.dest_addr    = 32'hc000_0000;
+        cdma_cfg.transfer_len = 32'hff;
+
+        cdma_cfg.start(p_sequencer.s00_sqr);
+        // Wait for interrupt clearing
+        isr_clear();
+     endtask
+endclass:cdma_rd_decerr_vseq
+
+class cdma_int_err_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(cdma_int_err_vseq)
+    `NEW_OBJ
+
+    cpu_config_intc_seq intc_seq;
+    cpu_isr_vseq        isr_vseq;
+    config_cdma_seq     cdma_cfg;     
+     task body();
+        super.body();
+        intc_seq = cpu_config_intc_seq::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq::type_id::create("isr_vseq");
+        cdma_cfg = config_cdma_seq::type_id::create("cdma_cfg");
+
+         // Start ISR listener in background
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+
+        // Configure interrupt controller
+        intc_seq.cdma_en = 1;
+        intc_seq.core_en = 1;
+        intc_seq.start(p_sequencer.s00_sqr);
+        
+        // Configure CDMA registers
+        cdma_cfg.cdma_cr      = 32'h7000;
+        cdma_cfg.src_addr     = 32'h8000_0000;
+        cdma_cfg.dest_addr    = 32'hc000_0000;
+        cdma_cfg.transfer_len = 32'h0000_0000;
+
+        cdma_cfg.start(p_sequencer.s00_sqr);
+        // Wait for interrupt clearing
+        isr_clear();
+     endtask
+endclass
+

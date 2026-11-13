@@ -602,11 +602,133 @@ class cdma_mem2bram_test extends cpu_base_test;
     endfunction
 
     task main_phase(uvm_phase phase);
-        cdma_mem2bram_seq cdma_seq=cdma_mem2bram_seq::type_id::create("cdma_seq");
+        cdma_mem2bram_vseq vseq=cdma_mem2bram_vseq::type_id::create("vseq");
         phase.raise_objection(this);
-            cdma_seq.start(w_env.c_env.cpu_agt[0].sqr);
+            vseq.start(w_env.vsqr);
             phase.phase_done.set_drain_time(this,1000ns);
         phase.drop_objection(this);
     endtask
 endclass
+
+class cdma_bram2mem_test extends cpu_base_test;
+    `uvm_component_utils(cdma_bram2mem_test)
+
+    function new(string name="cdma_bram2mem_test",uvm_component parent);
+        super.new(name,parent);
+    endfunction
+     
+     task main_phase(uvm_phase phase);
+        cdma_bram2mem_vseq vseq=cdma_bram2mem_vseq::type_id::create("vseq");
+        phase.raise_objection(this);
+            vseq.start(w_env.vsqr);
+            phase.phase_done.set_drain_time(this,1000ns);
+        phase.drop_objection(this);
+    endtask
+ endclass:cdma_bram2mem_test
+
+class cdma_bram2bram_test extends cpu_base_test;
+    `uvm_component_utils(cdma_bram2bram_test)
+    `NEW_COMP
+
+    task main_phase(uvm_phase phase);
+        cdma_bram2bram_vseq cdma_vseq=cdma_bram2bram_vseq::type_id::create("cdma_vseq");
+        phase.raise_objection(this);
+            cdma_vseq.start(w_env.vsqr);
+            phase.phase_done.set_drain_time(this,10000ns);
+        phase.drop_objection(this);
+    endtask
+    
+endclass
+
+class cdma_mem2mem_test extends cpu_base_test;
+    `uvm_component_utils(cdma_mem2mem_test)
+    `NEW_COMP
+
+    task main_phase(uvm_phase phase);
+        cdma_mem2mem_vseq cdma_seq=cdma_mem2mem_vseq::type_id::create("cdma_seq");
+        phase.raise_objection(this);
+            cdma_vseq.start(w_env.vsqr);
+            phase.phase_done.set_drain_time(this,10000ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
+class cdma_opif2bram_test extends cpu_base_test;
+    `uvm_component_utils(cdma_opif2bram_test)
+    `NEW_COMP
+
+    task main_phase(uvm_phase phase);
+        cdma_opif2bram_vseq vseq=cdma_opif2bram_vseq::type_id::create("vseq");
+        phase.raise_objection(this);
+            vseq.start(w_env.vsqr);
+            phase.phase_done.set_drain_time(this,1000ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
+class cdma_opif2mem_test extends cpu_base_test;
+    `uvm_component_utils(cdma_opif2mem_test)
+    `NEW_COMP
+
+    task main_phase(uvm_phase phase);
+        cdma_opif2mem_vseq vseq=cdma_opif2mem_vseq::type_id::create("vseq");
+        phase.raise_objection(this);
+            vseq.start(w_env.vsqr);
+            phase.phase_done.set_drain_time(this,10000ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
+class cdma_4k_split_test extends cpu_base_test;
+    `uvm_component_utils(cdma_4k_split_test)
+    `NEW_COMP
+
+    task main_phase(uvm_phase phase);
+        cdma_4k_split_vseq vseq=cdma_4k_split_vseq::type_id::create("vseq");
+        phase.raise_objection(this);
+            vseq.start(w_env.vsqr);
+            phase.phase_done.set_drain_time(this,5000ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
+class cdma_wr_decerr_test extends cpu_base_test;
+    `uvm_component_utils(cdma_wr_decerr_test)
+     `NEW_COMP
+
+     task main_phase(uvm_phase phase);
+       cdma_wr_decerr_vseq vseq=cdma_wr_decerr_vseq::type_id::create("vseq");
+       phase.raise_objection(this);
+            vseq.start(w_env.vsqr);
+            phase.phase_done.set_drain_time(this,4000ns);
+       phase.drop_objection(this);
+     endtask
+endclass
+
+class cdma_rd_decerr_test extends cpu_base_test;
+    `uvm_component_utils(cdma_rd_decerr_test)
+    `NEW_COMP
+
+    task main_phase(uvm_phase phase);
+        cdma_rd_decerr_vseq vseq=cdma_rd_decerr_vseq::type_id::create("vseq");
+        phase.raise_objection(this);
+            vseq.start(w_env.vsqr);
+            phase.phase_done.set_drain_time(this,4000ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
+class cdma_intr_err_test extends cpu_base_test;
+    `uvm_component_utils(cdma_intr_err_test)
+    `NEW_COMP
+
+    task main_phase(uvm_phase phase);
+        cdma_int_err_vseq vseq=cdma_int_err_vseq::type_id::create("vseq");
+        phase.raise_objection(this);
+            vseq.start(w_env.vsqr);
+            phase.phase_done.set_drain_time(this,4000ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
 `AXI_TEST(s04_master_axi_wrap_test,s04_master_axi_wrap_vseq,1000ns)

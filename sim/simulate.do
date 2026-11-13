@@ -27,6 +27,7 @@ vsim -sv_seed random +access +rwc +dbg +m+top +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJE
 -L axi_protocol_converter_v2_1_20 \
 -L axi_intf \
 -L axi4_lite_mem \
+-L axi4_mem \
 -L core_perif \
 -L spi_mem \
 -L core_wrapper \

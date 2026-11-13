@@ -1041,17 +1041,39 @@ class cdma_mem2bram_seq extends base_cpu_sequence;
         super.body();
         assert(std::randomize(mem_addr) with {mem_addr inside {[32'h8000_0000 : 32'h9FFF_FFC0]};mem_addr[1:0] == 2'b00;});
         for(int i=0;i<16;i++)begin
-            mem_addr=mem_addr+(i*4);
+            mem_addr=mem_addr+4;
            write_reg(mem_addr);
         end
           cdmacr_data=32'h7000;
-           write_reg(CDMA_BASE,cdmacr_data);
-           write_reg(CDMA_BASE+18,mem_addr);
+          write_reg(CDMA_BASE,cdmacr_data);
+           write_reg(CDMA_BASE+'h18,mem_addr);
            assert(std::randomize(mem_addr) with {mem_addr inside {[32'h7100_0000 : 32'h713F_FFC0]};mem_addr[1:0] == 2'b00;});
-           write_reg(CDMA_BASE+20,mem_addr);
-           write_reg(CDMA_BASE+28,32'h16);
+           write_reg(CDMA_BASE+'h20,mem_addr);
+           write_reg(CDMA_BASE+'h28,'h16);
     endtask
 endclass:cdma_mem2bram_seq
+
+class cdma_bram2mem_seq extends base_cpu_sequence;
+    `uvm_object_utils(cdma_bram2mem_seq)
+    `NEW_OBJ
+
+    bit[31:0]  mem_addr;
+    task body();
+        super.body();
+        assert(std::randomize(mem_addr) with {mem_addr inside {[BRAM_BASE : BRAM_END]};mem_addr[1:0] == 2'b00;});
+        for(int i=0;i<128;i++)begin
+            mem_addr=mem_addr+4;
+           write_reg(mem_addr);
+        end
+          cdmacr_data=32'h7000;
+          write_reg(CDMA_BASE,cdmacr_data);
+           write_reg(CDMA_BASE+'h18,mem_addr);
+           assert(std::randomize(mem_addr) with {mem_addr inside {[LITE_MEM_BASE: LITE_MEM_END]};mem_addr[1:0] == 2'b00;});
+           write_reg(CDMA_BASE+'h20,mem_addr);
+           write_reg(CDMA_BASE+'h28,'h20);
+    endtask
+
+endclass
 
 class gpio_check_seq extends base_cpu_sequence;
     `uvm_object_utils(gpio_check_seq)
@@ -1071,3 +1093,37 @@ class gpio_check_seq extends base_cpu_sequence;
         write_reg(GPIO_BASE + 'h8, 'h1);        // output
     endtask
 endclass : gpio_check_seq
+
+class config_cdma_seq extends base_cpu_sequence;
+
+    `uvm_object_utils(config_cdma_seq)
+    `NEW_OBJ
+    bit [31:0] cdma_cr;
+    bit [31:0] src_addr;
+    bit [31:0] dest_addr;
+    bit [31:0] transfer_len;
+
+    task body();
+        super.body();
+
+        `uvm_info("CDMA_CONFIG", "Configuring CDMA registers", UVM_LOW)
+
+        // CDMA Control Register
+        write_reg(CDMA_BASE, cdma_cr);
+
+        // CDMA Source Address Register
+        write_reg(CDMA_BASE + 'h18, src_addr);
+
+        // CDMA Destination Address Register
+        write_reg(CDMA_BASE + 'h20, dest_addr);
+
+        // CDMA Bytes To Transfer Register
+        write_reg(CDMA_BASE + 'h28, transfer_len);
+
+        `uvm_info("CDMA_CONFIG",$sformatf("SRC_ADDR=%h DEST_ADDR=%h LENGTH=%h",src_addr, dest_addr, transfer_len),UVM_LOW)
+
+    endtask
+
+endclass : config_cdma_seq
+
+

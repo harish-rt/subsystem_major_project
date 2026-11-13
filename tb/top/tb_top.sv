@@ -545,7 +545,16 @@ module top;
         //run_test("cdma_wr_rd_test");
         //run_test("mem_wr_rd_test");
         //run_test("cdma_sg_test");
-        run_test("cdma_mem2bram_test");
+        //run_test("cdma_mem2bram_test");
+        //run_test("cdma_bram2mem_test");
+        //run_test("cdma_bram2bram_test");
+        //run_test("cdma_mem2mem_test");
+        //run_test("cdma_opif2bram_test");
+        //run_test("cdma_opif2mem_test");
+        //run_test("cdma_4k_split_test");
+        //run_test("cdma_wr_decerr_test");
+        //run_test("cdma_rd_decerr_test");
+        //run_test("cdma_intr_err_test");
     end
 
     initial begin
