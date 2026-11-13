@@ -25,18 +25,26 @@ vlog -work xil_defaultlib -uvmver 1.2 \
 -l xil_defaultlib \
 -l axi_intf \
 -l axi4_lite_mem \
+-l axi4_mem \
 -l core_perif \
 -l spi_mem \
 -l core_wrapper \
-"../tb/common/config_tb.sv" \
 "../tb/common/soc_addr_pkg.sv" \
 "../tb/common/axi_parameters.sv" \
 "../tb/mem_agent/mem_pkg.sv" \
 "../tb/ips_core/axi_intc/intc_package.sv" \
 "../tb/ips_core/axi_cdma_env/top/axi_cdma_env_pkg.sv" \
 "../tb/top/cpu_package.sv" \
+"../tb/core_perif/uart/uart_intf.sv" \
+"../tb/core_perif/spi/spi_intf.sv" \
+"../tb/core_perif/gpio/gpio_intf.sv" \
+"../tb/core_perif/uart/uart_pkg.sv" \
+"../tb/core_perif/spi/spi_pkg.sv" \
+"../tb/core_perif/gpio/gpio_pkg.sv" \
+"../tb/core_perif/core_perif_pkg.sv" \
 "../tb/top/soc_package.sv" \
-"../tb/top/tb_top.sv"  
+"../tb/top/tb_top.sv"
+
 #2>&1 | tee compiletb.log
 
 

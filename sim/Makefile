@@ -144,7 +144,6 @@ run: setup
 ifeq ($(GUI), 1)
 	@echo "--- Launching Interactive GUI Simulation ---"
 	vsim $(VSIM_FLAGS) -l $(LOG_FILE) -do "do waves.tcl; $(GUI_WAVE_CMDS)"
-	#vsim $(VSIM_FLAGS) -do "do waves.tcl; $(GUI_WAVE_CMDS)"
 else
 ifeq ($(WAVE), 1)
 	@echo "--- Running Batch Simulation with Targeted ASDB Waveforms ---"

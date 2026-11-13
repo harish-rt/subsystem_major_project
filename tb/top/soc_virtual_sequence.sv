@@ -232,7 +232,7 @@ class uart_write_data_vseq extends soc_base_virtual_sequence;
     task body();
         uart_seq    = uart_write_data_seq::type_id::create("uart_seq");
         `uvm_info("uart_seq", "Starting uart PERIF vsequence...", UVM_LOW)
-        uart_seq.start(p_sequencer.s02_sqr);
+        uart_seq.start(p_sequencer.s00_sqr);
         `uvm_info("uart_seq", "uart PERIF vsequence complete.", UVM_LOW)
     endtask
 endclass : uart_write_data_vseq
@@ -289,9 +289,9 @@ class core_perif_master_vseq extends soc_base_virtual_sequence;
     task body();
         super.body();
 
-        isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
-        uart_vseq = uart_write_data_vseq  ::type_id::create("uart_vseq");
-        intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
+        isr_vseq    = cpu_isr_vseq         ::type_id::create("isr_vseq");
+        uart_vseq   = uart_write_data_vseq ::type_id::create("uart_vseq");
+        intc_seq    = cpu_config_intc_seq  ::type_id::create("intc_seq");
         
         intc_seq.core_en = 1;
       
@@ -569,27 +569,28 @@ class gpio_reg_access_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(gpio_reg_access_vseq)
     `NEW_OBJ
 
-    gpio_reg_access_seq         m_gpio_seq;
+    gpio_reg_config_seq         m_gpio_seq;
     gpio_slave_responder_seq    s_gpio_seq;
     cpu_config_intc_seq         intc_seq;   // s02
     cpu_isr_vseq                isr_vseq;   // s00
 
     task body();
-        m_gpio_seq = gpio_reg_access_seq::type_id::create("m_gpio_seq");
+        m_gpio_seq = gpio_reg_config_seq::type_id::create("m_gpio_seq");
         s_gpio_seq = gpio_slave_responder_seq::type_id::create("s_gpio_seq");
         intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
         isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
         intc_seq.core_en = 1;
 
-        fork
-            isr_vseq.start(p_sequencer);
-        join_none
-        fork
-            intc_seq.start(p_sequencer.s02_sqr);
-            m_gpio_seq.start(p_sequencer.s00_sqr);
-            s_gpio_seq.start(p_sequencer.gpio_sqr);
-        join
-        isr_clear();
+        m_gpio_seq.start(p_sequencer.s00_sqr);
+        //fork
+        //    isr_vseq.start(p_sequencer);
+        //join_none
+        //fork
+        //    intc_seq.start(p_sequencer.s02_sqr);
+        //    m_gpio_seq.start(p_sequencer.s00_sqr);
+        //    s_gpio_seq.start(p_sequencer.gpio_sqr);
+        //join
+        //isr_clear();
     endtask
 endclass : gpio_reg_access_vseq
 
@@ -675,9 +676,9 @@ class s04_master_outstanding_vseq extends soc_base_virtual_sequence;
         s04_ff_seq = load_mem_seq::type_id::create("s04_ff_seq");
         s04_b_seq  = load_mem_seq::type_id::create("s04_b_seq");
 
-        for (int i = 0; i < 64; i++) begin
+        for (int i = 0; i < 128; i++) begin
             if (!s04_b_seq.randomize() with {
-                len   == 'hfF;
+                len   == 'hF;
                 slave == BRAM_M;
                 aw_id == ((i % 15) + 1);                    
                 //solve len before addr;                

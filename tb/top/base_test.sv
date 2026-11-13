@@ -372,7 +372,7 @@ class core_perif_master_test extends cpu_base_test;
             reg_vseq.start(w_env.vsqr);
             slv_seq.start(w_env.cp_env.uart_agt.sequencer);
         join
-        phase.phase_done.set_drain_time(this, 1000ns);
+        phase.phase_done.set_drain_time(this, 3000ns);
         phase.drop_objection(this);
     endtask
 endclass : core_perif_master_test
@@ -519,8 +519,8 @@ class timer_reg_access_test extends cpu_base_test;
     endtask
 endclass
 
-class gpio_reg_access_test extends cpu_base_test;
-    `uvm_component_utils(gpio_reg_access_test)
+class gpio_check_test extends cpu_base_test;
+    `uvm_component_utils(gpio_check_test)
     `NEW_COMP
 
     gpio_reg_access_vseq    gpio_seq;
@@ -533,7 +533,7 @@ class gpio_reg_access_test extends cpu_base_test;
         phase.phase_done.set_drain_time(this,3000ns);
         phase.drop_objection(this);
     endtask
-endclass : gpio_reg_access_test
+endclass : gpio_check_test
 
 `GAPS_TEST(s02_masters_load_bram_test, s02_masters_load_bram_vseq,0)
 `GAPS_TEST(s04_master_bram_test, s04_master_bram_vseq,0)
@@ -568,7 +568,8 @@ class s04_master_outstanding_test extends cpu_base_test;
 
         phase.raise_objection(this);    
             ost_seq.start(w_env.vsqr);
-        phase.phase_done.set_drain_time(this,16000ns);
+        wait(w_env.c_env.s04_agt.tkt.tx_done);
+        phase.phase_done.set_drain_time(this,1000ns);
         phase.drop_objection(this);
     endtask
 endclass : s04_master_outstanding_test

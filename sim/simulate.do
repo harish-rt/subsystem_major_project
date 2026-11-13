@@ -2,6 +2,10 @@ close [open "sim_txt.log" w]
 
 echo "--- Starting UVM Simulation ---"
 
+#vsim -sv_seed random +access +rwc +dbg +m+top +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJECTION_TRACE
+#vsim -sv_seed random +access +rwc -dbg +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJECTION_TRACE
+#vsim -sv_seed random +access +rwc -dbg +m+top -acdb +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJECTION_TRACE
+
 vsim -sv_seed random +access +rwc +dbg +m+top +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJECTION_TRACE \
 -L unisims_ver -L unimacro_ver -L secureip \
 -L xpm \
@@ -27,6 +31,7 @@ vsim -sv_seed random +access +rwc +dbg +m+top +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJE
 -L axi_protocol_converter_v2_1_20 \
 -L axi_intf \
 -L axi4_lite_mem \
+-L axi4_mem \
 -L core_perif \
 -L spi_mem \
 -L core_wrapper \
@@ -35,6 +40,8 @@ vsim -sv_seed random +access +rwc +dbg +m+top +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJE
 -l sim_txt.log
 do waves.tcl
 run -all
+acdb save -o my_assertions.acdb
+quit
 #transcript to
 
 #add wave -recursive /top/dut/CORE_PERIF_CTRL/u_intc/*
