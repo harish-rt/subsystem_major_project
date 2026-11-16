@@ -114,50 +114,27 @@ class soc_master_test extends cpu_base_test;
 
     task main_phase(uvm_phase phase);
         master_vseq = soc_master_vseq::type_id::create("master_vseq");
-
         phase.raise_objection(this);
-
             master_vseq.start(w_env.vsqr);
-
         phase.phase_done.set_drain_time(this, 500ns);
         phase.drop_objection(this);
     endtask
 endclass : soc_master_test
 
-class load_bram_256_test extends cpu_base_test;
-    `uvm_component_utils(load_bram_256_test)
+class bram_s04_max_burst_len_test extends cpu_base_test;
+    `uvm_component_utils(bram_s04_max_burst_len_test)
     `NEW_COMP
 
-    //load_bram_seq       load_seq;   //axi4 lite
-    load_bram_256_seq   load_seq;   //axi4
-    read_bram_256_seq   read_seq;   //axi4
-    read_bram_vseq      lite_seq;   //axi4 lite
-    
-    virtual function void build_phase(uvm_phase phase);
-        super.build_phase(phase);
-        //load_seq = load_bram_seq::type_id::create("load_seq");  //axi4
-        load_seq = load_bram_256_seq::type_id::create("load_seq");  //axi4
-        read_seq = read_bram_256_seq::type_id::create("read_seq");  //axi4
-        lite_seq = read_bram_vseq::type_id::create("lite_seq");     //axi4 lite
-    endfunction
+    bram_s04_max_burst_len_vseq   max_seq;  
 
     task main_phase(uvm_phase phase);
-
+        max_seq = bram_s04_max_burst_len_vseq::type_id::create("max_seq"); 
         phase.raise_objection(this);
-            `uvm_info("UVM_TEST","started bram loading",UVM_LOW)
-            //load_seq.start(w_env.c_env.cpu_agt[0].sqr);
-            load_seq.start(w_env.c_env.s04_agt.sqr);
-            `uvm_info("UVM_TEST","loading bram completed",UVM_LOW)
-        fork
-            `uvm_info("UVM_TEST","entered fork",UVM_LOW)
-            //read_seq.start(w_env.c_env.s04_agt.sqr);
-            lite_seq.start(w_env.vsqr);
-        join
-        `uvm_info("UVM_TEST","came out of fork",UVM_LOW)
+            max_seq.start(w_env.vsqr);
         phase.phase_done.set_drain_time(this, 2000ns);
         phase.drop_objection(this);
     endtask
-endclass : load_bram_256_test
+endclass : bram_s04_max_burst_len_test
 
 class cdma_boundary_check_test extends cpu_base_test;
     `uvm_component_utils(cdma_boundary_check_test)
@@ -456,21 +433,20 @@ class concurrent_diff_slaves_test extends cpu_base_test;
     endtask
 endclass:concurrent_diff_slaves_test
 
-class masters_load_bram_test extends cpu_base_test;
-    `uvm_component_utils(masters_load_bram_test)
+class masters_load_read_bram_test extends cpu_base_test;
+    `uvm_component_utils(masters_load_read_bram_test)
     `NEW_COMP
 
-    masters_load_bram_vseq      bram_seq;
+    masters_load_read_bram_vseq      bram_seq;
 
     task main_phase(uvm_phase phase);
-        bram_seq = masters_load_bram_vseq::type_id::create("bram_seq");
-
+        bram_seq = masters_load_read_bram_vseq::type_id::create("bram_seq");
         phase.raise_objection(this);
             bram_seq.start(w_env.vsqr);
         phase.phase_done.set_drain_time(this,1000ns);
         phase.drop_objection(this);
     endtask
-endclass:masters_load_bram_test
+endclass : masters_load_read_bram_test
 
 class masters_load_lite_mem_test extends cpu_base_test;
     `uvm_component_utils(masters_load_lite_mem_test)
@@ -502,3 +478,91 @@ class timer_reg_access_test extends cpu_base_test;
         phase.drop_objection(this);
     endtask
 endclass
+
+class bram_access_s02_test extends cpu_base_test;
+    `uvm_component_utils(bram_access_s02_test)
+    `NEW_COMP
+
+    S02_load_read_bram_vseq    s02_seq;
+    task main_phase(uvm_phase phase);
+        s02_seq = S02_load_read_bram_vseq::type_id::create("s02_seq");
+        phase.raise_objection(this);
+            s02_seq.start(w_env.vsqr);
+        phase.phase_done.set_drain_time(this,3000ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
+class bram_access_s04_test extends cpu_base_test;
+    `uvm_component_utils(bram_access_s04_test)
+    `NEW_COMP
+
+    S04_load_read_bram_vseq    s04_seq;
+    task main_phase(uvm_phase phase);
+        s04_seq = S04_load_read_bram_vseq::type_id::create("s04_seq");
+        phase.raise_objection(this);
+            s04_seq.start(w_env.vsqr);
+        phase.phase_done.set_drain_time(this,3000ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
+class masters_load_read_bram_diff_addr_test extends cpu_base_test;
+    `uvm_component_utils(masters_load_read_bram_diff_addr_test)
+    `NEW_COMP
+
+    masters_load_read_bram_same_addr_vseq      bram_seq;
+
+    task main_phase(uvm_phase phase);
+        bram_seq = masters_load_read_bram_same_addr_vseq::type_id::create("bram_seq");
+        phase.raise_objection(this);
+            bram_seq.start(w_env.vsqr);
+        phase.phase_done.set_drain_time(this,1000ns);
+        phase.drop_objection(this);
+    endtask
+endclass : masters_load_read_bram_diff_addr_test
+
+class diff_masters_load_read_bram_test extends cpu_base_test;
+    `uvm_component_utils(diff_masters_load_read_bram_test)
+    `NEW_COMP
+
+    diff_masters_load_read_bram_vseq   bram_seq;
+
+    task main_phase(uvm_phase phase);
+        bram_seq = diff_masters_load_read_bram_vseq::type_id::create("bram_seq");
+        phase.raise_objection(this);
+            bram_seq.start(w_env.vsqr);
+        phase.phase_done.set_drain_time(this,1000ns);
+        phase.drop_objection(this);
+    endtask
+endclass : diff_masters_load_read_bram_test
+
+class bram_data_pattern_test extends cpu_base_test;
+    `uvm_component_utils(bram_data_pattern_test)
+    `NEW_COMP
+    bram_data_pattern_vseq    bram_vseq;
+    task main_phase(uvm_phase phase);
+        bram_vseq = bram_data_pattern_vseq::type_id::create("bram_vseq");
+        phase.raise_objection(this);
+            bram_vseq.start(w_env.vsqr);
+        phase.phase_done.set_drain_time(this,3000ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
+class gpio_reg_access_test extends cpu_base_test;
+     `uvm_component_utils(gpio_reg_access_test);
+    `NEW_COMP;
+    gpio_reg_access_vseq gpio_vseq; 
+    task main_phase(uvm_phase phase);
+        `SET_S00_FORK_DISABLE(1);
+        gpio_vseq = gpio_reg_access_vseq::type_id::create("gpio_vseq");
+        phase.raise_objection(this);
+          gpio_vseq.start(w_env.vsqr);
+        phase.phase_done.set_drain_time(this,3000ns);
+        phase.drop_objection(this);
+    endtask
+endclass
+
+
+

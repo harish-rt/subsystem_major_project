@@ -74,65 +74,18 @@ class base_s04_sequence extends uvm_sequence#(s04_seq_item);
     endtask
 endclass : base_s04_sequence
 
-class load_bram_256_seq extends base_s04_sequence;
-    `uvm_object_utils(load_bram_256_seq)
-    `NEW_OBJ
-
-    task body();
-        super.body();
-        start_item(pkt);
-        if(!pkt.randomize() with{
-            AWADDR  == 'h7100_0100;
-            AWLEN   == 'h3;
-            AWBURST == INCR;
-            //AWID    == 'h4;
-            AWCACHE == 'h0;
-            AWQOS   == 'h0;
-            operation   == WRITE;
-            }) begin
-            `uvm_error(get_full_name(), "randomization_failed")
-        end
-        finish_item(pkt);
-        get_response(pkt);
-    endtask
-endclass : load_bram_256_seq
-
-class read_bram_256_seq extends base_s04_sequence;
-    `uvm_object_utils(read_bram_256_seq)
-    `NEW_OBJ
-
-    task body();
-        super.body();
-        start_item(pkt);
-        if(!pkt.randomize() with{
-            ARADDR  == 'h7100_0100;
-            ARLEN   == 'h0;
-            ARBURST == INCR;
-            ARID    == 'h1;
-            operation   == READ;
-            }) begin
-            `uvm_error(get_full_name(), "randomization_failed")
-        end
-        finish_item(pkt);
-        get_response(pkt);
-    endtask
-endclass : read_bram_256_seq
-
-
-class load_mem_seq extends base_s04_sequence;
-    `uvm_object_utils(load_mem_seq)
+class s04_load_mem_seq extends base_s04_sequence;
+    `uvm_object_utils(s04_load_mem_seq)
     `NEW_OBJ
 
     rand bit [31:0] addr;
     rand bit [7:0]  len;
     rand bit [1:0]  burst;
-    rand bit        is_write;
 
     constraint default_config_c {
         soft addr inside {[LITE_MEM_BASE : LITE_MEM_BASE+'h1000]};
         soft len        == 8'hf;
         soft burst      == INCR;
-        soft is_write   == 1'b1;
     }
 
     task body();
@@ -146,11 +99,168 @@ class load_mem_seq extends base_s04_sequence;
                 AWLEN       == local::len;
                 AWBURST     == local::burst;
                 AWID        != 0;
-                operation   == (local::is_write ? WRITE : READ); 
+                operation   == WRITE; 
             }) begin
-                `uvm_error(get_full_name(), "load_mem_seq randomization failed")
+                `uvm_error(get_full_name(), "s04_load_mem_seq randomization failed")
             end
         finish_item(pkt);
         get_response(pkt);
     endtask
-endclass : load_mem_seq
+endclass : s04_load_mem_seq
+
+class s04_read_mem_seq extends base_s04_sequence;
+    `uvm_object_utils(s04_read_mem_seq)
+    `NEW_OBJ
+
+    rand bit [31:0] addr;
+    rand bit [7:0]  len;
+    rand bit [1:0]  burst;
+
+    constraint default_config_c {
+        soft addr inside {[LITE_MEM_BASE : LITE_MEM_BASE+'h1000]};
+        soft len        == 8'hf;
+        soft burst      == INCR;
+    }
+
+    task body();
+        super.body();
+        
+        `uvm_info(get_type_name(), $sformatf("Driving stress pkt: ADDR=0x%0h, LEN=0x%0h", addr, len), UVM_LOW)
+
+        start_item(pkt);
+            if(!pkt.randomize() with {
+                ARADDR      == local::addr;
+                ARLEN       == local::len;
+                ARBURST     == local::burst;
+                ARID        != 0;
+                operation   == READ; 
+            }) begin
+                `uvm_error(get_full_name(), "s04_read_mem_seq randomization failed")
+            end
+        finish_item(pkt);
+        get_response(pkt);
+    endtask
+endclass : s04_read_mem_seq
+
+class s04_load_bram_seq extends base_s04_sequence;
+    `uvm_object_utils(s04_load_bram_seq)
+    `NEW_OBJ
+
+    rand bit [31:0] addr;
+    rand bit [7:0]  len;
+    rand bit [1:0]  burst;
+
+    constraint default_config_c {
+        soft addr  == BRAM_BASE;
+        soft len   == 8'h03;  // 4 beats
+        soft burst == INCR;
+    }
+
+    task body();
+        super.body();
+        `uvm_info(get_type_name(), $sformatf("Driving BRAM write burst: ADDR=0x%0h,LEN=0x%0h",addr, len), UVM_LOW)
+        start_item(pkt);
+
+        if (!pkt.randomize() with {
+            AWADDR      == local::addr;
+            AWLEN       == local::len;
+            AWBURST     == local::burst;
+            AWID        != 0;
+            operation == WRITE;
+        }) begin
+            `uvm_fatal(get_full_name(),"s04_load_bram_seq randomization failed")
+        end
+
+        finish_item(pkt);
+        get_response(pkt);
+
+    endtask
+endclass : s04_load_bram_seq
+
+class s04_read_bram_seq extends base_s04_sequence;
+    `uvm_object_utils(s04_read_bram_seq)
+    `NEW_OBJ
+
+    rand bit [31:0] addr;
+    rand bit [7:0]  len;
+    rand bit [1:0]  burst;
+
+    constraint default_config_c {
+        soft addr  == BRAM_BASE;
+        soft len   == 8'h03;  // 4 beats
+        soft burst == INCR;
+    }
+
+    task body();
+        super.body();
+        `uvm_info(get_type_name(), $sformatf("BRAM read burst: ADDR=0x%0h, LEN=0x%0h",addr, len), UVM_LOW)
+
+        start_item(pkt);
+        if (!pkt.randomize() with {
+            ARADDR      == local::addr;
+            ARLEN       == local::len;
+            ARBURST     == local::burst;
+            ARID        != 0;
+            operation   == READ;
+        }) begin
+            `uvm_fatal(get_full_name(),"s04_read_bram_seq randomization failed")
+        end
+
+        finish_item(pkt);
+        get_response(pkt);
+
+    endtask
+endclass : s04_read_bram_seq
+
+class s04_bram_data_pattern_seq extends base_s04_sequence;
+  `uvm_object_utils(s04_bram_data_pattern_seq)
+  `NEW_OBJ
+
+  bit [31:0] pattern_q[$] = '{
+    32'hAAAA_AAAA,
+    32'hFFFF_FFFF,
+    32'h5555_5555,
+    32'hFFFF_0000,
+    32'h0000_FFFF,
+    32'hFF00_FF00,
+    32'h00FF_00FF
+  };
+  bit [31:0] base_addr = BRAM_BASE + 32'h100;  
+  task body();
+    super.body();
+    // WRITE BURST
+    start_item(pkt);
+    if (!pkt.randomize() with {
+          AWADDR       == base_addr;
+          AWLEN        == 6;              // 7 beats
+          AWBURST      == INCR;
+          AWID         != 0;
+          operation    == WRITE;
+          foreach (WDATA[i]) {
+            WDATA[i] == pattern_q[i];
+            WSTRB[i] == 4'hF;
+          }
+        }) begin
+      `uvm_fatal(get_type_name(), "Write burst randomization failed")
+    end
+    finish_item(pkt);
+    get_response(pkt);
+    `uvm_info(get_type_name(), $sformatf("WRITE burst completed  0x%08h", base_addr), UVM_LOW)
+
+    //READ BURST 
+    start_item(pkt);
+    if (!pkt.randomize() with {
+          ARADDR       == base_addr;
+          ARLEN        == 6;              // 7 beats
+          ARBURST      == INCR;
+          ARID         != 0;
+          operation    == READ;
+        }) begin
+      `uvm_fatal(get_type_name(), "Read burst randomization failed")
+    end
+    finish_item(pkt);
+    get_response(pkt);
+    `uvm_info(get_type_name(), $sformatf("READ burst completed 0x%08h ", base_addr), UVM_LOW)
+    `uvm_info(get_type_name(), "=== AXI4 BRAM Data Pattern Burst Sequence Completed ===", UVM_LOW)
+  endtask
+endclass : s04_bram_data_pattern_seq

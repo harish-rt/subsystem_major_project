@@ -445,13 +445,11 @@ module top;
     assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
 
     initial begin
-        run_test("timer_reg_access_test");
+        //run_test("timer_reg_access_test");
         //run_test("masters_load_lite_mem_test");
-        //run_test("masters_load_bram_test");
         //run_test("concurrent_diff_slaves_test");        //`SET_CPU_FORK_DISABLE(1) in test
         //run_test("intc_stress_lite_test");
         //run_test("intc_stress_test");
-        //run_test("load_bram_256_test");               //find the interconnect issue from local
         //run_test("core_perif_master_test");
         //run_test("spi_write_data_test");
         //run_test("perif_gap_interconnect_test");
@@ -465,15 +463,24 @@ module top;
         //run_test("cdma_reg_write_read_test");
         //run_test("reg_read_test");
         //run_test("soc_master_test");
-        //run_test("bram_address_range_test");
-        //run_test("bram_upper_invalid_addr_test");
-        //run_test("bram_lower_invalid_addr_test");
-        //run_test("bram_multiple_write_read_test");
         //run_test("config_cdma_ral_test");
         //run_test("cpu_base_test");
         //run_test("cdma_wr_rd_test");
         //run_test("mem_wr_rd_test");
         //run_test("cdma_sg_test");
+        //run_test("bram_address_range_test");               //1
+        //run_test("bram_multiple_write_read_test");         //2
+        //run_test("bram_upper_invalid_addr_test");          //3
+        //run_test("bram_lower_invalid_addr_test");          //4
+        //run_test("bram_access_s04_test");                  //5
+        //run_test("bram_access_s02_test");                  //6
+        //run_test("masters_load_read_bram_same_addr_test"); //7
+        //run_test("masters_load_read_bram_diff_addr_test"); //8
+        //run_test("bram_data_pattern_test");                //9
+        //run_test("diff_masters_load_read_bram_test");      //10
+        //run_test("bram_s04_max_burst_len_test");           //11  //find the interconnect issue from local
+        run_test("gpio_reg_access_test");                  
+        
     end
 
     initial begin

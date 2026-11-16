@@ -359,17 +359,16 @@ class intc_stress_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(intc_stress_vseq)
     `NEW_OBJ
 
-    load_mem_seq     write_seq;
+    s04_load_mem_seq     write_seq;
 
     task body();
         super.body();
-        write_seq = load_mem_seq::type_id::create("write_seq");
+        write_seq = s04_load_mem_seq::type_id::create("write_seq");
 
         assert(write_seq.randomize() with {
             addr  == {LITE_MEM_BASE + $urandom_range(100,1000)};
             len   == 'hff;
             burst == INCR;
-            is_write == 1;
         });
         write_seq.start(p_sequencer.s04_sqr);
     endtask
@@ -379,16 +378,15 @@ class wrap_burst_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(wrap_burst_vseq)
     `NEW_OBJ
 
-    load_mem_seq    burst_seq;
+    s04_load_mem_seq    burst_seq;
 
     task body();
         super.body();
-        burst_seq = load_mem_seq::type_id::create("burst_seq");
+        burst_seq = s04_load_mem_seq::type_id::create("burst_seq");
         assert(burst_seq.randomize()with{
             addr  == {BRAM_BASE + $urandom_range(100,1000)};
             len   == 'hf;
             burst == WRAP;
-            is_write == 1;
         });
         burst_seq.start(p_sequencer.s04_sqr);
     endtask
@@ -406,6 +404,18 @@ class uart_slave_vseq extends soc_base_virtual_sequence;
         uart_seq.start(p_sequencer.uart_sqr);
     endtask
 endclass : uart_slave_vseq
+
+class gpio_slave_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(gpio_slave_vseq)
+    `NEW_OBJ
+    gpio_slave_sequence gpio_seq;
+
+    task body();
+        super.body();
+        gpio_seq = gpio_slave_sequence::type_id::create("gpio_seq");
+        gpio_seq.start(p_sequencer.gpio_sqr);
+    endtask
+endclass : gpio_slave_vseq
 
 class concurrent_diff_slaves_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(concurrent_diff_slaves_vseq)
@@ -448,18 +458,23 @@ class concurrent_diff_slaves_vseq extends soc_base_virtual_sequence;
     endtask
 endclass : concurrent_diff_slaves_vseq
 
-class masters_load_bram_vseq extends soc_base_virtual_sequence;
-    `uvm_object_utils(masters_load_bram_vseq)
+class masters_load_read_bram_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(masters_load_read_bram_vseq)
     `NEW_OBJ
 
     load_mem_lite_seq       s00_seq;    // s00
     load_mem_lite_seq       s02_seq;    // s02
-    load_mem_seq            s04_seq;    // s04
+    s04_load_mem_seq        s04_seq;    // s04
+
+    read_mem_lite_seq       s00_rd_seq; // s00
+    read_mem_lite_seq       s02_rd_seq; // s02
+    s04_read_mem_seq        s04_rd_seq; // s04
 
     task body();
+    //  Create write sequences
         s00_seq  = load_mem_lite_seq::type_id::create("s00_seq");
         s02_seq  = load_mem_lite_seq::type_id::create("s02_seq");
-        s04_seq  = load_mem_seq::type_id::create("s04_seq");
+        s04_seq  = s04_load_mem_seq::type_id::create("s04_seq");
         assert(s00_seq.randomize() with {
             addr    == {BRAM_BASE + $urandom_range(100,1000)};
             beats   == 10;
@@ -472,15 +487,41 @@ class masters_load_bram_vseq extends soc_base_virtual_sequence;
             addr  == {BRAM_BASE + $urandom_range(2000,3000)};
             len   == 'hf;
             burst == INCR;
-            is_write == 1;
         });
         fork
             s02_seq.start(p_sequencer.s02_sqr);
             s04_seq.start(p_sequencer.s04_sqr);
             s00_seq.start(p_sequencer.s00_sqr);
         join
+        `uvm_info(get_type_name(), "=== Concurrent writes completed ===", UVM_LOW)
+
+        // Create read sequences
+        s00_rd_seq = read_mem_lite_seq::type_id::create("s00_rd_seq");
+        s02_rd_seq = read_mem_lite_seq::type_id::create("s02_rd_seq");
+        s04_rd_seq = s04_read_mem_seq::type_id::create("s04_rd_seq");
+
+        assert(s00_rd_seq.randomize() with {
+          addr  == s00_seq.addr;
+          beats == s00_seq.beats;
+        });
+        assert(s02_rd_seq.randomize() with {
+          addr  == s02_seq.addr;
+          beats == s02_seq.beats;
+        });
+        assert(s04_rd_seq.randomize() with {
+          addr     == s04_seq.addr;
+          len      == s04_seq.len;
+          burst    == s04_seq.burst;
+        });
+
+        fork
+          s02_rd_seq.start(p_sequencer.s02_sqr);
+          s04_rd_seq.start(p_sequencer.s04_sqr);
+          s00_rd_seq.start(p_sequencer.s00_sqr);
+        join
+        `uvm_info(get_type_name(), "=== Concurrent reads completed ===", UVM_LOW)
     endtask
-endclass:masters_load_bram_vseq
+endclass : masters_load_read_bram_vseq
 
 class masters_load_lite_mem_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(masters_load_lite_mem_vseq)
@@ -488,12 +529,12 @@ class masters_load_lite_mem_vseq extends soc_base_virtual_sequence;
 
     load_mem_lite_seq       s00_seq;    // s00
     load_mem_lite_seq       s02_seq;    // s02
-    load_mem_seq            s04_seq;    // s04
+    s04_load_mem_seq        s04_seq;    // s04
 
     task body();
         s00_seq  = load_mem_lite_seq::type_id::create("s00_seq");
         s02_seq  = load_mem_lite_seq::type_id::create("s02_seq");
-        s04_seq  = load_mem_seq::type_id::create("s04_seq");
+        s04_seq  = s04_load_mem_seq::type_id::create("s04_seq");
         assert(s00_seq.randomize() with {
             addr    == {LITE_MEM_BASE + $urandom_range(100,1000)};
             beats   == 20;
@@ -506,7 +547,6 @@ class masters_load_lite_mem_vseq extends soc_base_virtual_sequence;
             addr  == {LITE_MEM_BASE + $urandom_range(2000,3000)};
             len   == 'hff;
             burst == INCR;
-            is_write == 1;
         });
         fork
             s02_seq.start(p_sequencer.s02_sqr);
@@ -520,11 +560,11 @@ class master_starve_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(master_starve_vseq)
     `NEW_OBJ
 
-    load_mem_seq            s04_seq;
+    s04_load_mem_seq         s04_seq;
     load_mem_lite_seq       s02_seq;
 
     task body();
-        s04_seq = load_mem_seq::type_id::create("s04_seq");
+        s04_seq = s04_load_mem_seq::type_id::create("s04_seq");
         s02_seq = load_mem_lite_seq::type_id::create("s02_seq");
 
         forever begin
@@ -533,7 +573,6 @@ class master_starve_vseq extends soc_base_virtual_sequence;
                 addr inside {[BRAM_BASE : BRAM_BASE+'h1000]};
                 len   == 'hff;
                 burst == INCR;
-                is_write == 1;
             });
             s04_seq.start(p_sequencer.s04_sqr);
         end
@@ -569,3 +608,262 @@ class timer_reg_access_vseq extends soc_base_virtual_sequence;
         isr_clear();
     endtask
 endclass
+
+class S02_load_read_bram_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(S02_load_read_bram_vseq)
+    `NEW_OBJ
+
+    load_bram_seq  bram_seq;    
+    read_bram_seq  bram_vseq;
+
+    task body();
+        bram_seq     = load_bram_seq::type_id::create("bram_seq");        
+        bram_vseq    = read_bram_seq::type_id::create("bram_vseq");
+
+        bram_seq.start(p_sequencer.s02_sqr);
+        bram_vseq.start(p_sequencer.s02_sqr);
+    endtask
+endclass : S02_load_read_bram_vseq
+
+class S04_load_read_bram_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(S04_load_read_bram_vseq)
+    `NEW_OBJ
+
+    s04_load_bram_seq  bram_lseq;    
+    s04_read_bram_seq  bram_rseq;
+
+    task body();
+        bram_lseq     = s04_load_bram_seq::type_id::create("bram_lseq");        
+        bram_rseq     = s04_read_bram_seq::type_id::create("bram_rseq");
+        bram_lseq.start(p_sequencer.s04_sqr);
+        bram_rseq.start(p_sequencer.s04_sqr);
+    endtask
+endclass : S04_load_read_bram_vseq
+
+class masters_load_read_bram_same_addr_vseq extends soc_base_virtual_sequence;
+  `uvm_object_utils(masters_load_read_bram_same_addr_vseq)
+  `NEW_OBJ
+
+  load_mem_lite_seq       s00_seq;
+  load_mem_lite_seq       s02_seq;
+  s04_load_mem_seq        s04_seq;
+
+  read_mem_lite_seq       s00_rd_seq;
+  read_mem_lite_seq       s02_rd_seq;
+  s04_read_mem_seq        s04_rd_seq;
+
+  rand bit [31:0] common_addr;
+  constraint common_addr_c {common_addr inside {[BRAM_BASE : BRAM_END]};}
+
+  task body();
+    if (!this.randomize()) begin
+      `uvm_fatal(get_type_name(), "Failed to randomize common_addr")
+    end
+    `uvm_info(get_type_name(), $sformatf("Using common BRAM address = 0x%0h", common_addr), UVM_LOW)
+
+    // Create & configure WRITE sequences (same addr)
+    s00_seq = load_mem_lite_seq::type_id::create("s00_seq");
+    s02_seq = load_mem_lite_seq::type_id::create("s02_seq");
+    s04_seq = s04_load_mem_seq::type_id::create("s04_seq");
+
+    if (!s00_seq.randomize() with {
+          addr  == common_addr;
+          beats == 10;
+        })
+        `uvm_fatal(get_type_name(), "s00_seq rand failed")
+
+    if (!s02_seq.randomize() with {
+          addr  == common_addr;
+          beats == 10;
+        }) 
+        `uvm_fatal(get_type_name(), "s02_seq rand failed")
+
+    if (!s04_seq.randomize() with {
+          addr  == common_addr;
+          len   == 8'h0F;          
+          burst == INCR;
+        }) 
+        `uvm_fatal(get_type_name(), "s04_seq rand failed")
+
+    fork
+      s00_seq.start(p_sequencer.s00_sqr);
+      s02_seq.start(p_sequencer.s02_sqr);
+      s04_seq.start(p_sequencer.s04_sqr);
+    join
+    `uvm_info(get_type_name(), "=== Concurrent writes completed ===", UVM_LOW)
+
+    // Create & configure READ sequences (same addr)
+    s00_rd_seq = read_mem_lite_seq::type_id::create("s00_rd_seq");
+    s02_rd_seq = read_mem_lite_seq::type_id::create("s02_rd_seq");
+    s04_rd_seq = s04_read_mem_seq::type_id::create("s04_rd_seq");
+
+    if (!s00_rd_seq.randomize() with {
+          addr  == common_addr;
+          beats == 10;
+        })
+        `uvm_fatal(get_type_name(), "s00_rd_seq rand failed")
+
+    if (!s02_rd_seq.randomize() with {
+          addr  == common_addr;
+          beats == 10;
+        })
+        `uvm_fatal(get_type_name(), "s02_rd_seq rand failed")
+
+    if (!s04_rd_seq.randomize() with {
+          addr  == common_addr;
+          len   == 8'h0F;
+          burst == INCR;
+        }) 
+        `uvm_fatal(get_type_name(), "s04_rd_seq rand failed")
+
+    fork
+      s00_rd_seq.start(p_sequencer.s00_sqr);
+      s02_rd_seq.start(p_sequencer.s02_sqr);
+      s04_rd_seq.start(p_sequencer.s04_sqr);
+    join
+    `uvm_info(get_type_name(), "=== Concurrent reads completed ===", UVM_LOW)
+
+  endtask
+endclass : masters_load_read_bram_same_addr_vseq
+
+class diff_masters_load_read_bram_vseq extends soc_base_virtual_sequence;
+  `uvm_object_utils(diff_masters_load_read_bram_vseq)
+  `NEW_OBJ
+
+  s04_load_mem_seq  s04_seq;
+  read_mem_lite_seq s00_rd_seq;
+  read_mem_lite_seq s02_rd_seq;
+
+  rand bit [31:0] common_addr;
+
+  constraint common_addr_c {common_addr inside {[BRAM_BASE : BRAM_END]}; }
+
+  task body();
+    super.body();
+
+    if (!this.randomize()) begin
+      `uvm_fatal(get_type_name(), "Failed to randomize common_addr")
+    end
+    `uvm_info(get_type_name(), $sformatf("Common BRAM address = 0x%0h", common_addr), UVM_LOW)
+
+    s04_seq    = s04_load_mem_seq::type_id::create("s04_seq");
+    s00_rd_seq = read_mem_lite_seq::type_id::create("s00_rd_seq");
+    s02_rd_seq = read_mem_lite_seq::type_id::create("s02_rd_seq");
+
+    // Configure S04 WRITE transaction
+    if (!s04_seq.randomize() with {
+          addr  == local::common_addr;
+          len   == 8'h0F;
+          burst == INCR;
+        }) begin
+      `uvm_fatal(get_type_name(), "S04 write randomization failed")
+    end
+
+    // Configure S00 & S02 READ transactions
+    if (!s00_rd_seq.randomize() with {
+          addr  == local::common_addr;
+          beats == 10;
+        }) begin
+      `uvm_fatal(get_type_name(), "S00 read randomization failed")
+    end
+
+    if (!s02_rd_seq.randomize() with {
+          addr  == local::common_addr;
+          beats == 10;
+        }) begin
+      `uvm_fatal(get_type_name(), "S02 read randomization failed")
+    end
+
+      s04_seq.start(p_sequencer.s04_sqr);      
+    fork
+      s00_rd_seq.start(p_sequencer.s00_sqr);
+      s02_rd_seq.start(p_sequencer.s02_sqr);
+    join
+
+  endtask
+endclass : diff_masters_load_read_bram_vseq
+
+class bram_data_pattern_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(bram_data_pattern_vseq)
+    `NEW_OBJ
+
+    bram_data_pattern_seq     s00_seq;   // s00
+    bram_data_pattern_seq     s02_seq;   // s02
+    s04_bram_data_pattern_seq s04_seq;   // s04
+
+    task body();
+        s00_seq = bram_data_pattern_seq     ::type_id::create("s00_seq");
+        s02_seq = bram_data_pattern_seq     ::type_id::create("s02_seq");
+        s04_seq = s04_bram_data_pattern_seq ::type_id::create("s04_seq");
+        fork
+            s00_seq.start(p_sequencer.s00_sqr);
+            s02_seq.start(p_sequencer.s02_sqr);
+            s04_seq.start(p_sequencer.s04_sqr);
+        join
+    endtask
+endclass
+
+class bram_s04_max_burst_len_vseq extends soc_base_virtual_sequence;
+  `uvm_object_utils(bram_s04_max_burst_len_vseq)
+  `NEW_OBJ
+
+  s04_load_mem_seq        s04_seq;
+  s04_read_mem_seq        s04_rd_seq;
+  rand bit [31:0] common_addr;
+  constraint common_addr_c {common_addr inside {[BRAM_BASE : BRAM_END]};}
+
+  task body();
+    if (!this.randomize()) begin
+      `uvm_fatal(get_type_name(), "Failed to randomize common_addr")
+    end
+    `uvm_info(get_type_name(), $sformatf("Using common BRAM address = 0x%0h", common_addr), UVM_LOW)
+
+    s04_seq = s04_load_mem_seq::type_id::create("s04_seq");
+    s04_rd_seq = s04_read_mem_seq::type_id::create("s04_rd_seq");
+
+    if (!s04_seq.randomize() with {
+          addr  == common_addr;
+          len   == 8'hFF;          
+          burst == INCR;
+        }) 
+        `uvm_fatal(get_type_name(), "s04_seq rand failed")
+        if (!s04_rd_seq.randomize() with {
+          addr  == common_addr;
+          len   == 8'hFF;
+          burst == INCR;
+        }) 
+        `uvm_fatal(get_type_name(), "s04_rd_seq rand failed")
+    fork
+      s04_seq.start(p_sequencer.s04_sqr);    
+      s04_rd_seq.start(p_sequencer.s04_sqr);
+    join
+  endtask
+endclass : bram_s04_max_burst_len_vseq
+
+class gpio_reg_access_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(gpio_reg_access_vseq);
+
+    `NEW_OBJ;
+    cpu_config_intc_seq  intc_seq;
+    cpu_isr_vseq         isr_vseq;
+    gpio_config_seq      gpio_seq; 
+    gpio_slave_vseq      gpio_vseq;
+    task body();
+        super.body();
+
+        isr_vseq = cpu_isr_vseq        ::type_id::create("isr_vseq");
+        intc_seq = cpu_config_intc_seq ::type_id::create("intc_seq");
+        gpio_seq = gpio_config_seq     ::type_id::create("gpio_seq");
+        gpio_vseq = gpio_slave_vseq    ::type_id::create("gpio_vseq");
+        
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+        fork
+        gpio_vseq.start(p_sequencer);
+        intc_seq.start(p_sequencer.s00_sqr);
+        gpio_seq.start(p_sequencer.s00_sqr);
+        join
+    endtask
+endclass
+
