@@ -125,28 +125,36 @@ endclass : read_bram_256_seq
 class s04_read_mem_seq extends base_s04_sequence;
     `uvm_object_utils(s04_read_mem_seq)
     `NEW_OBJ
-    rand bit [31:0] addr;
+       rand bit [31:0] addr;
     rand bit [7:0]  len;
     rand bit [1:0]  burst;
+    rand bit [3:0]  ar_id;
+    bit wait_req;
+
     constraint default_config_c {
-        soft addr inside {[LITE_MEM_BASE : LITE_MEM_BASE+'h1000]};
+        soft addr inside {[LITE_MEM_BASE : LITE_MEM_END]};
         soft len        == 8'hf;
         soft burst      == INCR;
+        soft ar_id inside {[1 : 15]};
     }
+
     task body();
         super.body();
         
         `uvm_info(get_type_name(), $sformatf("Driving stress pkt: ADDR=0x%0h, LEN=0x%0h", addr, len), UVM_LOW)
+
         start_item(pkt);
             if(!pkt.randomize() with {
                 ARADDR      == local::addr;
                 ARLEN       == local::len;
                 ARBURST     == local::burst;
-                ARID        != 0;
+                ARID        == ar_id;
+                ARCACHE     == 0;
                 operation   == READ; 
             }) begin
-                `uvm_error(get_full_name(), "s04_read_mem_seq randomization failed")
+                `uvm_error(get_full_name(), "read_mem_seq randomization failed")
             end
+            pkt.wait_req = wait_req;
         finish_item(pkt);
         get_response(pkt);
     endtask
@@ -315,41 +323,3 @@ class s04_slave_mem_random_pattern_wr_rd_seq extends base_s04_sequence;
 endclass : s04_slave_mem_random_pattern_wr_rd_seq
 
 
-class read_mem_seq extends base_s04_sequence;
-    `uvm_object_utils(read_mem_seq)
-    `NEW_OBJ
-
-    rand bit [31:0] addr;
-    rand bit [7:0]  len;
-    rand bit [1:0]  burst;
-    rand bit [3:0]  ar_id;
-    bit wait_req;
-
-    constraint default_config_c {
-        soft addr inside {[LITE_MEM_BASE : LITE_MEM_END]};
-        soft len        == 8'hf;
-        soft burst      == INCR;
-        soft ar_id inside {[1 : 15]};
-    }
-
-    task body();
-        super.body();
-        
-        `uvm_info(get_type_name(), $sformatf("Driving stress pkt: ADDR=0x%0h, LEN=0x%0h", addr, len), UVM_LOW)
-
-        start_item(pkt);
-            if(!pkt.randomize() with {
-                ARADDR      == local::addr;
-                ARLEN       == local::len;
-                ARBURST     == local::burst;
-                ARID        == ar_id;
-                ARCACHE     == 0;
-                operation   == READ; 
-            }) begin
-                `uvm_error(get_full_name(), "read_mem_seq randomization failed")
-            end
-            pkt.wait_req = wait_req;
-        finish_item(pkt);
-        get_response(pkt);
-    endtask
-endclass : read_mem_seq

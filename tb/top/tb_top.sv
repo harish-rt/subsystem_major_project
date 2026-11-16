@@ -160,7 +160,7 @@ module top;
         .data_bridge2axi_int(axil_riscv_if[1]),
         //.data_bridge2axi_int(lite_data_if),
         //M05
-        //.ext_axi4_master(master_if),
+       // .ext_axi4_master(master_if),
         //S04
         .ext_axi4_slave(slave_if)
     );
@@ -508,7 +508,7 @@ module top;
 
     initial begin
         //run_test("bram_slave_test");
-        //run_test("s00_master_outstanding_test");
+        run_test("s00_master_outstanding_test");
         //run_test("s04_master_axi_wrap_test");
         //run_test("s04_master_interleaving_test");
         //run_test("s04_master_out_of_order_test");
@@ -556,7 +556,7 @@ module top;
         //run_test("slave_mem_upper_invalid_addr_test");
         //run_test("masters_wr_rd_lite_mem_same_addr_test");
         //run_test("mutiple_master_slave_mem_test");   //different address test
-        run_test("slave_mem_S02_acc_test");
+        //run_test("slave_mem_S02_acc_test");
         //run_test("slave_mem_s04_acc_test");
         //run_test("slave_mem_pattern_test");
         //run_test("slave_mem_large_data_test");

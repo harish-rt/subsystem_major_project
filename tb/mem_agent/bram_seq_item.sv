@@ -10,7 +10,6 @@ typedef enum {OKAY,EXOKAY,SLVERR,DECERR}    response_t;
     rand bit [7:0]      AWLEN;
     rand bit [2:0]      AWSIZE;
     rand burst_t        AWBURST;
-    rand bit [7:0]      AWID;
     rand bit [6:0]      AWID;
     rand bit [2:0]      AWPROT;
     rand bit [3:0]      AWCACHE;

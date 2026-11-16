@@ -7,6 +7,7 @@ class soc_base_virtual_sequence extends uvm_sequence;
     uvm_event           irq_event;
     virtual intc_intf   intc_if;
 
+
     task body();
         if(!uvm_config_db #(intc_config_obj)::get(null,get_full_name(),"intc_config_obj",obj))
             `uvm_fatal(get_full_name(),"Config_obj get Failure")
@@ -607,7 +608,6 @@ class S04_load_unload_lite_mem_vseq extends soc_base_virtual_sequence;
             addr     == LITE_MEM_BASE + 32'h100;
             len      == 9;
             burst    == INCR;
-            is_write == 1;
         })
             `uvm_fatal(get_type_name(), "S04 write randomization failed")
 
@@ -665,7 +665,6 @@ class masters_write_read_lite_mem_vseq extends soc_base_virtual_sequence;
             addr     == LITE_MEM_BASE + 32'h100;
             len      == 9;
             burst    == INCR;
-            is_write == 1;
         })
             `uvm_fatal(get_type_name(), "S04 write randomization failed")
 
@@ -751,7 +750,6 @@ class masters_write_read_lite_mem_diff_addr_vseq extends soc_base_virtual_sequen
             addr     == LITE_MEM_BASE + 500;
             len      == 9;
             burst    == INCR;
-            is_write == 1;
         })
             `uvm_fatal(get_type_name(), "S04 write randomization failed")
 
@@ -929,11 +927,11 @@ class s04_master_bram_4kb_vseq extends soc_base_virtual_sequence;
     `NEW_OBJ
 
     load_mem_seq    s04_seq;
-    read_mem_seq    r_s04_seq;
+    s04_read_mem_seq    r_s04_seq;
 
     task body();
         s04_seq = load_mem_seq::type_id::create("s04_seq");
-        r_s04_seq = read_mem_seq::type_id::create("r_s04_seq");
+        r_s04_seq = s04_read_mem_seq::type_id::create("r_s04_seq");
 
         assert(s04_seq.randomize() with {
             addr     == (BRAM_BASE + 'h40);
@@ -1007,8 +1005,8 @@ class s04_master_out_of_order_vseq extends soc_base_virtual_sequence;
     load_mem_seq    l_bram_seq;
     load_mem_seq    l_m05_seq;
 
-    read_mem_seq    bram_seq;
-    read_mem_seq    m05_seq;
+    s04_read_mem_seq    bram_seq;
+    s04_read_mem_seq    m05_seq;
 
     rand int bram_addr;
     rand int m05_addr;
@@ -1024,8 +1022,8 @@ class s04_master_out_of_order_vseq extends soc_base_virtual_sequence;
         l_bram_seq = load_mem_seq::type_id::create("l_bram_seq");
         l_m05_seq  = load_mem_seq::type_id::create("l_m05_seq");
 
-        bram_seq = read_mem_seq::type_id::create("bram_seq");
-        m05_seq  = read_mem_seq::type_id::create("m05_seq");
+        bram_seq = s04_read_mem_seq::type_id::create("bram_seq");
+        m05_seq  = s04_read_mem_seq::type_id::create("m05_seq");
 
     //  load BRAM and AXI4 mem
         assert(l_bram_seq.randomize()with{
@@ -1073,8 +1071,8 @@ class s04_master_interleaving_vseq extends soc_base_virtual_sequence;
     load_mem_seq    l_bram_seq;
     load_mem_seq    l_m05_seq;
 
-    read_mem_seq    bram_seq;
-    read_mem_seq    m05_seq;
+    s04_read_mem_seq    bram_seq;
+    s04_read_mem_seq    m05_seq;
 
     rand int bram_addr;
     rand int m05_addr;
@@ -1099,8 +1097,8 @@ class s04_master_interleaving_vseq extends soc_base_virtual_sequence;
         l_bram_seq = load_mem_seq::type_id::create("l_bram_seq");
         l_m05_seq  = load_mem_seq::type_id::create("l_m05_seq");
 
-        bram_seq = read_mem_seq::type_id::create("bram_seq");
-        m05_seq  = read_mem_seq::type_id::create("m05_seq");
+        bram_seq = s04_read_mem_seq::type_id::create("bram_seq");
+        m05_seq  = s04_read_mem_seq::type_id::create("m05_seq");
 
     //  load BRAM and AXI4 mem
         assert(l_bram_seq.randomize()with{
@@ -1150,11 +1148,11 @@ class s04_master_axi_wrap_vseq extends soc_base_virtual_sequence;
     `NEW_OBJ
 
     load_mem_seq    s04_seq;
-    read_mem_seq    s04_seq_r;
+    s04_read_mem_seq    s04_seq_r;
 
     task body();
         s04_seq = load_mem_seq::type_id::create("s04_seq");
-        s04_seq_r = read_mem_seq::type_id::create("s04_seq_r");
+        s04_seq_r = s04_read_mem_seq::type_id::create("s04_seq_r");
 
         assert(s04_seq.randomize()with{
             addr  == LITE_MEM_BASE + 'h108;
