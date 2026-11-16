@@ -21,7 +21,7 @@ class core_perif_lite_seq_item extends uvm_sequence_item;
         `uvm_field_int(ARADDR, UVM_ALL_ON)
         `uvm_field_int(RDATA, UVM_ALL_ON)
         `uvm_field_enum(response_t, RRESP, UVM_ALL_ON)
-        `uvm_field_enum (command_t,operation,UVM_ALL_ON)
+        `uvm_field_enum(command_t,operation,UVM_ALL_ON)
     `uvm_object_utils_end
 
     `NEW_OBJ

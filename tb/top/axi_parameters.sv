@@ -20,7 +20,7 @@ typedef enum {NO_RESET,RESET_ASSERTED,RESET_DEASSERTED}    reset_info_t;
 typedef enum {s0,s1,s2,s3}    slave_type;
 typedef enum {m0,m1,m2,m3}    master_type;
 
-parameter ID_WIDTH = 4;
+parameter ID_WIDTH = 7;
 parameter ADDR_WIDTH = 32;
 parameter BURST_LENGTH = 8;
 parameter BURST_SIZE = 3;

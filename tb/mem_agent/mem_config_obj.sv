@@ -7,5 +7,6 @@ class mem_config_obj extends uvm_object;
 
     virtual axi4_lite_tb_intf       mem_intf;
     virtual axi4_tb_intf            bram_intf;
+    virtual axi4_tb_intf            mem4_intf;
 
 endclass : mem_config_obj

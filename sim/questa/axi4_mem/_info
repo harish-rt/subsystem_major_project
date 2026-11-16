@@ -1,0 +1,36 @@
+m255
+K4
+z2
+!s11f vlog 2024.1 2024.02, Feb  1 2024
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dD:/VLSI/7 Protocol/RISCV/subsystem_major_project/sim/questa
+vaxi_memory_slave
+2../../rtl/sub_ips/m05/rtl/axi_memory_slave.sv
+DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+!s110 1793171611
+!i10b 1
+!s100 _9e?DhlXjd^e<cfAM[QiS0
+I2CIL[K7LN8[bZImEnUj]Q2
+S1
+R0
+w1793169921
+8../../rtl/sub_ips/m05/rtl/axi_memory_slave.sv
+F../../rtl/sub_ips/m05/rtl/axi_memory_slave.sv
+!i122 3
+L0 8 259
+VDg1SIo80bB@j0V0VzS_@n1
+OL;L;2024.1;79
+r1
+!s85 0
+31
+!s108 1793171611.000000
+!s107 ../../rtl/sub_ips/m05/rtl/axi_memory_slave.sv|
+!s90 -reportprogress|300|-work|axi4_mem|../../rtl/sub_ips/m05/rtl/axi_memory_slave.sv|
+!i113 0
+o-work axi4_mem -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+tCvgOpt 0

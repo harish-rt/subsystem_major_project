@@ -40,6 +40,7 @@ class s04_seq_item extends axi_base_sequence_item;
 
     //     master_e       master_p = MST_UNKNOWN;
 
+    bit wait_req;
          reset_info_t   reset_op = NO_RESET; //monitor signals reset info to sb using this enum //setting default value to be NO_RESET
     realtime reset_asserted, reset_deasserted;  //to hold reset timestamp info         
     realtime radd_hndshk, rdata_hndshk[], wadd_hndshk, wdata_hndshk[], wresp_hndshk;  // to capture timing when handshakes happen
@@ -48,6 +49,7 @@ class s04_seq_item extends axi_base_sequence_item;
         `uvm_field_enum(reset_info_t, reset_op, UVM_ALL_ON)
         `uvm_field_enum(command_t, operation, UVM_ALL_ON)
         
+        `uvm_field_int(wait_req, UVM_ALL_ON)
         `uvm_field_int(AWADDR, UVM_ALL_ON)
         `uvm_field_int(AWLEN, UVM_ALL_ON)
         `uvm_field_int(AWSIZE, UVM_ALL_ON)

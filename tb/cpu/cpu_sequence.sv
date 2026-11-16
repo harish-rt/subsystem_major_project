@@ -8,8 +8,10 @@ class base_cpu_sequence extends uvm_sequence#(cpu_seq_item);
     cpu_seq_item        pkt,w_pkt,r_pkt;
 
     bit [31:0]          reg_data;
+    bit [31:0]          bram_data;
     bit [31:0]          isr_data;
     bit [31:0]          ipr_data;
+    bit [31:0]          c_ipr_data;
     bit [31:0]          iar_data;
     bit [31:0]          cdmacr_data;
     bit [31:0]          cdmasr_data;
@@ -17,6 +19,7 @@ class base_cpu_sequence extends uvm_sequence#(cpu_seq_item);
     bit [31:0]          da_data;
     bit [31:0]          btt_data;
     bit [31:0]          sr_data;
+    bit [31:0]          timer_data;
 
     task pre_body();
         phase   =   get_starting_phase();
@@ -157,7 +160,6 @@ class load_bram_seq extends base_cpu_sequence;
         super.body();
         for(int i=0;i<bytes;i=i+4)begin
             write_reg(LITE_MEM_BASE + i);
-            //write_reg('h7100_0000 + i);
         end
     endtask
 endclass : load_bram_seq
@@ -258,33 +260,31 @@ class cdma_read_write_seq extends base_cpu_sequence;
         end while (pkt.RDATA[0][1] == 0);
 
         `uvm_do_with(pkt, {
-            AWADDR    == CDMA_BASE;
-            operation == WRITE;
-            WDATA[0]     == 32'h5000;
-            WSTRB[0]     == 'hf;
+            AWADDR      == CDMA_BASE;
+            operation   == WRITE;
+            WDATA[0]    == 32'h5000;
+            WSTRB[0]    == 'hf;
         })
 
         `uvm_do_with(pkt, {
-            AWADDR    == CDMA_BASE + 'h18; //sa
-            operation == WRITE;
-            WDATA[0]     == LITE_MEM_BASE;     //bram
-            //WDATA[0]     == 32'h7100_0000;     //bram
-            WSTRB[0]     == 'hf;
+            AWADDR      == CDMA_BASE + 'h18;          // sa
+            operation   == WRITE;
+            WDATA[0]    == AXI4_MEM_BASE;          // axi4_mem
+            WSTRB[0]    == 'hf;
         })
         
         `uvm_do_with(pkt, {
-            AWADDR    == CDMA_BASE + 'h20; //da
-            operation == WRITE;
-            WDATA[0]     == LITE_MEM_BASE + 'h100;     //bram
-            //WDATA[0]     == 32'h7100_1000;     //bram
-            WSTRB[0]     == 'hf;
+            AWADDR      == CDMA_BASE + 'h20;          // da
+            operation   == WRITE;
+            WDATA[0]    == AXI4_MEM_BASE + 'h100;  // axi4_mem
+            WSTRB[0]    == 'hf;
         })
 
        `uvm_do_with(pkt, {
-            AWADDR    == CDMA_BASE + 'h28; //btt
-            operation == WRITE;
-            WDATA[0]     == 32'h8;
-            WSTRB[0]     == 'hf;
+            AWADDR      == CDMA_BASE + 'h28;          // btt
+            operation   == WRITE;
+            WDATA[0]    == 32'ha;
+            WSTRB[0]    == 'hf;
         })
     endtask
 endclass:cdma_read_write_seq
@@ -299,8 +299,8 @@ class cpu_config_intc_seq extends base_cpu_sequence;
     task body();
         super.body();
         reg_data        = 0;
-        reg_data[26]    = cdma_en;                    //CDMA
-        reg_data[27]    = core_en;                    //Core Peripheral
+        reg_data[26]    = cdma_en;              //CDMA
+        reg_data[27]    = core_en;              //Core Peripheral
         write_reg(INTC_BASE + 'h8, reg_data);   //IER
         reg_data        = 0;
         reg_data[0]     = 1;                    //Master En
@@ -321,6 +321,7 @@ class cpu_isr_seq extends base_cpu_sequence;
 
         do begin
             read_reg(INTC_BASE + 'h4, ipr_data);
+            `uvm_info("ISR_IPR_DATA",$sformatf("ipr data: %b",ipr_data),UVM_LOW)
             
             if (ipr_data == 0) break;
 
@@ -361,15 +362,17 @@ class cpu_isr_seq extends base_cpu_sequence;
     endtask
 
     task handle_core_perif_isr();
+        ipr_data = 0;
         read_reg(IRQ_BASE + 'h4, ipr_data);
         `uvm_info("CPF_ISR_SEQ",$sformatf("ipr data: %b",ipr_data),UVM_LOW)
 
         if(ipr_data[0]) begin   //timer
+            write_reg(IRQ_BASE + 'hc, 'h1);      // INTC ACK
         end
 
         if(ipr_data[1]) begin   //uart
             read_reg(UART_BASE + 'h8, sr_data);
-            `uvm_info("CPF_ISR_SEQ",$sformatf("uart sr data: %b",sr_data),UVM_LOW)
+            `uvm_info("UART_ISR_SEQ",$sformatf("uart sr data: %b",sr_data),UVM_LOW)
 
             if(sr_data[3]) begin    // tx_fifo_full
                 write_reg(UART_BASE + 'hc, 'h1);    // uart control_reg
@@ -393,11 +396,21 @@ class cpu_isr_seq extends base_cpu_sequence;
         end
         if(ipr_data[2]) begin   //spi
             read_reg(SPI_BASE + 'h20, sr_data);
-            `uvm_info("CPF_ISR_SEQ",$sformatf("spi ipisr data: %b",sr_data),UVM_LOW)
+            `uvm_info("SPI_ISR_SEQ",$sformatf("spi ipisr data: %b",sr_data),UVM_LOW)
+            write_reg(SPI_BASE + 'h20,sr_data);
             read_reg(SPI_BASE + 'h64, sr_data);
-            `uvm_info("CPF_ISR_SEQ",$sformatf("spi sr data: %b",sr_data),UVM_LOW)
+            `uvm_info("SPI_ISR_SEQ",$sformatf("spi sr data: %b",sr_data),UVM_LOW)
+            write_reg(IRQ_BASE + 'hc, 'h4);      // INTC ACK
         end
         if(ipr_data[3]) begin   //gpio
+            read_reg(GPIO_BASE + 'h20, sr_data);    // GPIO INT STATUS
+            `uvm_info("GPIO_ISR_SEQ",$sformatf("gpio sr data: %b",sr_data),UVM_LOW)
+            write_reg(GPIO_BASE + 'h1c, sr_data);   // GPIO ACK
+            read_reg(GPIO_BASE + 'h20, sr_data);    // GPIO INT STATUS
+            if(sr_data != 0)
+                `uvm_error("GPIO_ISR_SEQ",$sformatf("GPIO interrupt status not cleared: %h",sr_data))
+            `uvm_info("GPIO_ISR_SEQ",$sformatf("gpio sr data: %b",sr_data),UVM_LOW)
+            write_reg(IRQ_BASE + 'hc, 'h8);     // INTC ACK
         end
         write_reg(INTC_BASE + 'hc, 'h800_0000);      // INTC ACK
     endtask
@@ -423,6 +436,7 @@ class bram_multiple_wr_rd_seq extends base_cpu_sequence;
                    `uvm_error("RAND_ERR","Randomization failed")
                    end
                 finish_item(pkt);
+                get_response(pkt);
             end
             for (int i=0;i<64;i+=4)begin
                 addr=32'h7100_0000+i;
@@ -434,6 +448,7 @@ class bram_multiple_wr_rd_seq extends base_cpu_sequence;
                    `uvm_error("RAND_ERR","Randomization failed")
                    end
                 finish_item(pkt);
+                get_response(pkt);
             end
         endtask
 endclass : bram_multiple_wr_rd_seq
@@ -746,7 +761,7 @@ class spi_write_data_seq extends base_cpu_sequence;
         //tx random data
         write_reg(SPI_BASE + 'h68,tx_data);     //dtr
         do begin
-            read_reg(SPI_BASE + 'h64, reg_data);
+            read_reg(SPI_BASE + 'h64, reg_data);//sr
         end while ((reg_data & 32'h1) != 0);    //rx not empty
         read_reg(SPI_BASE + 'h6c, reg_data);    //drr
         `uvm_info("SPI_TEST", $sformatf("Read back from SPI RX FIFO: 0x%02h", reg_data[7:0]), UVM_LOW)
@@ -1092,9 +1107,8 @@ class load_mem_lite_seq extends base_cpu_sequence;
     rand int        beats = 1;
 
     constraint default_config_c {
-        soft addr == LITE_MEM_BASE;
-        soft beats      == 2;
-        beats inside {[1:1024]};
+        soft addr   == LITE_MEM_BASE;
+        soft beats  == 2;
     }
 
     task body();
@@ -1146,3 +1160,102 @@ class gpio_config_seq extends base_cpu_sequence;
         write_reg(GPIO_BASE + 'h8  , 'h1);  //GPIO_OUTPUT
     endtask
 endclass:gpio_config_seq
+
+class read_mem_lite_seq extends base_cpu_sequence;
+    `uvm_object_utils(read_mem_lite_seq)
+    `NEW_OBJ
+
+    rand bit [31:0] addr;
+    rand int        beats = 1;
+
+    constraint default_config_c {
+        soft addr == LITE_MEM_BASE;
+        soft beats == 2;
+        beats inside {[1:1024]};
+    }
+
+    task body();
+        bit [31:0] current_addr;
+        super.body();
+
+        `uvm_info(get_type_name(), $sformatf("Starting Memory Read: Base ADDR=0x%0h, BEATS=%0d", addr, beats), UVM_LOW)
+
+        for (int i = 0; i < beats; i++) begin
+            current_addr = addr + (i * 4);
+            read_reg(current_addr,bram_data);
+        end
+
+        `uvm_info(get_type_name(), "End of Memory Read Sequence", UVM_LOW)
+    endtask
+endclass : read_mem_lite_seq
+
+class timer_reg_access_seq  extends base_cpu_sequence;
+    `uvm_object_utils(timer_reg_access_seq)
+
+        `NEW_OBJ
+
+    task body();
+        super.body();
+
+
+        write_reg(IRQ_BASE + 'h8,'h1);          //irq en
+        write_reg(IRQ_BASE + 'h1c,'h3);         //irq mer
+        write_reg(TIMER_BASE + 'h8,'h0);        // timer_ctrl
+        write_reg(TIMER_BASE + 'hc,'d300);      // timer_cmpr
+        write_reg(TIMER_BASE + 'h8,'h6);        // timer_ctrl
+        read_reg(TIMER_BASE + 'h10,timer_data); // timer_curr
+        `uvm_info("TIMER_SEQ", $sformatf("Timer current value = %0d", timer_data), UVM_LOW)
+        write_reg(TIMER_BASE + 'h14,'h0);        // timer_ctrl
+        write_reg(TIMER_BASE + 'h18,'d300);      // timer_cmpr
+        write_reg(TIMER_BASE + 'h14,'h6);        // timer_ctrl
+        read_reg(TIMER_BASE + 'h1c,timer_data); // timer_curr
+        `uvm_info("TIMER_SEQ", $sformatf("Timer current value = %0d", timer_data), UVM_LOW)
+    endtask
+endclass
+
+class gpio_reg_access_seq extends base_cpu_sequence;
+    `uvm_object_utils(gpio_reg_access_seq)
+    `NEW_OBJ
+
+    int no_of_reg = 11;
+
+    task body();
+        super.body();
+        for(int i = 0; i < no_of_reg; i++)begin
+            read_reg(GPIO_BASE + (i*4),reg_data);
+        end
+    endtask
+endclass : gpio_reg_access_seq
+
+class gpio_check_seq extends base_cpu_sequence;
+    `uvm_object_utils(gpio_check_seq)
+    `NEW_OBJ
+
+    task body();
+        super.body();
+        write_reg(IRQ_BASE + 'h8,'h8);              // irq en
+        write_reg(IRQ_BASE + 'h1c,'h3);             // irq mer
+
+        write_reg(GPIO_BASE + 'h24, 'hffff_ffff);   // int trigger level AL/AH
+        write_reg(GPIO_BASE + 'h28, 'hffff_ffff);   // int trigger mode L/E
+        write_reg(GPIO_BASE + 'h1c, 'hffff_ffff);   // int_clr
+
+        do begin
+            read_reg(GPIO_BASE + 'h20, sr_data);    // int_status
+        end while (sr_data != 0);
+        if(sr_data != 0)
+            `uvm_error("GPIO_ERR", $sformatf("status not cleared: %h", sr_data))
+
+        write_reg(GPIO_BASE + 'h14, 'h1);           // int_mask
+        write_reg(GPIO_BASE + 'h14, 'h1000_0001);   // int_mask
+        write_reg(GPIO_BASE, 'hf);                  // direction
+        write_reg(GPIO_BASE + 'h8, 'h1);            // output
+        write_reg(GPIO_BASE + 'h14, 1<<3);          // int_mask
+        write_reg(GPIO_BASE + 'hc, 1<<3);           // output_set
+        write_reg(GPIO_BASE + 'h10, 1<<3);          // output_clr
+        write_reg(GPIO_BASE + 'h10, 1);             // output_clr
+        write_reg(GPIO_BASE + 'h14, 1<<3);          // INT_MASK
+        write_reg(GPIO_BASE + 'h18, 1<<3);          // INT_SET - directly setting to get irq
+        read_reg (GPIO_BASE + 'h20, sr_data);       // expect 0x8
+    endtask
+endclass : gpio_check_seq

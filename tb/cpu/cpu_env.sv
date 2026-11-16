@@ -4,6 +4,7 @@ class cpu_env extends uvm_env;
     s04_agent        s04_agt;
     cpu_agent        cpu_agt[];
     cpu_config_obj   obj;
+    int max_outstanding_depth = 8;    
 
     function new(string name="cpu_env", uvm_component parent=null);
         super.new(name, parent);
@@ -36,6 +37,8 @@ class cpu_env extends uvm_env;
             cpu_agt[i].drv.seq_item_port.connect(cpu_agt[i].sqr.seq_item_export);
         end
         s04_agt.drv.seq_item_port.connect(s04_agt.sqr.seq_item_export);
+    // added for IC outstanding test
+        //s04_agt.sqr.set_max_pipeline_depth(max_outstanding_depth);        
     endfunction
 
 endclass:cpu_env

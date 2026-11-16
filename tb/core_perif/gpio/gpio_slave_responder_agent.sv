@@ -9,10 +9,9 @@ class gpio_slave_seq_item extends uvm_sequence_item;
 
     rand bit [31:0] req_data;
     rand bit [31:0] gpio_out;
-    rand bit [31:0] gpio_oe;
     rand int        latency_cycles;
 
-    constraint c_latency { latency_cycles inside {[1:8]}; }
+    constraint c_latency {soft latency_cycles inside {[1:8]}; }
 
     function new(string name = "gpio_slave_seq_item");
         super.new(name);
@@ -24,7 +23,6 @@ class gpio_slave_seq_item extends uvm_sequence_item;
         super.do_copy(rhs);
         req_data = rhs_.req_data;
         gpio_out = rhs_.gpio_out;
-        gpio_oe = rhs_.gpio_oe;
         latency_cycles = rhs_.latency_cycles;
     endfunction
 endclass
@@ -36,6 +34,32 @@ class gpio_slave_sequencer extends uvm_sequencer #(gpio_slave_seq_item);
         super.new(name, parent);
     endfunction
 endclass
+
+class gpio_slave_responder_seq extends uvm_sequence #(gpio_slave_seq_item);
+    `uvm_object_utils(gpio_slave_responder_seq)
+
+    function new(string name = "gpio_slave_responder_seq");
+        super.new(name);
+    endfunction
+
+    task body();
+        gpio_slave_seq_item resp_item;
+
+        `uvm_info(get_type_name(), "Starting GPIO slave responder sequence...", UVM_MEDIUM)
+
+        resp_item = gpio_slave_seq_item::type_id::create("resp_item");
+
+        start_item(resp_item);
+
+        if (!resp_item.randomize() with {
+            gpio_out  == 'h1000_0000;
+        }) begin
+            `uvm_fatal(get_type_name(),"Constrained randomization failed for resp_item")
+        end
+
+        finish_item(resp_item);
+    endtask
+endclass : gpio_slave_responder_seq
 
 class gpio_slave_driver extends uvm_driver #(gpio_slave_seq_item);
     `uvm_component_utils(gpio_slave_driver)
@@ -56,31 +80,20 @@ class gpio_slave_driver extends uvm_driver #(gpio_slave_seq_item);
     task run_phase(uvm_phase phase);
         gpio_slave_seq_item req;
 
-        vif.ack     = 1'b0;
         vif.gpio_out = '0;
-        vif.gpio_oe  = '0;
 
         forever begin
             seq_item_port.get_next_item(req);
 
-            // Wait for a request from the RTL or master-side GPIO logic.
-            while (!(vif.req_valid)) begin
-                @(posedge vif.clk);
-            end
+            wait(vif.gpio_oe != 0);
 
-            // Acknowledge and drive the response to the RTL bus.
-            vif.ack     = 1'b1;
             vif.gpio_out = req.gpio_out;
-            vif.gpio_oe  = req.gpio_oe;
 
             repeat (req.latency_cycles) @(posedge vif.clk);
 
-            vif.ack     = 1'b0;
             vif.gpio_out = '0;
-            vif.gpio_oe  = '0;
 
-            `uvm_info("GPIO_DRV", $sformatf("GPIO request accepted. req=0x%08h out=0x%08h oe=0x%08h",
-                req.req_data, req.gpio_out, req.gpio_oe), UVM_LOW)
+            `uvm_info("GPIO_DRV", $sformatf("GPIO request accepted. req=0x%08h out=0x%08h", req.req_data, req.gpio_out), UVM_LOW)
 
             seq_item_port.item_done();
         end
