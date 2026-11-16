@@ -2,7 +2,8 @@ class lite_intc_driver extends uvm_driver#(lite_intc_seq_item);
     `uvm_component_utils(lite_intc_driver)
     `NEW_COMP
     
-    virtual axi4_lite_intf          drv_if;
+    virtual axi4_lite_intc_intf          drv_if;
+    //virtual axi4_lite_tb_intf          drv_if;
     //virtual lite_intc_interface.lite_intc_driver_modport    drv_if;
     
     mailbox #(lite_intc_seq_item)waddress_mbx, wdata_mbx, raddress_mbx, rdata_mbx, wresponse_mbx;

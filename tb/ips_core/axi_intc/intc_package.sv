@@ -1,4 +1,4 @@
-`include "lite_intc_interface.sv"
+//`include "lite_intc_interface.sv"
 `include "intc_interface.sv"
 package intc_package;
     import uvm_pkg::*;

@@ -42,7 +42,7 @@ typedef logic [2:0]       prot_t;
 typedef logic [3:0]       qos_t;
 typedef logic [0:0]       lock_t;
 
-parameter ID_WIDTH = 7;
+parameter ID_WIDTH = 4;
 parameter ADDR_WIDTH = 32;
 parameter BURST_LENGTH = 8;
 parameter BURST_SIZE = 3;

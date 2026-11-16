@@ -49,7 +49,7 @@ class bram_access_seq extends axi_master_sequence;
         pkt=master_seq_item::type_id::create("pkt");
 
         start_item(pkt);
-            if(!pkt.randomize() with {operation==READ;araddr==32'h7100_0000;arid==7'h4;arlen==4;arburst==INCR;})
+            if(!pkt.randomize() with {operation==READ;araddr==32'h713FFFFF;arid==7'h4;arlen==2;arburst==INCR;})
             `uvm_error("AXI4_MASTER_SEQUENCE","Randomization failed")
         finish_item(pkt);
         `uvm_info("MASTER_SEQUENCE",pkt.sprint(),UVM_LOW)

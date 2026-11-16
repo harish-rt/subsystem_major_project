@@ -3,7 +3,7 @@
 # ==============================================================================
 
 TEST          ?= soc_master_test
-VERBOSITY     ?= UVM_LOW
+VERBOSITY     ?= UVM_DEBUG
 SEED          ?= random
 GUI           ?= 0
 WAVE          ?= 1
@@ -94,6 +94,7 @@ TB_SRCS       = $(TB_DIR)/common/soc_addr_pkg.sv \
 
 VLOG_FLAGS    = -sv -coverage a -dbg \
 				-work $(WORK_LIB) -uvmver 1.2 \
+  				+define+SBD_COMPONENTS \
 				+define+UART_SLAVE_RESPONDER_AGENT_SV \
 				+define+SPI_SLAVE_RESPONDER_AGENT_SV \
 				+define+GPIO_SLAVE_RESPONDER_AGENT_SV \

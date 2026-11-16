@@ -1,16 +1,16 @@
 class bram_seq_item extends uvm_sequence_item;
 
-    typedef enum bit { READ, WRITE } write_t;
+    typedef enum bit {READ,WRITE} write_t;
 typedef enum {OKAY,EXOKAY,SLVERR,DECERR}    response_t;
     typedef enum bit [1:0] { FIXED=2'b00, INCR=2'b01, WRAP=2'b10, RESERVED=2'b11 } burst_t;
 
-    rand write_t        write;
+    rand write_t        operation;
 
     rand bit [31:0]     AWADDR;
     rand bit [7:0]      AWLEN;
     rand bit [2:0]      AWSIZE;
     rand burst_t        AWBURST;
-    rand bit [3:0]      AWID;
+    rand bit [7:0]      AWID;
     rand bit [2:0]      AWPROT;
     rand bit [3:0]      AWCACHE;
     rand bit [3:0]      AWQOS;
@@ -20,13 +20,13 @@ typedef enum {OKAY,EXOKAY,SLVERR,DECERR}    response_t;
     rand bit [3:0]      WSTRB[];
 
          response_t     BRESP;
-         bit [3:0]      BID;
+         bit [7:0]      BID;
 
     rand bit [31:0]     ARADDR;
     rand bit [7:0]      ARLEN;
     rand bit [2:0]      ARSIZE;
     rand burst_t        ARBURST;
-    rand bit [3:0]      ARID;
+    rand bit [7:0]      ARID;
     rand bit [2:0]      ARPROT;
     rand bit [3:0]      ARCACHE;
     rand bit [3:0]      ARQOS;
@@ -34,10 +34,10 @@ typedef enum {OKAY,EXOKAY,SLVERR,DECERR}    response_t;
 
          bit [31:0]     RDATA[];
          response_t     RRESP[];
-         bit [3:0]      RID;
+         bit [7:0]      RID;
 
     `uvm_object_utils_begin(bram_seq_item)
-        `uvm_field_enum(write_t, write, UVM_ALL_ON)
+        `uvm_field_enum(write_t, operation, UVM_ALL_ON)
         
         `uvm_field_int(AWADDR, UVM_ALL_ON)
         `uvm_field_int(AWLEN, UVM_ALL_ON)
@@ -76,7 +76,7 @@ typedef enum {OKAY,EXOKAY,SLVERR,DECERR}    response_t;
     }
 
     constraint c_channel_exclusion {
-        if (write == WRITE) {
+        if (operation == WRITE) {
             ARADDR  == 0;
             ARLEN   == 0;
             ARSIZE  == 0;

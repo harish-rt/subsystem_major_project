@@ -21,9 +21,9 @@
 /* RAITON_COPYRIGHT_END                                                   */
 `include "uvm_macros.svh"
 //required macros
-  `define DATA_WIDTH     256
-  `define ADDR_WIDTH     64
-  `define ID_WIDTH       5
+  `define DATA_WIDTH     32
+  `define ADDR_WIDTH     32
+  `define ID_WIDTH       4
   `define LEN_WIDTH      8
   `define SIZE_WIDTH     3
   `define BURST_WIDTH    2

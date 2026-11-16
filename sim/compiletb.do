@@ -1,5 +1,6 @@
 vlog -work xil_defaultlib -uvmver 1.2 \
 -err VCP7803 W1 -err VCP2980 W1 \
+"+define+SBD_COMPONENTS" \
 -l xpm \
 -l generic_baseblocks_v2_1_0 \
 -l axi_infrastructure_v1_1_0 \

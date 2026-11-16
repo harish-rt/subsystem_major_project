@@ -7,6 +7,8 @@ class spi_monitor extends uvm_monitor;
     uvm_analysis_port #(spi_seq_item) tx_mon_ap;
     uvm_analysis_port #(spi_seq_item) rx_mon_ap;
     
+    realtime baud_period = 1000ns;
+        
     extern function void build_phase(uvm_phase phase);
     extern task main_phase(uvm_phase phase);
     extern task mon_tx_frames();

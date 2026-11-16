@@ -6,6 +6,7 @@ class soc_config extends uvm_object;
     endfunction
     
     cpu_config_obj          cpu_obj;
+    mem_config_obj          mem_obj;
     axi_cdma_config_obj     cdma_config_obj;
     intc_config_obj         intc_obj;
 endclass
