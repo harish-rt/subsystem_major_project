@@ -1,4 +1,4 @@
-typedef enum {BRAM, LITE_MEM, CDMA, INTC, CORE_INTC, GPIO, SPI, UART, TIMER} slave_t;
+typedef enum {BRAM, LITE_MEM, AXI4_MEM, CDMA, INTC, CORE_INTC, GPIO, SPI, UART, TIMER} slave_t;
 
 typedef struct {
     slave_t                 slave_name;

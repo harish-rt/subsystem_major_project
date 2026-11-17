@@ -1,0 +1,41 @@
+#-----------------------------------------------------------
+# Vivado v2025.1 (64-bit)
+# SW Build 6140274 on Wed May 21 22:58:25 MDT 2025
+# IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+# SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+# Start of session at: Wed Oct 28 14:56:18 2026
+# Process ID         : 2654832
+# Current directory  : /home/harish/projects/subsystem_major_project/sim
+# Command line       : vivado
+# Log file           : /home/harish/projects/subsystem_major_project/sim/vivado.log
+# Journal file       : /home/harish/projects/subsystem_major_project/sim/vivado.jou
+# Running On         : raiton
+# Platform           : unknown
+# Operating System   : unknown
+# Processor Detail   : Intel(R) Xeon(R) CPU E5-2673 v3 @ 2.40GHz
+# CPU Frequency      : 3100.000 MHz
+# CPU Physical cores : 24
+# CPU Logical cores  : 48
+# Host memory        : 134528 MB
+# Swap memory        : 34359 MB
+# Total Virtual      : 168888 MB
+# Available Virtual  : 144510 MB
+#-----------------------------------------------------------
+start_gui
+create_project interconnect_project /home/harish/projects/interconnect_project -part xc7z100iffg1156-2L
+create_bd_design -dir {/home/harish/projects/interconnect_project} "design_1"
+update_compile_order -fileset sources_1
+open_bd_design {/home/harish/projects/interconnect_project/design_1/design_1.bd}
+open_bd_design {/home/harish/projects/interconnect_project/design_1/design_1.bd}
+create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0
+set_property -dict [list CONFIG.SYNCHRONIZATION_STAGES.VALUE_SRC PROPAGATED] [get_bd_cells axi_interconnect_0]
+set_property -dict [list \
+  CONFIG.ENABLE_ADVANCED_OPTIONS {1} \
+  CONFIG.ENABLE_PROTOCOL_CHECKERS {1} \
+  CONFIG.M00_SECURE {0} \
+  CONFIG.M01_SECURE {0} \
+  CONFIG.NUM_MI {6} \
+  CONFIG.NUM_SI {6} \
+  CONFIG.PCHK_MAX_RD_BURSTS {4} \
+  CONFIG.PCHK_MAX_WR_BURSTS {4} \
+] [get_bd_cells axi_interconnect_0]

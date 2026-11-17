@@ -14,6 +14,9 @@ package soc_addr_pkg;
     parameter bit [31:0] CORE_PERIF_BASE  = 32'hA000_0000;
     parameter bit [31:0] CORE_PERIF_END   = 32'hBFFF_FFFF;
 
+    parameter bit [31:0] AXI4_MEM_BASE    = 32'hC000_0000;
+    parameter bit [31:0] AXI4_MEM_END     = 32'hFFFF_FFFF;
+
     // Core Peripherals Base Addresses (0xA000_0000 - 0xBFFF_FFFF)
     parameter bit [31:0] IRQ_BASE       = 32'hA000_0000;
     parameter bit [31:0] IRQ_END        = 32'hA0FF_FFFF;

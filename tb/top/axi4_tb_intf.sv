@@ -2,7 +2,7 @@
 interface axi4_tb_intf();
    parameter ADDR_WIDTH 	    = 32;
    parameter DATA_WIDTH 	    = 32;
-   parameter ID_WIDTH 		    = 8	;
+   parameter ID_WIDTH 		    = 7	;
    parameter USER_SIGNAL_WIDTH 	= 8	;
 
    //Global signals
@@ -57,25 +57,11 @@ interface axi4_tb_intf();
 
    //Write data channel signals
    wire [DATA_WIDTH-1:0]	WDATA	;
-   wire [DATA_WIDTH>>3-1:0] WSTRB	;
+   wire [3:0]               WSTRB	;
    wire 			        WLAST	;
    wire  			        WVALID	;
    wire  			        WREADY	;
    wire [USER_SIGNAL_WIDTH-1:0]WUSER	;
-
-    clocking tb_master_cb @(posedge ACLK);
-        default input #1ns output #1ns;
-        output ARADDR, ARBURST, ARCACHE, ARID, ARLEN, ARLOCK, ARPROT, ARQOS, ARREGION, ARSIZE, ARVALID, ARUSER;
-        input  ARREADY;
-        output AWADDR, AWBURST, AWCACHE, AWID, AWLEN, AWLOCK, AWPROT, AWQOS, AWREGION, AWSIZE, AWVALID, AWUSER;
-        input  AWREADY;
-        output WDATA, WSTRB, WLAST, WVALID, WUSER;
-        input  WREADY;
-        input  BID, BRESP, BVALID, BUSER;
-        output BREADY;
-        input  RID, RDATA, RRESP, RLAST, RVALID, RUSER;
-        output RREADY;
-    endclocking
 
     clocking axi4_drv_cb @(posedge ACLK);
         default input #1ns output #1ns;
@@ -105,7 +91,6 @@ interface axi4_tb_intf();
         input RID, RDATA, RRESP, RLAST, RVALID, RREADY, RUSER;
     endclocking
 
-    modport TB_MASTER_MOD (clocking tb_master_cb, input ACLK, input ARESETn);
     modport MONITOR_MOD (clocking axi4_mon_cb, input ACLK, input ARESETn);
     modport DRIVER_MOD (clocking axi4_drv_cb, input ACLK, input ARESETn);
 
@@ -194,7 +179,7 @@ endinterface
 interface axi3_intf();
    parameter ADDR_WIDTH 	= 32	;
    parameter DATA_WIDTH 	= 32	;
-   parameter ID_WIDTH 		= 4	;
+   parameter ID_WIDTH 		= 7	;
 
    //Global signals
    wire 			ACLK	;

@@ -11,17 +11,21 @@ package cpu_package;
     `include "../common/axi_parameters.sv"
     `include "../common/axi_base_sequence_item.sv"
 
+    `include "../cpu/track_pkt.sv"
     `include "../cpu/cpu_seq_item.sv"
     `include "../cpu/cpu_sequence.sv"
     `include "../cpu/cpu_sequencer.sv"
-    `include "../cpu/cpu_driver.sv"
+    `include "../cpu/cpu_driver_copy_1.sv"
+    //`include "../cpu/cpu_driver.sv"
     `include "../cpu/cpu_monitor.sv"
     `include "../cpu/cpu_agent.sv"
 
     `include "../cpu/s04_seq_item.sv"
     `include "../cpu/s04_sequence.sv"
     `include "../cpu/s04_sequencer.sv"
-    `include "../cpu/s04_driver.sv"
+    `include "../cpu/s04_driver_copy2.sv"
+    //`include "../cpu/s04_driver_copy1.sv"
+    //`include "../cpu/s04_driver.sv"
     `include "../cpu/s04_monitor.sv"
     `include "../cpu/s04_agent.sv"
 

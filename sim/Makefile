@@ -42,6 +42,7 @@ LIBS          = -l xpm \
                 -l xil_defaultlib \
                 -l axi_intf \
                 -l axi4_lite_mem \
+                -l axi4_mem \
                 -l core_perif \
                 -l spi_mem \
                 -l core_wrapper
@@ -71,6 +72,7 @@ RTL_LIBS      = -L unisims_ver -L unimacro_ver -L secureip \
                 -L axi_protocol_converter_v2_1_20 \
                 -L axi_intf \
                 -L axi4_lite_mem \
+                -L axi4_mem \
                 -L core_perif \
                 -L spi_mem \
                 -L core_wrapper \
@@ -142,7 +144,6 @@ run: setup
 ifeq ($(GUI), 1)
 	@echo "--- Launching Interactive GUI Simulation ---"
 	vsim $(VSIM_FLAGS) -l $(LOG_FILE) -do "do waves.tcl; $(GUI_WAVE_CMDS)"
-	#vsim $(VSIM_FLAGS) -do "do waves.tcl; $(GUI_WAVE_CMDS)"
 else
 ifeq ($(WAVE), 1)
 	@echo "--- Running Batch Simulation with Targeted ASDB Waveforms ---"

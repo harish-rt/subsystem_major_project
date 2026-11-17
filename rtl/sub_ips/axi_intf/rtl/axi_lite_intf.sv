@@ -1,4 +1,5 @@
 // default param config to AXI4_lite
+`timescale 1ns/1ps
 interface axi4_lite_intf();
    parameter ADDR_WIDTH = 32;
    parameter DATA_WIDTH = 32;
