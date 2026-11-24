@@ -1,0 +1,20 @@
+Basic Assertion Report
+Simulation time: 3595 ns
+
+------------------------------------------------------------------------------------------------------------------------
+Name                     Hierarchy               Source Reference          Attempt Count   Failure Count   Pass Count   
+------------------------------------------------------------------------------------------------------------------------
+
+axi4_aw_valid_assert     /top/master_if          axi4_tb_intf.sv (105)           359              0             344     
+axi4_aw_payload_stable   /top/master_if          axi4_tb_intf.sv (117)           359              0             344     
+axi4_aw_valid_assert     /top/slave_if           axi4_tb_intf.sv (105)           359              0             344     
+axi4_aw_payload_stable   /top/slave_if           axi4_tb_intf.sv (117)           359              0             344     
+axi4_aw_valid_assert     /top/axi4_bram_if       axi4_tb_intf.sv (105)           359              0             344     
+axi4_aw_payload_stable   /top/axi4_bram_if       axi4_tb_intf.sv (117)           359              0             344     
+@ASSERT#109@             /top/axil_riscv_if[0]   axi4_lite_tb_intf.sv (109)      359              0             344     
+@ASSERT#109@             /top/axil_riscv_if[1]   axi4_lite_tb_intf.sv (109)      359              0             344     
+@ASSERT#109@             /top/mem_intf           axi4_lite_tb_intf.sv (109)      359              0             344     
+axi4_aw_valid_assert     /top/mem4_intf          axi4_tb_intf.sv (105)           359              0             344     
+axi4_aw_payload_stable   /top/mem4_intf          axi4_tb_intf.sv (117)           359              0             344     
+@ASSERT#109@             /top/core_perif_if      axi4_lite_tb_intf.sv (109)      359              0             344     
+@ASSERT#109@             /top/lite_intc_if       axi4_lite_tb_intf.sv (109)      359              0             344     

@@ -696,10 +696,10 @@ class uart_write_data_seq extends base_cpu_sequence;
         write_reg(UART_BASE + 'hc,'h10);    // ctrl
         write_reg(UART_BASE + 'h4,'haa);    // tx fifo
         do begin
-            read_reg(UART_BASE + 'h8, reg_data);
+            read_reg(UART_BASE + 'h8, reg_data);    // sr
         end while ((reg_data & 32'h1) == 0);
 
-        read_reg(UART_BASE + 'h0, reg_data);
+        read_reg(UART_BASE + 'h0, reg_data);        // rx fifo
 
         `uvm_info("UART_TEST", $sformatf("Read back from UART RX FIFO: 0x%02h", reg_data[7:0]), UVM_LOW)
         if (reg_data[7:0] == 8'hba) begin
@@ -1054,16 +1054,46 @@ class gpio_check_seq extends base_cpu_sequence;
         if(sr_data != 0)
             `uvm_error("GPIO_ERR", $sformatf("status not cleared: %h", sr_data))
 
-        write_reg(GPIO_BASE + 'h14, 'h1);           // int_mask
-        write_reg(GPIO_BASE + 'h14, 'h1000_0001);   // int_mask
+        write_reg(GPIO_BASE + 'h14, 'h1000_0000);   // int_mask
         write_reg(GPIO_BASE, 'hf);                  // direction
         write_reg(GPIO_BASE + 'h8, 'h1);            // output
-        write_reg(GPIO_BASE + 'h14, 1<<3);          // int_mask
+        write_reg(GPIO_BASE + 'h14, 1<<3);          // int_mask - irq won't come for output
         write_reg(GPIO_BASE + 'hc, 1<<3);           // output_set
         write_reg(GPIO_BASE + 'h10, 1<<3);          // output_clr
         write_reg(GPIO_BASE + 'h10, 1);             // output_clr
-        write_reg(GPIO_BASE + 'h14, 1<<3);          // INT_MASK
+        write_reg(GPIO_BASE + 'h14, 1<<3);          // int_mask
         write_reg(GPIO_BASE + 'h18, 1<<3);          // INT_SET - directly setting to get irq
         read_reg (GPIO_BASE + 'h20, sr_data);       // expect 0x8
     endtask
 endclass : gpio_check_seq
+
+class gpio_reg_config_seq extends base_cpu_sequence;
+    `uvm_object_utils(gpio_reg_config_seq)
+    `NEW_OBJ
+
+    rand bit [31:0]gpio_level;
+    rand bit [31:0]gpio_mode;
+    rand bit [31:0]gpio_mask;
+    rand bit [31:0]gpio_direction;
+    int time_cnt = 0;
+
+    task body();
+        super.body();
+        write_reg(IRQ_BASE + 'h8,'h8);                  // irq en
+        write_reg(IRQ_BASE + 'h1c,'h3);                 // irq mer
+
+        write_reg(GPIO_BASE + 'h14, 'h0000_0000);       // int mask 0
+        write_reg(GPIO_BASE + 'h24, gpio_level);        // int trigger level AL/AH
+        write_reg(GPIO_BASE + 'h28, gpio_mode);         // int trigger mode L/E
+        write_reg(GPIO_BASE + 'h14, gpio_mask);         // int mask 1
+        write_reg(GPIO_BASE, gpio_direction);           // direction
+        write_reg(GPIO_BASE + 'h1c, 'hffff_ffff);       // int clr
+
+        do begin
+            read_reg(GPIO_BASE + 'h20, sr_data);        // int_status
+            time_cnt++;
+        end while ((sr_data != 0) && (time_cnt < 10));
+        if(sr_data != 0)
+            `uvm_error("GPIO_ERR", $sformatf("status not cleared: %h", sr_data))
+    endtask
+endclass : gpio_reg_config_seq

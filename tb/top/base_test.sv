@@ -292,6 +292,7 @@ class uart_write_data_test extends cpu_base_test;
     `NEW_COMP
 
     uart_write_data_vseq   reg_vseq;
+
     task main_phase(uvm_phase phase);
         `SET_S00_FORK_DISABLE(1);
         reg_vseq = uart_write_data_vseq::type_id::create("reg_vseq");
@@ -309,6 +310,22 @@ class TESTNAME extends cpu_base_test;\
     VSEQ_NAME   vseq;\
     task main_phase(uvm_phase phase);\
         `SET_S00_FORK_DISABLE(CFD);\
+        vseq = VSEQ_NAME::type_id::create("vseq");\
+        phase.raise_objection(this);\
+            vseq.start(w_env.vsqr);\
+        phase.phase_done.set_drain_time(this, 1000ns);\
+        phase.drop_objection(this);\
+    endtask\
+endclass : TESTNAME
+
+`define TEST_MAC(TESTNAME,VSEQ_NAME,CFD,CFG)\
+class TESTNAME extends cpu_base_test;\
+    `uvm_component_utils(TESTNAME)\
+    `NEW_COMP\
+    VSEQ_NAME   vseq;\
+    task main_phase(uvm_phase phase);\
+        `SET_S00_FORK_DISABLE(CFD);\
+        `SET_S02_FORK_DISABLE(CFG);\
         vseq = VSEQ_NAME::type_id::create("vseq");\
         phase.raise_objection(this);\
             vseq.start(w_env.vsqr);\
@@ -462,6 +479,7 @@ class concurrent_diff_slaves_test extends cpu_base_test;
     concurrent_diff_slaves_vseq     diff_vseq;
 
     task main_phase(uvm_phase phase);
+        `SET_S00_FORK_DISABLE(1);
         `SET_S02_FORK_DISABLE(1);
         diff_vseq   = concurrent_diff_slaves_vseq::type_id::create("diff_vseq");
 
@@ -594,4 +612,4 @@ endclass : s04_master_axi4_mem_test
 `AXI_TEST(s04_master_out_of_order_test,s04_master_out_of_order_vseq,1000ns)
 `AXI_TEST(s04_master_interleaving_test,s04_master_interleaving_vseq,1000ns)
 `AXI_TEST(s04_master_axi_wrap_test,s04_master_axi_wrap_vseq,1000ns)
-`AXI_TEST(s00_master_outstanding_test,s00_master_outstanding_vseq,1000ns)
+`TEST_MAC(gpio_reg_config_test,gpio_reg_config_vseq,1,0)

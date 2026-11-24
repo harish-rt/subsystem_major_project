@@ -1,0 +1,3051 @@
++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++       REPORT INFO       ++++++++++
++++++++++++++++++++++++++++++++++++++++++++++
+
+
+SUMMARY
+===========================================================================================================
+|     Property     |                                        Value                                         |
+===========================================================================================================
+| User             | harish                                                                               |
+| Host             | raiton                                                                               |
+| Tool             | Riviera-PRO 2025.04                                                                  |
+| Report file      | /home/harish/projects/subsystem_major_project/sim/logs/assert_report.txt             |
+| Report date      | 2026-11-23 18:00                                                                     |
+| Report arguments | -cov a                                                                               |
+| Input file       | /home/harish/projects/subsystem_major_project/sim/logs/make_cov_soc_master_test.acdb |
+| Input file date  | 2026-11-23 14:25                                                                     |
+| Number of tests  | 1                                                                                    |
+===========================================================================================================
+
+
+TEST DETAILS
+=====================================================================================================================
+| Property |                                                 Value                                                  |
+=====================================================================================================================
+| Test     | make_cov_soc_master_test.acdb:soc_master_test_590254560                                                |
+| Status   | Ok                                                                                                     |
+| Args     | asim -sv_seed random +access +rwc +dbg +m+top +UVM_TESTNAME=soc_master_test +UVM_VERBOSITY=UVM_DEBUG   |
+|          | +UVM_OBJECTION_TRACE -L unisims_ver -L unimacro_ver -L secureip -L xpm -L generic_baseblocks_v2_1_0    |
+|          | -L axi_infrastructure_v1_1_0 -L axi_register_slice_v2_1_20 -L fifo_generator_v13_2_5                   |
+|          | -L axi_data_fifo_v2_1_19 -L axi_crossbar_v2_1_21 -L core_ip_wraps -L axi_lite_ipif_v3_0_4              |
+|          | -L axi_intc_v4_1_14 -L blk_mem_gen_v8_4_4 -L axi_bram_ctrl_v4_1_2 -L lib_pkg_v1_0_2                    |
+|          | -L lib_srl_fifo_v1_0_2 -L lib_fifo_v1_0_14 -L lib_cdc_v1_0_2 -L axi_datamover_v5_1_22                  |
+|          | -L axi_sg_v4_1_13 -L axi_cdma_v4_1_20 -L axi_clock_converter_v2_1_19 -L axi_protocol_converter_v2_1_20 |
+|          | -L axi_intf -L axi4_lite_mem -L axi4_mem -L core_perif -L spi_mem -L core_wrapper                      |
+|          | -L xil_defaultlib -O0 xil_defaultlib.top core_ip_wraps.glbl -acdb -acdb_cov a -acdb_file               |
+|          | ./logs/make_cov_soc_master_test.acdb +TraceAssert -assert                                              |
+| Simtime  | 7055000 ps                                                                                             |
+| Cputime  | 45.278 s                                                                                               |
+| Seed     | 590254560                                                                                              |
+| Date     | 2026-11-23 14:24                                                                                       |
+| User     | harish                                                                                                 |
+| Host     | raiton                                                                                                 |
+| Host os  | Linux64                                                                                                |
+| Tool     | Riviera-PRO 2025.04 (simulator)                                                                        |
+=====================================================================================================================
+
+
++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++     DESIGN HIERARCHY    ++++++++++
++++++++++++++++++++++++++++++++++++++++++++++
+
+
+CUMULATIVE SUMMARY
+============================================
+|   Coverage Type    | Weight | Hits/Total |
+============================================
+| Assertion Coverage |      1 |     1.689% |
+|--------------------|--------|------------|
+| Assertions         |        |    5 / 148 |
+| Covers             |        |      0 / 4 |
+============================================
+CUMULATIVE INSTANCE-BASED COVERAGE: 1.689%
+COVERED INSTANCES: 3 / 66
+FILES: 7
+
+
+INTERFACE - /top/master_if : xil_defaultlib.axi4_tb_intf
+
+
+    SUMMARY
+    =========================================================================
+    |   Coverage Type    | Weight | Local Hits/Total | Recursive Hits/Total |
+    =========================================================================
+    | Assertion Coverage |      1 |           0.000% |               0.000% |
+    |--------------------|--------|------------------|----------------------|
+    | Assertions         |        |            0 / 2 |                0 / 2 |
+    | Covers             |        |            0 / 1 |                0 / 1 |
+    =========================================================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+    WEIGHTED AVERAGE RECURSIVE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ===============================================================================
+    |          Name          |              Source              | Failed | Passed |
+    |------------------------|----------------------------------|--------|--------|
+    | axi4_aw_valid_assert   | ./../tb/top/axi4_tb_intf.sv(105) |      0 |      0 |
+    | axi4_aw_payload_stable | ./../tb/top/axi4_tb_intf.sv(117) |      0 |      0 |
+    ===============================================================================
+
+
+    COVER COVERAGE
+    =====================================================================
+    |          Name           |              Source              | Hits |
+    |-------------------------|----------------------------------|------|
+    | read_ooo_cover_property | ./../tb/top/axi4_tb_intf.sv(129) |    0 |
+    =====================================================================
+
+
+INTERFACE - /top/slave_if : xil_defaultlib.axi4_tb_intf
+
+
+    SUMMARY
+    =========================================================================
+    |   Coverage Type    | Weight | Local Hits/Total | Recursive Hits/Total |
+    =========================================================================
+    | Assertion Coverage |      1 |          50.000% |              50.000% |
+    |--------------------|--------|------------------|----------------------|
+    | Assertions         |        |            2 / 2 |                2 / 2 |
+    | Covers             |        |            0 / 1 |                0 / 1 |
+    =========================================================================
+    WEIGHTED AVERAGE LOCAL: 50.000%
+    WEIGHTED AVERAGE RECURSIVE: 50.000%
+
+
+    ASSERTION COVERAGE
+    ===============================================================================
+    |          Name          |              Source              | Failed | Passed |
+    |------------------------|----------------------------------|--------|--------|
+    | axi4_aw_valid_assert   | ./../tb/top/axi4_tb_intf.sv(105) |      0 |     16 |
+    | axi4_aw_payload_stable | ./../tb/top/axi4_tb_intf.sv(117) |      0 |     16 |
+    ===============================================================================
+
+
+    COVER COVERAGE
+    =====================================================================
+    |          Name           |              Source              | Hits |
+    |-------------------------|----------------------------------|------|
+    | read_ooo_cover_property | ./../tb/top/axi4_tb_intf.sv(129) |    0 |
+    =====================================================================
+
+
+INTERFACE - /top/axi4_bram_if : xil_defaultlib.axi4_tb_intf
+
+
+    SUMMARY
+    =========================================================================
+    |   Coverage Type    | Weight | Local Hits/Total | Recursive Hits/Total |
+    =========================================================================
+    | Assertion Coverage |      1 |           0.000% |               0.000% |
+    |--------------------|--------|------------------|----------------------|
+    | Assertions         |        |            0 / 2 |                0 / 2 |
+    | Covers             |        |            0 / 1 |                0 / 1 |
+    =========================================================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+    WEIGHTED AVERAGE RECURSIVE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ===============================================================================
+    |          Name          |              Source              | Failed | Passed |
+    |------------------------|----------------------------------|--------|--------|
+    | axi4_aw_valid_assert   | ./../tb/top/axi4_tb_intf.sv(105) |      0 |      0 |
+    | axi4_aw_payload_stable | ./../tb/top/axi4_tb_intf.sv(117) |      0 |      0 |
+    ===============================================================================
+
+
+    COVER COVERAGE
+    =====================================================================
+    |          Name           |              Source              | Hits |
+    |-------------------------|----------------------------------|------|
+    | read_ooo_cover_property | ./../tb/top/axi4_tb_intf.sv(129) |    0 |
+    =====================================================================
+
+
+INTERFACE - /top/axil_riscv_if[0] : xil_defaultlib.axi4_lite_tb_intf
+
+
+    SUMMARY
+    =========================================================================
+    |   Coverage Type    | Weight | Local Hits/Total | Recursive Hits/Total |
+    =========================================================================
+    | Assertion Coverage |      1 |         100.000% |             100.000% |
+    |--------------------|--------|------------------|----------------------|
+    | Assertions         |        |            1 / 1 |                1 / 1 |
+    =========================================================================
+    WEIGHTED AVERAGE LOCAL: 100.000%
+    WEIGHTED AVERAGE RECURSIVE: 100.000%
+
+
+    ASSERTION COVERAGE
+    ==========================================================================
+    |     Name     |                Source                 | Failed | Passed |
+    |--------------|---------------------------------------|--------|--------|
+    | @ASSERT#109@ | ./../tb/top/axi4_lite_tb_intf.sv(109) |      0 |    114 |
+    ==========================================================================
+
+
+INTERFACE - /top/axil_riscv_if[1] : xil_defaultlib.axi4_lite_tb_intf
+
+
+    SUMMARY
+    =========================================================================
+    |   Coverage Type    | Weight | Local Hits/Total | Recursive Hits/Total |
+    =========================================================================
+    | Assertion Coverage |      1 |           0.000% |               0.000% |
+    |--------------------|--------|------------------|----------------------|
+    | Assertions         |        |            0 / 1 |                0 / 1 |
+    =========================================================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+    WEIGHTED AVERAGE RECURSIVE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==========================================================================
+    |     Name     |                Source                 | Failed | Passed |
+    |--------------|---------------------------------------|--------|--------|
+    | @ASSERT#109@ | ./../tb/top/axi4_lite_tb_intf.sv(109) |      0 |      0 |
+    ==========================================================================
+
+
+INTERFACE - /top/mem_intf : xil_defaultlib.axi4_lite_tb_intf
+
+
+    SUMMARY
+    =========================================================================
+    |   Coverage Type    | Weight | Local Hits/Total | Recursive Hits/Total |
+    =========================================================================
+    | Assertion Coverage |      1 |           0.000% |               0.000% |
+    |--------------------|--------|------------------|----------------------|
+    | Assertions         |        |            0 / 1 |                0 / 1 |
+    =========================================================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+    WEIGHTED AVERAGE RECURSIVE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==========================================================================
+    |     Name     |                Source                 | Failed | Passed |
+    |--------------|---------------------------------------|--------|--------|
+    | @ASSERT#109@ | ./../tb/top/axi4_lite_tb_intf.sv(109) |      0 |      0 |
+    ==========================================================================
+
+
+INTERFACE - /top/mem4_intf : xil_defaultlib.axi4_tb_intf
+
+
+    SUMMARY
+    =========================================================================
+    |   Coverage Type    | Weight | Local Hits/Total | Recursive Hits/Total |
+    =========================================================================
+    | Assertion Coverage |      1 |           0.000% |               0.000% |
+    |--------------------|--------|------------------|----------------------|
+    | Assertions         |        |            0 / 2 |                0 / 2 |
+    | Covers             |        |            0 / 1 |                0 / 1 |
+    =========================================================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+    WEIGHTED AVERAGE RECURSIVE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ===============================================================================
+    |          Name          |              Source              | Failed | Passed |
+    |------------------------|----------------------------------|--------|--------|
+    | axi4_aw_valid_assert   | ./../tb/top/axi4_tb_intf.sv(105) |      0 |      0 |
+    | axi4_aw_payload_stable | ./../tb/top/axi4_tb_intf.sv(117) |      0 |      0 |
+    ===============================================================================
+
+
+    COVER COVERAGE
+    =====================================================================
+    |          Name           |              Source              | Hits |
+    |-------------------------|----------------------------------|------|
+    | read_ooo_cover_property | ./../tb/top/axi4_tb_intf.sv(129) |    0 |
+    =====================================================================
+
+
+INTERFACE - /top/core_perif_if : xil_defaultlib.axi4_lite_tb_intf
+
+
+    SUMMARY
+    =========================================================================
+    |   Coverage Type    | Weight | Local Hits/Total | Recursive Hits/Total |
+    =========================================================================
+    | Assertion Coverage |      1 |           0.000% |               0.000% |
+    |--------------------|--------|------------------|----------------------|
+    | Assertions         |        |            0 / 1 |                0 / 1 |
+    =========================================================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+    WEIGHTED AVERAGE RECURSIVE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==========================================================================
+    |     Name     |                Source                 | Failed | Passed |
+    |--------------|---------------------------------------|--------|--------|
+    | @ASSERT#109@ | ./../tb/top/axi4_lite_tb_intf.sv(109) |      0 |      0 |
+    ==========================================================================
+
+
+INTERFACE - /top/lite_intc_if : xil_defaultlib.axi4_lite_tb_intf
+
+
+    SUMMARY
+    =========================================================================
+    |   Coverage Type    | Weight | Local Hits/Total | Recursive Hits/Total |
+    =========================================================================
+    | Assertion Coverage |      1 |         100.000% |             100.000% |
+    |--------------------|--------|------------------|----------------------|
+    | Assertions         |        |            1 / 1 |                1 / 1 |
+    =========================================================================
+    WEIGHTED AVERAGE LOCAL: 100.000%
+    WEIGHTED AVERAGE RECURSIVE: 100.000%
+
+
+    ASSERTION COVERAGE
+    ==========================================================================
+    |     Name     |                Source                 | Failed | Passed |
+    |--------------|---------------------------------------|--------|--------|
+    | @ASSERT#109@ | ./../tb/top/axi4_lite_tb_intf.sv(109) |      0 |      9 |
+    ==========================================================================
+
+
+CLASS - /\package xil_defaultlib.cpu_package\/axi_base_sequence_item : xil_defaultlib.cpu_package/\cpu_package axi_base_sequence_item \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |     0 / 11 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================
+    |       Name       |                    Source                     | Failed | Passed |
+    |------------------|-----------------------------------------------|--------|--------|
+    | @IMM_ASSERT#431@ | ./../tb/common/axi_base_sequence_item.sv(431) |      0 |      0 |
+    | @IMM_ASSERT#432@ | ./../tb/common/axi_base_sequence_item.sv(432) |      0 |      0 |
+    | @IMM_ASSERT#433@ | ./../tb/common/axi_base_sequence_item.sv(433) |      0 |      0 |
+    | @IMM_ASSERT#434@ | ./../tb/common/axi_base_sequence_item.sv(434) |      0 |      0 |
+    | @IMM_ASSERT#436@ | ./../tb/common/axi_base_sequence_item.sv(436) |      0 |      0 |
+    | @IMM_ASSERT#437@ | ./../tb/common/axi_base_sequence_item.sv(437) |      0 |      0 |
+    | @IMM_ASSERT#439@ | ./../tb/common/axi_base_sequence_item.sv(439) |      0 |      0 |
+    | @IMM_ASSERT#440@ | ./../tb/common/axi_base_sequence_item.sv(440) |      0 |      0 |
+    | @IMM_ASSERT#441@ | ./../tb/common/axi_base_sequence_item.sv(441) |      0 |      0 |
+    | @IMM_ASSERT#442@ | ./../tb/common/axi_base_sequence_item.sv(442) |      0 |      0 |
+    | @IMM_ASSERT#445@ | ./../tb/common/axi_base_sequence_item.sv(445) |      0 |      0 |
+    ======================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/axi_base_seq_item : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg axi_base_seq_item \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |     0 / 11 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ===========================================================================================================================
+    |       Name       |                                       Source                                       | Failed | Passed |
+    |------------------|------------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#326@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(326) |      0 |      0 |
+    | @IMM_ASSERT#327@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(327) |      0 |      0 |
+    | @IMM_ASSERT#328@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(328) |      0 |      0 |
+    | @IMM_ASSERT#329@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(329) |      0 |      0 |
+    | @IMM_ASSERT#331@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(331) |      0 |      0 |
+    | @IMM_ASSERT#332@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(332) |      0 |      0 |
+    | @IMM_ASSERT#334@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(334) |      0 |      0 |
+    | @IMM_ASSERT#335@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(335) |      0 |      0 |
+    | @IMM_ASSERT#336@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(336) |      0 |      0 |
+    | @IMM_ASSERT#337@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(337) |      0 |      0 |
+    | @IMM_ASSERT#340@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(340) |      0 |      0 |
+    ===========================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/btt_1_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg btt_1_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |      Name       |                                   Source                                   | Failed | Passed |
+    |-----------------|----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#62@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(62) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/keyhole_read_inc_wr_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg keyhole_read_inc_wr_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#164@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(164) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/keyhole_write_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg keyhole_write_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#189@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(189) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/simple_mode_slave_err_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg simple_mode_slave_err_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#233@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(233) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/decode_error_sequence : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg decode_error_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#263@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(263) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/simple_inc_4k : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg simple_inc_4k \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#289@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(289) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/simple_mode_inc4kcross : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg simple_mode_inc4kcross \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#311@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(311) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/fixed_btt_4k : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg fixed_btt_4k \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |        Name        |                                   Source                                    | Failed | Passed |
+    |--------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#336_1@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(336) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/decode_err_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg decode_err_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#420@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(420) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/multiple_trans_sequence : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg multiple_trans_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#476@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(476) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/multiple_trans_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg multiple_trans_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#505@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(505) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/max_btt_sequence : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg max_btt_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#599@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(599) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_fixed_read_inc_wr_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_fixed_read_inc_wr_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#690@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(690) |      0 |      0 |
+    | @IMM_ASSERT#696@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(696) |      0 |      0 |
+    | @IMM_ASSERT#698@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(698) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_inc_read_fixed_wr_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_inc_read_fixed_wr_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#730@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(730) |      0 |      0 |
+    | @IMM_ASSERT#736@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(736) |      0 |      0 |
+    | @IMM_ASSERT#738@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(738) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_fixed_rd_wr_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_fixed_rd_wr_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#770@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(770) |      0 |      0 |
+    | @IMM_ASSERT#776@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(776) |      0 |      0 |
+    | @IMM_ASSERT#778@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(778) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_mode_inc_random_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_mode_inc_random_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#813@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(813) |      0 |      0 |
+    | @IMM_ASSERT#819@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(819) |      0 |      0 |
+    | @IMM_ASSERT#821@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(821) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_threshold_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_threshold_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#853@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(853) |      0 |      0 |
+    | @IMM_ASSERT#859@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(859) |      0 |      0 |
+    | @IMM_ASSERT#861@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(861) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/delay_interrupt_sequence : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg delay_interrupt_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#899@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(899) |      0 |      0 |
+    | @IMM_ASSERT#905@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(905) |      0 |      0 |
+    | @IMM_ASSERT#907@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(907) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_internal_error_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_internal_error_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#957@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(957) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_decode_err_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_decode_err_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#986@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(986) |      0 |      0 |
+    | @IMM_ASSERT#991@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(991) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_mode_decode_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_mode_decode_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1022@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1022) |      0 |      0 |
+    | @IMM_ASSERT#1029@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1029) |      0 |      0 |
+    | @IMM_ASSERT#1031@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1031) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_slave_error_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_slave_error_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1064@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1064) |      0 |      0 |
+    | @IMM_ASSERT#1071@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1071) |      0 |      0 |
+    | @IMM_ASSERT#1073@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1073) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_dma_internal_error_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_dma_internal_error_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1105@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1105) |      0 |      0 |
+    | @IMM_ASSERT#1112@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1112) |      0 |      0 |
+    | @IMM_ASSERT#1114@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1114) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_mode_slave_error_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_mode_slave_error_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1146@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1146) |      0 |      0 |
+    | @IMM_ASSERT#1153@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1153) |      0 |      0 |
+    | @IMM_ASSERT#1155@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1155) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_dma_decode_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_dma_decode_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1186@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1186) |      0 |      0 |
+    | @IMM_ASSERT#1193@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1193) |      0 |      0 |
+    | @IMM_ASSERT#1195@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1195) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/cyclic_bd_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg cyclic_bd_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1254@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1254) |      0 |      0 |
+    | @IMM_ASSERT#1261@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1261) |      0 |      0 |
+    | @IMM_ASSERT#1263@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1263) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/fixed_trans_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg fixed_trans_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1362@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1362) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/back_to_back_sg_mode_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg back_to_back_sg_mode_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 6 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1384@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1384) |      0 |      0 |
+    | @IMM_ASSERT#1394@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1394) |      0 |      0 |
+    | @IMM_ASSERT#1396@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1396) |      0 |      0 |
+    | @IMM_ASSERT#1407@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1407) |      0 |      0 |
+    | @IMM_ASSERT#1411@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1411) |      0 |      0 |
+    | @IMM_ASSERT#1413@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1413) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/base_slave_sequence : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg base_slave_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ================================================================================================================
+    |      Name       |                                  Source                                  | Failed | Passed |
+    |-----------------|--------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#41@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(41) |      0 |      0 |
+    | @IMM_ASSERT#59@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(59) |      0 |      0 |
+    ================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/slave_error_sequence : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg slave_error_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#97@  | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(97)  |      0 |      0 |
+    | @IMM_ASSERT#114@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(114) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/slave_err_sequence : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg slave_err_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#152@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(152) |      0 |      0 |
+    | @IMM_ASSERT#169@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(169) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/decode_err_sequence : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg decode_err_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#208@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(208) |      0 |      0 |
+    | @IMM_ASSERT#225@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(225) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/decode_err_sequence_1 : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg decode_err_sequence_1 \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |        Name        |                                  Source                                   | Failed | Passed |
+    |--------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#263_1@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(263) |      0 |      0 |
+    | @IMM_ASSERT#280@   | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(280) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_slave_sequence : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_slave_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |        Name        |                                  Source                                   | Failed | Passed |
+    |--------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#328_1@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(328) |      0 |      0 |
+    | @IMM_ASSERT#352@   | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(352) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_decode_err_slave_sequence : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_decode_err_slave_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#398@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(398) |      0 |      0 |
+    | @IMM_ASSERT#418@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(418) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_decode_err_slave_seq : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_decode_err_slave_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#464@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(464) |      0 |      0 |
+    | @IMM_ASSERT#487@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(487) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_slave_error_sequence : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_slave_error_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#532@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(532) |      0 |      0 |
+    | @IMM_ASSERT#552@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(552) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.axi_cdma_env_pkg\/sg_slave_err_sequence : xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_slave_err_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#598@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(598) |      0 |      0 |
+    | @IMM_ASSERT#618@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(618) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/soc_master_vseq : xil_defaultlib.soc_package/\soc_package soc_master_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |   100.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      1 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 100.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#118@ | ./../tb/top/soc_virtual_sequence.sv(118) |      0 |      1 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/intc_stress_lite_vseq : xil_defaultlib.soc_package/\soc_package intc_stress_lite_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#316@ | ./../tb/top/soc_virtual_sequence.sv(316) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/intc_stress_vseq : xil_defaultlib.soc_package/\soc_package intc_stress_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ===================================================================================
+    |        Name        |                  Source                  | Failed | Passed |
+    |--------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#335_1@ | ./../tb/top/soc_virtual_sequence.sv(335) |      0 |      0 |
+    ===================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/wrap_burst_vseq : xil_defaultlib.soc_package/\soc_package wrap_burst_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#353@ | ./../tb/top/soc_virtual_sequence.sv(353) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/masters_load_bram_vseq : xil_defaultlib.soc_package/\soc_package masters_load_bram_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#375@ | ./../tb/top/soc_virtual_sequence.sv(375) |      0 |      0 |
+    | @IMM_ASSERT#379@ | ./../tb/top/soc_virtual_sequence.sv(379) |      0 |      0 |
+    | @IMM_ASSERT#383@ | ./../tb/top/soc_virtual_sequence.sv(383) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/masters_load_lite_mem_vseq : xil_defaultlib.soc_package/\soc_package masters_load_lite_mem_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#408@ | ./../tb/top/soc_virtual_sequence.sv(408) |      0 |      0 |
+    | @IMM_ASSERT#412@ | ./../tb/top/soc_virtual_sequence.sv(412) |      0 |      0 |
+    | @IMM_ASSERT#416@ | ./../tb/top/soc_virtual_sequence.sv(416) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/master_starve_vseq : xil_defaultlib.soc_package/\soc_package master_starve_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    ===================================================================================
+    |        Name        |                  Source                  | Failed | Passed |
+    |--------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#441_1@ | ./../tb/top/soc_virtual_sequence.sv(441) |      0 |      0 |
+    | @IMM_ASSERT#449@   | ./../tb/top/soc_virtual_sequence.sv(449) |      0 |      0 |
+    ===================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/gpio_check_vseq : xil_defaultlib.soc_package/\soc_package gpio_check_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#501@ | ./../tb/top/soc_virtual_sequence.sv(501) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/gpio_reg_config_vseq : xil_defaultlib.soc_package/\soc_package gpio_reg_config_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#533@ | ./../tb/top/soc_virtual_sequence.sv(533) |      0 |      0 |
+    | @IMM_ASSERT#539@ | ./../tb/top/soc_virtual_sequence.sv(539) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/s02_masters_load_bram_vseq : xil_defaultlib.soc_package/\soc_package s02_masters_load_bram_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#562@ | ./../tb/top/soc_virtual_sequence.sv(562) |      0 |      0 |
+    | @IMM_ASSERT#567@ | ./../tb/top/soc_virtual_sequence.sv(567) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/s04_master_bram_vseq : xil_defaultlib.soc_package/\soc_package s04_master_bram_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#586@ | ./../tb/top/soc_virtual_sequence.sv(586) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/s04_master_bram_4kb_vseq : xil_defaultlib.soc_package/\soc_package s04_master_bram_4kb_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#607@ | ./../tb/top/soc_virtual_sequence.sv(607) |      0 |      0 |
+    | @IMM_ASSERT#612@ | ./../tb/top/soc_virtual_sequence.sv(612) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/s04_master_axi4_mem_vseq : xil_defaultlib.soc_package/\soc_package s04_master_axi4_mem_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#657@ | ./../tb/top/soc_virtual_sequence.sv(657) |      0 |      0 |
+    | @IMM_ASSERT#662@ | ./../tb/top/soc_virtual_sequence.sv(662) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/s04_master_out_of_order_vseq : xil_defaultlib.soc_package/\soc_package s04_master_out_of_order_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 5 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#687@ | ./../tb/top/soc_virtual_sequence.sv(687) |      0 |      0 |
+    | @IMM_ASSERT#700@ | ./../tb/top/soc_virtual_sequence.sv(700) |      0 |      0 |
+    | @IMM_ASSERT#705@ | ./../tb/top/soc_virtual_sequence.sv(705) |      0 |      0 |
+    | @IMM_ASSERT#711@ | ./../tb/top/soc_virtual_sequence.sv(711) |      0 |      0 |
+    | @IMM_ASSERT#716@ | ./../tb/top/soc_virtual_sequence.sv(716) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/s04_master_interleaving_vseq : xil_defaultlib.soc_package/\soc_package s04_master_interleaving_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 5 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#754@ | ./../tb/top/soc_virtual_sequence.sv(754) |      0 |      0 |
+    | @IMM_ASSERT#775@ | ./../tb/top/soc_virtual_sequence.sv(775) |      0 |      0 |
+    | @IMM_ASSERT#781@ | ./../tb/top/soc_virtual_sequence.sv(781) |      0 |      0 |
+    | @IMM_ASSERT#788@ | ./../tb/top/soc_virtual_sequence.sv(788) |      0 |      0 |
+    | @IMM_ASSERT#794@ | ./../tb/top/soc_virtual_sequence.sv(794) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/s04_master_axi_wrap_vseq : xil_defaultlib.soc_package/\soc_package s04_master_axi_wrap_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#828@ | ./../tb/top/soc_virtual_sequence.sv(828) |      0 |      0 |
+    | @IMM_ASSERT#833@ | ./../tb/top/soc_virtual_sequence.sv(833) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - /\package xil_defaultlib.soc_package\/concurrent_diff_slaves_vseq : xil_defaultlib.soc_package/\soc_package concurrent_diff_slaves_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE LOCAL: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#950@ | ./../tb/top/soc_virtual_sequence.sv(950) |      0 |      0 |
+    =================================================================================
+
+
++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++       DESIGN UNITS      ++++++++++
++++++++++++++++++++++++++++++++++++++++++++++
+
+
+CUMULATIVE SUMMARY
+============================================
+|   Coverage Type    | Weight | Hits/Total |
+============================================
+| Assertion Coverage |      1 |     1.449% |
+|--------------------|--------|------------|
+| Assertions         |        |    4 / 138 |
+| Covers             |        |      0 / 1 |
+============================================
+CUMULATIVE DESIGN-BASED COVERAGE: 1.449%
+COVERED DESIGN UNITS: 2 / 59
+FILES: 7
+
+
+INTERFACE - xil_defaultlib.axi4_tb_intf
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |    50.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      2 / 2 |
+    | Covers             |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 50.000%
+
+
+    ASSERTION COVERAGE
+    ===============================================================================
+    |          Name          |              Source              | Failed | Passed |
+    |------------------------|----------------------------------|--------|--------|
+    | axi4_aw_valid_assert   | ./../tb/top/axi4_tb_intf.sv(105) |      0 |     16 |
+    | axi4_aw_payload_stable | ./../tb/top/axi4_tb_intf.sv(117) |      0 |     16 |
+    ===============================================================================
+
+
+    COVER COVERAGE
+    =====================================================================
+    |          Name           |              Source              | Hits |
+    |-------------------------|----------------------------------|------|
+    | read_ooo_cover_property | ./../tb/top/axi4_tb_intf.sv(129) |    0 |
+    =====================================================================
+
+
+INTERFACE - xil_defaultlib.axi4_lite_tb_intf
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |   100.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      1 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 100.000%
+
+
+    ASSERTION COVERAGE
+    ==========================================================================
+    |     Name     |                Source                 | Failed | Passed |
+    |--------------|---------------------------------------|--------|--------|
+    | @ASSERT#109@ | ./../tb/top/axi4_lite_tb_intf.sv(109) |      0 |    123 |
+    ==========================================================================
+
+
+CLASS - xil_defaultlib.cpu_package/\cpu_package axi_base_sequence_item \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |     0 / 11 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================
+    |       Name       |                    Source                     | Failed | Passed |
+    |------------------|-----------------------------------------------|--------|--------|
+    | @IMM_ASSERT#431@ | ./../tb/common/axi_base_sequence_item.sv(431) |      0 |      0 |
+    | @IMM_ASSERT#432@ | ./../tb/common/axi_base_sequence_item.sv(432) |      0 |      0 |
+    | @IMM_ASSERT#433@ | ./../tb/common/axi_base_sequence_item.sv(433) |      0 |      0 |
+    | @IMM_ASSERT#434@ | ./../tb/common/axi_base_sequence_item.sv(434) |      0 |      0 |
+    | @IMM_ASSERT#436@ | ./../tb/common/axi_base_sequence_item.sv(436) |      0 |      0 |
+    | @IMM_ASSERT#437@ | ./../tb/common/axi_base_sequence_item.sv(437) |      0 |      0 |
+    | @IMM_ASSERT#439@ | ./../tb/common/axi_base_sequence_item.sv(439) |      0 |      0 |
+    | @IMM_ASSERT#440@ | ./../tb/common/axi_base_sequence_item.sv(440) |      0 |      0 |
+    | @IMM_ASSERT#441@ | ./../tb/common/axi_base_sequence_item.sv(441) |      0 |      0 |
+    | @IMM_ASSERT#442@ | ./../tb/common/axi_base_sequence_item.sv(442) |      0 |      0 |
+    | @IMM_ASSERT#445@ | ./../tb/common/axi_base_sequence_item.sv(445) |      0 |      0 |
+    ======================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg axi_base_seq_item \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |     0 / 11 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ===========================================================================================================================
+    |       Name       |                                       Source                                       | Failed | Passed |
+    |------------------|------------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#326@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(326) |      0 |      0 |
+    | @IMM_ASSERT#327@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(327) |      0 |      0 |
+    | @IMM_ASSERT#328@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(328) |      0 |      0 |
+    | @IMM_ASSERT#329@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(329) |      0 |      0 |
+    | @IMM_ASSERT#331@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(331) |      0 |      0 |
+    | @IMM_ASSERT#332@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(332) |      0 |      0 |
+    | @IMM_ASSERT#334@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(334) |      0 |      0 |
+    | @IMM_ASSERT#335@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(335) |      0 |      0 |
+    | @IMM_ASSERT#336@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(336) |      0 |      0 |
+    | @IMM_ASSERT#337@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(337) |      0 |      0 |
+    | @IMM_ASSERT#340@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/axi_base_sequence_item.sv(340) |      0 |      0 |
+    ===========================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg btt_1_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |      Name       |                                   Source                                   | Failed | Passed |
+    |-----------------|----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#62@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(62) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg keyhole_read_inc_wr_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#164@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(164) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg keyhole_write_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#189@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(189) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg simple_mode_slave_err_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#233@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(233) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg decode_error_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#263@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(263) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg simple_inc_4k \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#289@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(289) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg simple_mode_inc4kcross \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#311@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(311) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg fixed_btt_4k \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |        Name        |                                   Source                                    | Failed | Passed |
+    |--------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#336_1@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(336) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg decode_err_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#420@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(420) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg multiple_trans_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#476@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(476) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg multiple_trans_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#505@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(505) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg max_btt_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#599@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(599) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_fixed_read_inc_wr_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#690@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(690) |      0 |      0 |
+    | @IMM_ASSERT#696@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(696) |      0 |      0 |
+    | @IMM_ASSERT#698@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(698) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_inc_read_fixed_wr_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#730@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(730) |      0 |      0 |
+    | @IMM_ASSERT#736@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(736) |      0 |      0 |
+    | @IMM_ASSERT#738@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(738) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_fixed_rd_wr_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#770@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(770) |      0 |      0 |
+    | @IMM_ASSERT#776@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(776) |      0 |      0 |
+    | @IMM_ASSERT#778@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(778) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_mode_inc_random_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#813@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(813) |      0 |      0 |
+    | @IMM_ASSERT#819@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(819) |      0 |      0 |
+    | @IMM_ASSERT#821@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(821) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_threshold_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#853@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(853) |      0 |      0 |
+    | @IMM_ASSERT#859@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(859) |      0 |      0 |
+    | @IMM_ASSERT#861@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(861) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg delay_interrupt_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#899@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(899) |      0 |      0 |
+    | @IMM_ASSERT#905@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(905) |      0 |      0 |
+    | @IMM_ASSERT#907@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(907) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_internal_error_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#957@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(957) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_decode_err_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |       Name       |                                   Source                                    | Failed | Passed |
+    |------------------|-----------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#986@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(986) |      0 |      0 |
+    | @IMM_ASSERT#991@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(991) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_mode_decode_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1022@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1022) |      0 |      0 |
+    | @IMM_ASSERT#1029@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1029) |      0 |      0 |
+    | @IMM_ASSERT#1031@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1031) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_slave_error_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1064@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1064) |      0 |      0 |
+    | @IMM_ASSERT#1071@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1071) |      0 |      0 |
+    | @IMM_ASSERT#1073@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1073) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_dma_internal_error_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1105@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1105) |      0 |      0 |
+    | @IMM_ASSERT#1112@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1112) |      0 |      0 |
+    | @IMM_ASSERT#1114@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1114) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_mode_slave_error_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1146@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1146) |      0 |      0 |
+    | @IMM_ASSERT#1153@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1153) |      0 |      0 |
+    | @IMM_ASSERT#1155@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1155) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_dma_decode_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1186@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1186) |      0 |      0 |
+    | @IMM_ASSERT#1193@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1193) |      0 |      0 |
+    | @IMM_ASSERT#1195@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1195) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg cyclic_bd_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1254@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1254) |      0 |      0 |
+    | @IMM_ASSERT#1261@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1261) |      0 |      0 |
+    | @IMM_ASSERT#1263@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1263) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg fixed_trans_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1362@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1362) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg back_to_back_sg_mode_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 6 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ======================================================================================================================
+    |       Name        |                                    Source                                    | Failed | Passed |
+    |-------------------|------------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#1384@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1384) |      0 |      0 |
+    | @IMM_ASSERT#1394@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1394) |      0 |      0 |
+    | @IMM_ASSERT#1396@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1396) |      0 |      0 |
+    | @IMM_ASSERT#1407@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1407) |      0 |      0 |
+    | @IMM_ASSERT#1411@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1411) |      0 |      0 |
+    | @IMM_ASSERT#1413@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_master_agent/master_sequence.sv(1413) |      0 |      0 |
+    ======================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg base_slave_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ================================================================================================================
+    |      Name       |                                  Source                                  | Failed | Passed |
+    |-----------------|--------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#41@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(41) |      0 |      0 |
+    | @IMM_ASSERT#59@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(59) |      0 |      0 |
+    ================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg slave_error_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#97@  | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(97)  |      0 |      0 |
+    | @IMM_ASSERT#114@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(114) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg slave_err_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#152@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(152) |      0 |      0 |
+    | @IMM_ASSERT#169@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(169) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg decode_err_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#208@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(208) |      0 |      0 |
+    | @IMM_ASSERT#225@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(225) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg decode_err_sequence_1 \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |        Name        |                                  Source                                   | Failed | Passed |
+    |--------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#263_1@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(263) |      0 |      0 |
+    | @IMM_ASSERT#280@   | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(280) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_slave_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ====================================================================================================================
+    |        Name        |                                  Source                                   | Failed | Passed |
+    |--------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#328_1@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(328) |      0 |      0 |
+    | @IMM_ASSERT#352@   | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(352) |      0 |      0 |
+    ====================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_decode_err_slave_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#398@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(398) |      0 |      0 |
+    | @IMM_ASSERT#418@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(418) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_decode_err_slave_seq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#464@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(464) |      0 |      0 |
+    | @IMM_ASSERT#487@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(487) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_slave_error_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#532@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(532) |      0 |      0 |
+    | @IMM_ASSERT#552@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(552) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - xil_defaultlib.axi_cdma_env_pkg/\axi_cdma_env_pkg sg_slave_err_sequence \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ==================================================================================================================
+    |       Name       |                                  Source                                   | Failed | Passed |
+    |------------------|---------------------------------------------------------------------------|--------|--------|
+    | @IMM_ASSERT#598@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(598) |      0 |      0 |
+    | @IMM_ASSERT#618@ | ./../tb/ips_core/axi_cdma_env/axi_cdma_slave_agent/slave_sequence.sv(618) |      0 |      0 |
+    ==================================================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package soc_master_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |   100.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      1 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 100.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#118@ | ./../tb/top/soc_virtual_sequence.sv(118) |      0 |      1 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package intc_stress_lite_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#316@ | ./../tb/top/soc_virtual_sequence.sv(316) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package intc_stress_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ===================================================================================
+    |        Name        |                  Source                  | Failed | Passed |
+    |--------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#335_1@ | ./../tb/top/soc_virtual_sequence.sv(335) |      0 |      0 |
+    ===================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package wrap_burst_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#353@ | ./../tb/top/soc_virtual_sequence.sv(353) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package masters_load_bram_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#375@ | ./../tb/top/soc_virtual_sequence.sv(375) |      0 |      0 |
+    | @IMM_ASSERT#379@ | ./../tb/top/soc_virtual_sequence.sv(379) |      0 |      0 |
+    | @IMM_ASSERT#383@ | ./../tb/top/soc_virtual_sequence.sv(383) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package masters_load_lite_mem_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 3 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#408@ | ./../tb/top/soc_virtual_sequence.sv(408) |      0 |      0 |
+    | @IMM_ASSERT#412@ | ./../tb/top/soc_virtual_sequence.sv(412) |      0 |      0 |
+    | @IMM_ASSERT#416@ | ./../tb/top/soc_virtual_sequence.sv(416) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package master_starve_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    ===================================================================================
+    |        Name        |                  Source                  | Failed | Passed |
+    |--------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#441_1@ | ./../tb/top/soc_virtual_sequence.sv(441) |      0 |      0 |
+    | @IMM_ASSERT#449@   | ./../tb/top/soc_virtual_sequence.sv(449) |      0 |      0 |
+    ===================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package gpio_check_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#501@ | ./../tb/top/soc_virtual_sequence.sv(501) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package gpio_reg_config_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#533@ | ./../tb/top/soc_virtual_sequence.sv(533) |      0 |      0 |
+    | @IMM_ASSERT#539@ | ./../tb/top/soc_virtual_sequence.sv(539) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package s02_masters_load_bram_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#562@ | ./../tb/top/soc_virtual_sequence.sv(562) |      0 |      0 |
+    | @IMM_ASSERT#567@ | ./../tb/top/soc_virtual_sequence.sv(567) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package s04_master_bram_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#586@ | ./../tb/top/soc_virtual_sequence.sv(586) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package s04_master_bram_4kb_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#607@ | ./../tb/top/soc_virtual_sequence.sv(607) |      0 |      0 |
+    | @IMM_ASSERT#612@ | ./../tb/top/soc_virtual_sequence.sv(612) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package s04_master_axi4_mem_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#657@ | ./../tb/top/soc_virtual_sequence.sv(657) |      0 |      0 |
+    | @IMM_ASSERT#662@ | ./../tb/top/soc_virtual_sequence.sv(662) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package s04_master_out_of_order_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 5 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#687@ | ./../tb/top/soc_virtual_sequence.sv(687) |      0 |      0 |
+    | @IMM_ASSERT#700@ | ./../tb/top/soc_virtual_sequence.sv(700) |      0 |      0 |
+    | @IMM_ASSERT#705@ | ./../tb/top/soc_virtual_sequence.sv(705) |      0 |      0 |
+    | @IMM_ASSERT#711@ | ./../tb/top/soc_virtual_sequence.sv(711) |      0 |      0 |
+    | @IMM_ASSERT#716@ | ./../tb/top/soc_virtual_sequence.sv(716) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package s04_master_interleaving_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 5 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#754@ | ./../tb/top/soc_virtual_sequence.sv(754) |      0 |      0 |
+    | @IMM_ASSERT#775@ | ./../tb/top/soc_virtual_sequence.sv(775) |      0 |      0 |
+    | @IMM_ASSERT#781@ | ./../tb/top/soc_virtual_sequence.sv(781) |      0 |      0 |
+    | @IMM_ASSERT#788@ | ./../tb/top/soc_virtual_sequence.sv(788) |      0 |      0 |
+    | @IMM_ASSERT#794@ | ./../tb/top/soc_virtual_sequence.sv(794) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package s04_master_axi_wrap_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 2 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#828@ | ./../tb/top/soc_virtual_sequence.sv(828) |      0 |      0 |
+    | @IMM_ASSERT#833@ | ./../tb/top/soc_virtual_sequence.sv(833) |      0 |      0 |
+    =================================================================================
+
+
+CLASS - xil_defaultlib.soc_package/\soc_package concurrent_diff_slaves_vseq \
+
+
+    SUMMARY
+    ============================================
+    |   Coverage Type    | Weight | Hits/Total |
+    ============================================
+    | Assertion Coverage |      1 |     0.000% |
+    |--------------------|--------|------------|
+    | Assertions         |        |      0 / 1 |
+    ============================================
+    WEIGHTED AVERAGE: 0.000%
+
+
+    ASSERTION COVERAGE
+    =================================================================================
+    |       Name       |                  Source                  | Failed | Passed |
+    |------------------|------------------------------------------|--------|--------|
+    | @IMM_ASSERT#950@ | ./../tb/top/soc_virtual_sequence.sv(950) |      0 |      0 |
+    =================================================================================
+
+

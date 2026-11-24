@@ -37,10 +37,11 @@ endclass
 
 class gpio_slave_responder_seq extends uvm_sequence #(gpio_slave_seq_item);
     `uvm_object_utils(gpio_slave_responder_seq)
-
     function new(string name = "gpio_slave_responder_seq");
         super.new(name);
     endfunction
+
+    rand bit [31:0] gpio_out_slv;
 
     task body();
         gpio_slave_seq_item resp_item;
@@ -52,7 +53,7 @@ class gpio_slave_responder_seq extends uvm_sequence #(gpio_slave_seq_item);
         start_item(resp_item);
 
         if (!resp_item.randomize() with {
-            gpio_out  == 'h1000_0000;
+            gpio_out  == gpio_out_slv;
         }) begin
             `uvm_fatal(get_type_name(),"Constrained randomization failed for resp_item")
         end

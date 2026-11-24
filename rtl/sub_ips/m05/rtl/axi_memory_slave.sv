@@ -217,3 +217,31 @@ module axi4_memory_unit #(
     end
 
 endmodule
+
+/*
+    logic [AXI_DW-1:0] rdata_reg;
+    assign s_axi4_intf.RDATA = rdata_reg;
+
+    always @(posedge s_axi4_intf.ACLK) begin
+        if (r_state == R_IDLE && s_axi4_intf.ARVALID) begin
+            // Pre-fetch the first beat directly from ARADDR so it is ready for cycle 1
+            if (in_range(s_axi4_intf.ARADDR)) begin
+                for (int b = 0; b < AXI_SW; b++) begin
+                    rdata_reg[b*8 +: 8] <= mem[bus_base(s_axi4_intf.ARADDR) + b];
+                end
+            end else begin
+                rdata_reg <= '0;
+            end
+        end else if (r_state == R_DATA && s_axi4_intf.RREADY) begin
+            // Fetch subsequent beats by calculating the next address early
+            logic [AXI_AW-1:0] next_a = next_addr(r_addr, r_total_len, r_size, r_burst);
+            if (in_range(next_a)) begin
+                for (int b = 0; b < AXI_SW; b++) begin
+                    rdata_reg[b*8 +: 8] <= mem[bus_base(next_a) + b];
+                end
+            end else begin
+                rdata_reg <= '0;
+            end
+        end
+    end
+    */

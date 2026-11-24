@@ -94,14 +94,40 @@ interface axi4_tb_intf();
     modport MONITOR_MOD (clocking axi4_mon_cb, input ACLK, input ARESETn);
     modport DRIVER_MOD (clocking axi4_drv_cb, input ACLK, input ARESETn);
 
-    property awvalid_assert;
+// Assertions:
+    // valid study till ready asserts
+    property aw_valid_assert;
         logic[ID_WIDTH-1:0] id;
     
         @(posedge ACLK) disable iff (!ARESETn)
         ((AWVALID && !AWREADY),id = AWID) |=> (AWVALID && (AWID == id));
     endproperty
-    assert property (awvalid_assert)
+    axi4_aw_valid_assert:assert property (aw_valid_assert)
         else $error("AWVALID deasserted before AWREADY");
+
+    // payload stable
+    property aw_payload_stable;
+        logic [ID_WIDTH-1:0] id;
+        @(posedge ACLK) disable iff (!ARESETn)
+        ((AWVALID && !AWREADY), id = AWID) |=>
+            (AWID == id)     && $stable(AWADDR)  && $stable(AWLEN)  &&
+            $stable(AWSIZE)  && $stable(AWBURST) && $stable(AWPROT) &&
+            $stable(AWCACHE) && $stable(AWLOCK);
+    endproperty
+    axi4_aw_payload_stable:assert property (aw_payload_stable)
+        else $error("AW payload changed while AWVALID held");    
+/*
+    // OoO cover property
+    property read_ooo_property;
+        logic [ID_WIDTH-1:0] id_i1, id_i2;
+
+        @(posedge ACLK) disable iff (!ARESETn)
+        ((ARVALID && ARREADY), id_i1 = ARID)##[1:$]
+        ((ARVALID && ARREADY), id_i2 = ARID)##[1:$]
+        (RVALID && RDATA && RLAST && (RID == id_i2));
+    endproperty
+    read_ooo_cover_property:cover property (read_ooo_property);
+*/
 endinterface
 
 

@@ -19,7 +19,8 @@ vlog -work axi_intf "../rtl/sub_ips/axi_intf/rtl/axi_intf.sv" \
 vlog -work axi4_lite_mem "../rtl/sub_ips/axi4_lite_memory_unit/rtl/axi4_lite_intf.sv" \
 "../rtl/sub_ips/axi4_lite_memory_unit/rtl/axi4_lite_memory_unit.sv"
 
-vlog -work axi4_mem "../rtl/sub_ips/m05/rtl/axi_memory_slave.sv"
+vlog -work axi4_mem "../rtl/sub_ips/m05/rtl/mem_slave.sv"
+//vlog -work axi4_mem "../rtl/sub_ips/m05/rtl/axi_memory_slave.sv"
 
 vlog -work core_perif -v2k5 "../rtl/sub_ips/core_perif/rtl/src_v/uart_lite_defs.v" \
 "../rtl/sub_ips/core_perif/rtl/src_v/uart_lite.v" \

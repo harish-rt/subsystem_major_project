@@ -73,8 +73,8 @@ module core_wrapper
   output         ext3_cfg_wvalid_o,
   input          ext3_irq_i,
 
-  output rsta_busy_0,
-  output rstb_busy_0,
+  output         rsta_busy_0,
+  output         rstb_busy_0,
 
   ////S00
   //axi4_lite_intf    inst_bridge2axi_int,

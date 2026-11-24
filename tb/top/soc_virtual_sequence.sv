@@ -228,20 +228,6 @@ class perif_reg_read_vseq extends soc_base_virtual_sequence;
     endtask
 endclass : perif_reg_read_vseq
 
-class uart_write_data_vseq extends soc_base_virtual_sequence;
-    `uvm_object_utils(uart_write_data_vseq)
-    `NEW_OBJ
-
-    uart_write_data_seq uart_seq;
-
-    task body();
-        uart_seq    = uart_write_data_seq::type_id::create("uart_seq");
-        `uvm_info("uart_seq", "Starting uart PERIF vsequence...", UVM_LOW)
-        uart_seq.start(p_sequencer.s00_sqr);
-        `uvm_info("uart_seq", "uart PERIF vsequence complete.", UVM_LOW)
-    endtask
-endclass : uart_write_data_vseq
-
 `define GAPS_SEQ(VSEQ_NAME,SEQ_NAME)\
 class VSEQ_NAME extends soc_base_virtual_sequence;\
     `uvm_object_utils(VSEQ_NAME)\
@@ -283,30 +269,6 @@ class interconnect_gaps_vseq extends soc_base_virtual_sequence;
     endtask
 endclass:interconnect_gaps_vseq
 
-class core_perif_master_vseq extends soc_base_virtual_sequence;
-    `uvm_object_utils(core_perif_master_vseq)
-    `NEW_OBJ
-
-    cpu_config_intc_seq     intc_seq;
-    uart_write_data_vseq    uart_vseq;
-    cpu_isr_vseq            isr_vseq;
-
-    task body();
-        super.body();
-
-        isr_vseq    = cpu_isr_vseq         ::type_id::create("isr_vseq");
-        uart_vseq   = uart_write_data_vseq ::type_id::create("uart_vseq");
-        intc_seq    = cpu_config_intc_seq  ::type_id::create("intc_seq");
-        
-        intc_seq.core_en = 1;
-      
-        uart_vseq.start(p_sequencer);
-        intc_seq.start(p_sequencer.s00_sqr);
-        //isr_clear();    // waits for irq down before ending core_perif_master_vseq
-    endtask
-endclass : core_perif_master_vseq
-
-//`GAPS_SEQ(spi_write_data_vseq, spi_write_data_seq)
 
 class spi_write_data_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(spi_write_data_vseq)
@@ -397,59 +359,6 @@ class wrap_burst_vseq extends soc_base_virtual_sequence;
     endtask
 endclass : wrap_burst_vseq
 
-class uart_slave_vseq extends soc_base_virtual_sequence;
-    `uvm_object_utils(uart_slave_vseq)
-    `NEW_OBJ
-    uart_slave_sequence uart_seq;
-
-    task body();
-        super.body();
-        uart_seq = uart_slave_sequence::type_id::create("uart_seq");
-
-        uart_seq.start(p_sequencer.uart_sqr);
-    endtask
-endclass : uart_slave_vseq
-
-class concurrent_diff_slaves_vseq extends soc_base_virtual_sequence;
-    `uvm_object_utils(concurrent_diff_slaves_vseq)
-    `NEW_OBJ
-
-    intc_stress_vseq        lite_vseq;  // s04
-    uart_write_data_vseq    uart_vseq;  // s02
-    load_mem_lite_seq       bram_seq;   // s00
-    uart_slave_vseq         slv_vseq;   // uart
-    cpu_config_intc_seq     intc_seq;   // s02
-    cpu_isr_vseq            isr_vseq;   // s00
-
-    task body();
-        super.body();
-        lite_vseq = intc_stress_vseq::type_id::create("lite_vseq");
-        uart_vseq = uart_write_data_vseq::type_id::create("uart_vseq");
-        bram_seq  = load_mem_lite_seq::type_id::create("bram_seq");
-        slv_vseq  = uart_slave_vseq::type_id::create("slv_vseq");
-
-        intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
-        isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
-        intc_seq.core_en = 1;
-        fork
-            isr_vseq.start(p_sequencer);
-        join_none
-
-        assert(bram_seq.randomize() with {
-            addr    == {BRAM_BASE + $urandom_range(100,1000)};
-            beats   == 10;
-        });
-
-        fork
-            lite_vseq.start(p_sequencer);
-            bram_seq.start(p_sequencer.s00_sqr);
-            uart_vseq.start(p_sequencer);
-            slv_vseq.start(p_sequencer);
-        join
-        intc_seq.start(p_sequencer.s02_sqr);
-        isr_clear();
-    endtask
-endclass : concurrent_diff_slaves_vseq
 
 class masters_load_bram_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(masters_load_bram_vseq)
@@ -589,6 +498,9 @@ class gpio_check_vseq extends soc_base_virtual_sequence;
         fork
             isr_vseq.start(p_sequencer);
         join_none
+        assert(s_gpio_seq.randomize() with {
+            gpio_out_slv == 'h1001_0000;
+        });
         fork
             intc_seq.start(p_sequencer.s02_sqr);
             m_gpio_seq.start(p_sequencer.s00_sqr);
@@ -598,6 +510,43 @@ class gpio_check_vseq extends soc_base_virtual_sequence;
     endtask
 endclass : gpio_check_vseq
 
+class gpio_reg_config_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(gpio_reg_config_vseq)
+    `NEW_OBJ
+
+    gpio_reg_config_seq         m_gpio_seq;
+    gpio_slave_responder_seq    s_gpio_seq;
+    cpu_config_intc_seq         intc_seq;   // s02
+    cpu_isr_vseq                isr_vseq;   // s00
+
+    task body();
+        m_gpio_seq = gpio_reg_config_seq::type_id::create("m_gpio_seq");
+        s_gpio_seq = gpio_slave_responder_seq::type_id::create("s_gpio_seq");
+        intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
+        intc_seq.core_en = 1;
+
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+
+        assert(m_gpio_seq.randomize() with {
+            gpio_mode       == 'hffff_ffff;
+            gpio_level      == 'hffff_ffff;
+            gpio_mask       == 'h0001_0000;
+            gpio_direction  == 'h7ffe_ffff;
+        });
+        assert(s_gpio_seq.randomize() with {
+            gpio_out_slv == 'h8001_0000;
+        });
+        fork
+            intc_seq.start(p_sequencer.s02_sqr);
+            m_gpio_seq.start(p_sequencer.s00_sqr);
+            s_gpio_seq.start(p_sequencer.gpio_sqr);
+        join
+        isr_clear();
+    endtask
+endclass : gpio_reg_config_vseq
 
 class s02_masters_load_bram_vseq extends soc_base_virtual_sequence;
     `uvm_object_utils(s02_masters_load_bram_vseq)
@@ -909,3 +858,107 @@ class s00_master_outstanding_vseq extends soc_base_virtual_sequence;
         s00_seq.start(p_sequencer.s00_sqr);
     endtask
 endclass : s00_master_outstanding_vseq
+
+class uart_slave_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(uart_slave_vseq)
+    `NEW_OBJ
+    uart_slave_sequence uart_seq;
+
+    task body();
+        super.body();
+        uart_seq = uart_slave_sequence::type_id::create("uart_seq");
+
+        uart_seq.start(p_sequencer.uart_sqr);
+    endtask
+endclass : uart_slave_vseq
+
+class uart_write_data_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(uart_write_data_vseq)
+    `NEW_OBJ
+
+    uart_write_data_seq     uart_seq;   // s00
+    uart_slave_vseq         slv_vseq;   // uart
+    cpu_config_intc_seq     intc_seq;   // s02
+    cpu_isr_vseq            isr_vseq;   // s00
+
+    task body();
+        uart_seq = uart_write_data_seq  ::type_id::create("uart_seq");
+        slv_vseq = uart_slave_vseq      ::type_id::create("slv_vseq");
+        intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
+        intc_seq.core_en = 1;
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+        intc_seq.start(p_sequencer.s02_sqr);
+        fork
+            uart_seq.start(p_sequencer.s00_sqr);
+            slv_vseq.start(p_sequencer);
+        join
+        isr_clear();
+    endtask
+endclass : uart_write_data_vseq
+
+class core_perif_master_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(core_perif_master_vseq)
+    `NEW_OBJ
+
+    cpu_config_intc_seq     intc_seq;
+    uart_write_data_vseq    uart_vseq;
+    cpu_isr_vseq            isr_vseq;
+
+    task body();
+        super.body();
+
+        isr_vseq    = cpu_isr_vseq         ::type_id::create("isr_vseq");
+        uart_vseq   = uart_write_data_vseq ::type_id::create("uart_vseq");
+        intc_seq    = cpu_config_intc_seq  ::type_id::create("intc_seq");
+        
+        intc_seq.core_en = 1;
+      
+        uart_vseq.start(p_sequencer);
+        intc_seq.start(p_sequencer.s00_sqr);
+        //isr_clear();    // waits for irq down before ending core_perif_master_vseq
+    endtask
+endclass : core_perif_master_vseq
+
+class concurrent_diff_slaves_vseq extends soc_base_virtual_sequence;
+    `uvm_object_utils(concurrent_diff_slaves_vseq)
+    `NEW_OBJ
+
+    intc_stress_vseq        lite_vseq;  // s04
+    uart_write_data_vseq    uart_vseq;  // s02
+    uart_slave_vseq         slv_vseq;   // uart
+    load_mem_lite_seq       bram_seq;   // s02
+    cpu_config_intc_seq     intc_seq;   // s02
+    cpu_isr_vseq            isr_vseq;   // s00
+
+    task body();
+        super.body();
+        lite_vseq = intc_stress_vseq::type_id::create("lite_vseq");
+        uart_vseq = uart_write_data_vseq::type_id::create("uart_vseq");
+        bram_seq  = load_mem_lite_seq::type_id::create("bram_seq");
+        slv_vseq  = uart_slave_vseq::type_id::create("slv_vseq");
+
+        intc_seq = cpu_config_intc_seq  ::type_id::create("intc_seq");
+        isr_vseq = cpu_isr_vseq         ::type_id::create("isr_vseq");
+        intc_seq.core_en = 1;
+        fork
+            isr_vseq.start(p_sequencer);
+        join_none
+
+        assert(bram_seq.randomize() with {
+            addr    == {BRAM_BASE + $urandom_range(100,1000)};
+            beats   == 10;
+        });
+
+        intc_seq.start(p_sequencer.s02_sqr);
+        fork
+            lite_vseq.start(p_sequencer);
+            bram_seq.start(p_sequencer.s02_sqr);
+            uart_vseq.start(p_sequencer);
+            slv_vseq.start(p_sequencer);
+        join
+        isr_clear();
+    endtask
+endclass : concurrent_diff_slaves_vseq

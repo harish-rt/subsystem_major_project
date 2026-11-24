@@ -6,7 +6,7 @@ echo "--- Starting UVM Simulation ---"
 #vsim -sv_seed random +access +rwc -dbg +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJECTION_TRACE
 #vsim -sv_seed random +access +rwc -dbg +m+top -acdb +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJECTION_TRACE
 
-vsim -sv_seed random +access +rwc +dbg +m+top +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJECTION_TRACE \
+vsim +TraceAssert -sv_seed random +access +rwc +dbg +m+top -acdb -acdb_cov ta +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJECTION_TRACE \
 -L unisims_ver -L unimacro_ver -L secureip \
 -L xpm \
 -L generic_baseblocks_v2_1_0 \
@@ -39,11 +39,18 @@ vsim -sv_seed random +access +rwc +dbg +m+top +UVM_VERBOSITY=UVM_DEBUG +UVM_OBJE
 -O0 xil_defaultlib.top core_ip_wraps.glbl \
 -l sim_txt.log
 do waves.tcl
+add wave -recursive /top/axi4_bram_if/*
+assertion fail -log on
+toggle -rec -verbose /top/dut/*
 run -all
-acdb save -o my_assertions.acdb
+assertion report
+acdb save -o ss_cov.acdb
+acdb report -cov a -txt -i ss_cov.acdb -o assert_report.txt
+acdb report -cov t -html -i ss_cov.acdb -o toggle_report_html
 quit
-#transcript to
 
+#transcript to
+#acdb report -cov a -html -i ss_cov.acdb -o assert_report_html
 #add wave -recursive /top/dut/CORE_PERIF_CTRL/u_intc/*
 #add wave -recursive /top/dut/CORE_PERIF_CTRL/u_spi/*
 #add wave -recursive /top/dut/CORE_PERIF_CTRL/u_gpio/*

@@ -49,7 +49,8 @@ class wrapper_env extends uvm_env;
         c_env.s04_agt.mon.mon_ap.connect(sbd.s04_af.analysis_export);
         m_env.mem_agt.mem_mon.mon_ap.connect(sbd.mem_af.analysis_export);
         ips_env.cdma_env.m_agt[0].mon.mon_ap.connect(sbd.cdma_m_af.analysis_export);
-        ips_env.intc_env.lite_intc_agt.mon.mon_ap.connect(sbd.intc_af.analysis_export);
+        ips_env.intc_env.lite_intc_agt.mon.mon_ap.connect(sbd.lite_intc_af.analysis_export);
+        ips_env.intc_env.intc_agt.mon.resp_ap.connect(sbd.intc_af.analysis_export);
         cp_env.lite_mon.mon_ap.connect(sbd.core_perif_af.analysis_export);
     endfunction
 endclass

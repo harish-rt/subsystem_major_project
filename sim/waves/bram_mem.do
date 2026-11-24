@@ -46,5 +46,9 @@ add wave -vgroup {BRAM/R_Channel} \
     /top/axi4_bram_if/RVALID \
     /top/axi4_bram_if/RREADY
 
+add wave -vgroup {BRAM/RST_BUSY_SIGNALS} \
+    /top/dut/rsta_busy_0 \
+    /top/dut/rstb_busy_0
+
 wv.time.unit.auto.set
 wv.zoom.fit

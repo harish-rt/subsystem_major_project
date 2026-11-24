@@ -507,16 +507,17 @@ module top;
     assign mem_intf.WVALID  = dut.AXI_SLAVE_MEM.s_axi_intf.WVALID;   
 
     initial begin
+        //run_test("gpio_reg_config_test");
         //run_test("s00_master_outstanding_test");
         //run_test("s04_master_axi_wrap_test");
         //run_test("s04_master_interleaving_test");
-        //run_test("s04_master_out_of_order_test");
+        run_test("s04_master_out_of_order_test");
         //run_test("s04_master_axi4_mem_test");
         //run_test("s04_master_outstanding_test");
         //run_test("s04_master_bram_4kb_test");
         //run_test("s04_master_bram_test");
         //run_test("s02_masters_load_bram_test");
-        run_test("gpio_check_test");
+        //run_test("gpio_check_test");
         //run_test("timer_reg_access_test");
         //run_test("masters_load_lite_mem_test");
         //run_test("masters_load_bram_test");
@@ -734,4 +735,18 @@ module top;
         $finish();
     end
 */
+axi_read_checker
+    u_axi_read_ooo_checker (
+    .ACLK    (slave_if.ACLK),
+    .ARESETn (slave_if.ARESETn),
+
+    .ARVALID (slave_if.ARVALID),
+    .ARREADY (slave_if.ARREADY),
+    .ARID    (slave_if.ARID),
+
+    .RVALID  (slave_if.RVALID),
+    .RREADY  (slave_if.RREADY),
+    .RLAST   (slave_if.RLAST),
+    .RID     (slave_if.RID)
+);
 endmodule

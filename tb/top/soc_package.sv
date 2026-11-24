@@ -1,5 +1,5 @@
-`include "axi4_tb_intf.sv"
-`include "axi4_lite_tb_intf.sv"
+//`include "axi4_tb_intf.sv"
+//`include "axi4_lite_tb_intf.sv"
 package soc_package;
     `include "uvm_macros.svh"
     import uvm_pkg::*;
